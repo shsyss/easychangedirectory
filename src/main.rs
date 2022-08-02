@@ -1,5 +1,4 @@
-mod app;
-mod ui;
+use easychangedirectory::app;
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},

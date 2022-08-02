@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use tui::backend::Backend;
 use tui::Terminal;
 
-use crate::ui::ui;
+use crate::frame::ui;
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>) -> crossterm::Result<()> {
     let current_dir = env::current_dir()?;
