@@ -1,9 +1,6 @@
-use std::env;
-use std::io::{stdout, Write};
-
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use crossterm::queue;
-use crossterm::style::Print;
+use std::env;
+use std::path::PathBuf;
 use tui::backend::Backend;
 use tui::Terminal;
 
@@ -12,7 +9,6 @@ use crate::ui::ui;
 pub fn run<B: Backend>(terminal: &mut Terminal<B>) -> crossterm::Result<()> {
     let current_dir = env::current_dir()?;
     let mut pwd = env::current_dir()?;
-    let mut stdout = stdout();
     loop {
         terminal.draw(|f| ui(f, &pwd, &current_dir))?;
         if let Event::Key(key) = event::read()? {

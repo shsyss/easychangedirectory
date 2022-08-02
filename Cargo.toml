@@ -1,7 +1,11 @@
 [package]
-name = "fm"
+name = "easychangedirectory"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+path = "./src/main.rs"
+name = "ecd"
 
 [dependencies]
 crossterm = "0.24.0"
