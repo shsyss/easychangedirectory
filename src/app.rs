@@ -1,3 +1,4 @@
+use anyhow::bail;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
@@ -137,6 +138,7 @@ impl App {
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
+        // TODO: pwdのフォルダにカーソルを合わせる
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
         } else {
@@ -190,7 +192,7 @@ impl App {
     }
 }
 
-pub fn app() -> anyhow::Result<()> {
+pub fn app() -> anyhow::Result<PathBuf> {
     // setup terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -199,7 +201,10 @@ pub fn app() -> anyhow::Result<()> {
     let mut terminal = Terminal::new(backend)?;
 
     let app = App::new()?;
-    self::run(&mut terminal, app)?;
+    let path = match self::run(&mut terminal, app) {
+        Ok(path) => path,
+        Err(e) => bail!(e),
+    };
 
     // restore terminal
     disable_raw_mode()?;
@@ -210,20 +215,21 @@ pub fn app() -> anyhow::Result<()> {
     )?;
     terminal.show_cursor()?;
 
-    Ok(())
+    Ok(path)
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<()> {
+fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
+    let current = env::current_dir()?;
     loop {
         terminal.draw(|f| ui(f, &mut app))?;
         if let Event::Key(key) = event::read()? {
             match key.code {
                 // finish
-                KeyCode::Backspace => return Ok(()),
-                KeyCode::Esc => return Ok(()),
-                KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
+                KeyCode::Backspace => return Ok(current),
+                KeyCode::Esc => return Ok(current),
+                KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
                 // TODO: change directory
-                KeyCode::Enter => return Ok(()),
+                KeyCode::Enter => return Ok(app.pwd),
                 // next
                 KeyCode::Char('j') => app.next()?,
                 KeyCode::Down => app.next()?,

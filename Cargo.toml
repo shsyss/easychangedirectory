@@ -12,6 +12,7 @@ name = "ecd"
 [dependencies]
 anyhow = "1.0.59"
 clap = { version = "3.2.16", features = ["cargo"] }
+clap_complete = "3.2.3"
 crossterm = "0.24.0"
 tui = "0.18.0"
 

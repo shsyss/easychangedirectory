@@ -1,6 +1,7 @@
 mod app;
 mod info;
 pub mod items;
+mod shell;
 mod ui;
 
 pub use app::{app, App};
