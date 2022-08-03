@@ -18,12 +18,6 @@ pub struct StatefulList<T> {
 }
 
 impl<T> StatefulList<T> {
-    fn with_items(items: Vec<T>) -> StatefulList<T> {
-        let mut state = ListState::default();
-        state.select(Some(0));
-        StatefulList { state, items }
-    }
-
     fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -51,12 +45,20 @@ impl<T> StatefulList<T> {
         };
         self.state.select(Some(i));
     }
+
+    fn with_items(items: Vec<T>) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(Some(0));
+        StatefulList { state, items }
+    }
 }
 
 pub struct App {
     pub items: StatefulList<PathBuf>,
     pub parent_items: Vec<PathBuf>,
     pub grandparent_items: Vec<PathBuf>,
+    pwd: PathBuf,
+    grandparent_path: PathBuf,
 }
 
 impl App {
@@ -64,12 +66,27 @@ impl App {
         let pwd = env::current_dir()?;
         let items = items::read_dir(&pwd)?;
         let parent_items = items::read_dir(pwd.parent().unwrap())?;
-        let grandparent_items = items::read_dir(pwd.parent().unwrap().parent().unwrap())?;
+        let grandparent_path = pwd.parent().unwrap().parent().unwrap().to_path_buf();
+        let grandparent_items = items::read_dir(&grandparent_path)?;
         Ok(App {
             items: StatefulList::with_items(items),
             parent_items,
             grandparent_items,
+            pwd,
+            grandparent_path,
         })
+    }
+
+    fn move_parent(&mut self) -> anyhow::Result<()> {
+        let grandparent_items = items::read_dir(self.grandparent_path.parent().unwrap())?;
+        *self = Self {
+            items: StatefulList::with_items(self.parent_items.clone()),
+            parent_items: self.grandparent_items.clone(),
+            grandparent_items,
+            pwd: self.pwd.parent().unwrap().to_path_buf(),
+            grandparent_path: self.grandparent_path.parent().unwrap().to_path_buf(),
+        };
+        Ok(())
     }
 }
 
@@ -96,7 +113,7 @@ pub fn app() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Result<()> {
+fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<()> {
     loop {
         terminal.draw(|f| ui(f, &mut app))?;
         if let Event::Key(key) = event::read()? {
@@ -116,10 +133,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
                 KeyCode::Char('j') => app.items.next(),
                 KeyCode::Up => app.items.previous(),
                 KeyCode::Down => app.items.next(),
-                // TODO: left and right move
-                KeyCode::Char('h') => {}
+                // TODO: left move
+                KeyCode::Char('h') => app.move_parent()?,
+                KeyCode::Left => app.move_parent()?,
+                // TODO: right move
                 KeyCode::Char('l') => {}
-                KeyCode::Left => {}
                 KeyCode::Right => {}
                 _ => {}
             }

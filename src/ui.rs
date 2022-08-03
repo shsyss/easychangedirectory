@@ -24,8 +24,8 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .constraints([
             Constraint::Percentage(20),
             Constraint::Percentage(20),
-            Constraint::Percentage(30),
-            Constraint::Percentage(30),
+            Constraint::Max(100),
+            Constraint::Percentage(20),
         ])
         .split(f.size());
 
