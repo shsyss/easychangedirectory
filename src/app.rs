@@ -144,18 +144,18 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     // grandparent
     let items = set_items(&app.grandparent_items);
-    let items = List::new(items).block(Block::default().borders(Borders::all()));
+    let items = List::new(items).block(Block::default().borders(Borders::RIGHT));
     f.render_widget(items, chunks[0]);
 
     // parent
     let items = set_items(&app.parent_items);
-    let items = List::new(items).block(Block::default().borders(Borders::all()));
+    let items = List::new(items).block(Block::default().borders(Borders::RIGHT));
     f.render_widget(items, chunks[1]);
 
     // current
     let items = set_items(&app.items.items);
     let items = List::new(items)
-        .block(Block::default().borders(Borders::all()))
+        .block(Block::default().borders(Borders::RIGHT))
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
