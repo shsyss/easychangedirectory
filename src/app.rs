@@ -109,28 +109,6 @@ impl App {
         Ok(())
     }
 
-    // fn move_child(&mut self) -> anyhow::Result<()> {
-    //     let pwd = if let Some(pwd) = self.pwd.parent() {
-    //         pwd.to_path_buf()
-    //     } else {
-    //         return Ok(());
-    //     };
-
-    //     let grandparent_path = Self::get_parent_path(&self.grandparent_path);
-    //     let grandparent_items = Self::get_items(&grandparent_path)?;
-
-    //     *self = Self {
-    //         child_items: self.items.items.clone(),
-    //         items: StatefulList::with_items(self.parent_items.clone()),
-    //         parent_items: self.grandparent_items.clone(),
-    //         grandparent_items,
-    //         pwd,
-    //         grandparent_path,
-    //     };
-
-    //     Ok(())
-    // }
-
     fn move_parent(&mut self) -> anyhow::Result<()> {
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
@@ -148,6 +126,29 @@ impl App {
             grandparent_items,
             pwd,
             grandparent_path,
+        };
+
+        Ok(())
+    }
+
+    fn move_child(&mut self) -> anyhow::Result<()> {
+        let i = self.items.state.selected().unwrap();
+        let selected_path = self.items.items[i].clone();
+        let pwd = if selected_path.is_dir() {
+            selected_path
+        } else {
+            return Ok(());
+        };
+
+        let child_items = Self::get_items(&self.child_items[0])?;
+
+        *self = Self {
+            child_items,
+            items: StatefulList::with_items(self.child_items.clone()),
+            parent_items: self.items.items.clone(),
+            grandparent_items: self.parent_items.clone(),
+            pwd,
+            grandparent_path: Self::get_parent_path(&self.pwd),
         };
 
         Ok(())
@@ -229,8 +230,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
                 // TODO: right move
-                KeyCode::Char('l') => {}
-                KeyCode::Right => {}
+                KeyCode::Char('l') => app.move_child()?,
+                KeyCode::Right => app.move_child()?,
                 _ => {}
             }
         }
