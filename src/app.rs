@@ -3,7 +3,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{env, io};
+use std::{env, io, path::PathBuf};
 use tui::{
     backend::{Backend, CrosstermBackend},
     widgets::ListState,
@@ -54,9 +54,9 @@ impl<T> StatefulList<T> {
 }
 
 pub struct App {
-    pub items: StatefulList<String>,
-    pub parent_items: Vec<String>,
-    pub grandparent_items: Vec<String>,
+    pub items: StatefulList<PathBuf>,
+    pub parent_items: Vec<PathBuf>,
+    pub grandparent_items: Vec<PathBuf>,
 }
 
 impl App {

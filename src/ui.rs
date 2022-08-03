@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::PathBuf;
 use tui::{
     backend::Backend,
     layout::{Constraint, Direction, Layout},
@@ -64,22 +64,23 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_stateful_widget(items, chunks[2], &mut app.items.state);
 }
 
-fn set_items(items: &[String]) -> Vec<ListItem> {
+fn set_items(items: &[PathBuf]) -> Vec<ListItem> {
     items
         .iter()
-        .map(|p| {
-            let lines = if Path::new(p).is_dir() {
+        .filter_map(|p| {
+            let filename = p.file_name()?.to_string_lossy().to_string();
+            let lines = if p.is_dir() {
                 vec![Spans::from(Span::styled(
-                    p,
+                    filename,
                     Style::default().fg(Color::Blue),
                 ))]
             } else {
                 vec![Spans::from(Span::styled(
-                    p,
+                    filename,
                     Style::default().fg(Color::Gray),
                 ))]
             };
-            ListItem::new(lines)
+            Some(ListItem::new(lines))
         })
         .collect()
 }
