@@ -93,12 +93,40 @@ impl App {
         })
     }
 
-    fn next(&mut self) {
+    fn next(&mut self) -> anyhow::Result<()> {
         self.items.next();
+
+        let i = self.items.state.selected().unwrap_or(0);
+
+        let selected_path = self.items.items[i].clone();
+        let child_path = if selected_path.is_dir() {
+            selected_path
+        } else {
+            PathBuf::new()
+        };
+        let child_items = Self::get_items(child_path)?;
+
+        self.child_items = child_items;
+
+        Ok(())
     }
 
-    fn previous(&mut self) {
+    fn previous(&mut self) -> anyhow::Result<()> {
         self.items.previous();
+
+        let i = self.items.state.selected().unwrap_or(0);
+
+        let selected_path = self.items.items[i].clone();
+        let child_path = if selected_path.is_dir() {
+            selected_path
+        } else {
+            PathBuf::new()
+        };
+        let child_items = Self::get_items(child_path)?;
+
+        self.child_items = child_items;
+
+        Ok(())
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
@@ -177,11 +205,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
                 // TODO: change directory
                 KeyCode::Enter => return Ok(()),
                 // next
-                KeyCode::Char('j') => app.next(),
-                KeyCode::Down => app.next(),
+                KeyCode::Char('j') => app.next()?,
+                KeyCode::Down => app.next()?,
                 // previous
-                KeyCode::Char('k') => app.previous(),
-                KeyCode::Up => app.previous(),
+                KeyCode::Char('k') => app.previous()?,
+                KeyCode::Up => app.previous()?,
                 // parent
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
