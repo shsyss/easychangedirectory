@@ -48,7 +48,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_widget(parent_items, chunks[1]);
 
     // current
-    let items: Vec<ListItem> = set_items(&Some(app.items.items.clone()));
+    let items: Vec<ListItem> = set_items(&app.items.items);
     let items = List::new(items)
         .block(
             Block::default()
@@ -64,27 +64,23 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_stateful_widget(items, chunks[2], &mut app.items.state);
 }
 
-fn set_items(items: &Option<Vec<PathBuf>>) -> Vec<ListItem<'static>> {
-    if let Some(items) = items {
-        items
-            .iter()
-            .filter_map(|p| {
-                let filename = p.file_name()?.to_string_lossy().to_string();
-                let lines = if p.is_dir() {
-                    vec![Spans::from(Span::styled(
-                        filename,
-                        Style::default().fg(Color::Blue),
-                    ))]
-                } else {
-                    vec![Spans::from(Span::styled(
-                        filename,
-                        Style::default().fg(Color::Gray),
-                    ))]
-                };
-                Some(ListItem::new(lines))
-            })
-            .collect()
-    } else {
-        vec![ListItem::new("")]
-    }
+fn set_items(items: &[PathBuf]) -> Vec<ListItem> {
+    items
+        .iter()
+        .filter_map(|p| {
+            let filename = p.file_name()?.to_string_lossy().to_string();
+            let lines = if p.is_dir() {
+                vec![Spans::from(Span::styled(
+                    filename,
+                    Style::default().fg(Color::Blue),
+                ))]
+            } else {
+                vec![Spans::from(Span::styled(
+                    filename,
+                    Style::default().fg(Color::Gray),
+                ))]
+            };
+            Some(ListItem::new(lines))
+        })
+        .collect()
 }
