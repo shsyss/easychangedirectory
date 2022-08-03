@@ -21,34 +21,6 @@ pub struct StatefulList<T> {
 }
 
 impl<T> StatefulList<T> {
-    fn next(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i >= self.items.len() - 1 {
-                    0
-                } else {
-                    i + 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i))
-    }
-
-    fn previous(&mut self) {
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.len() - 1
-                } else {
-                    i - 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
-
     fn with_items(items: Vec<T>) -> StatefulList<T> {
         let mut state = ListState::default();
         state.select(Some(0));
@@ -57,7 +29,7 @@ impl<T> StatefulList<T> {
 }
 
 pub struct App {
-    // pub child_items: Vec<PathBuf>,
+    pub child_items: Vec<PathBuf>,
     pub items: StatefulList<PathBuf>,
     pub parent_items: Vec<PathBuf>,
     pub grandparent_items: Vec<PathBuf>,
@@ -68,12 +40,27 @@ pub struct App {
 impl App {
     fn new() -> anyhow::Result<App> {
         let pwd = env::current_dir()?;
+        let items = items::read_dir(&pwd)?;
+
+        let child_path = if items[0].is_dir() {
+            pwd.join(&items[0])
+        } else {
+            PathBuf::new()
+        };
+
+        let child_items = if child_path.to_string_lossy().is_empty() {
+            vec![PathBuf::new()]
+        } else {
+            items::read_dir(child_path)?
+        };
+
         let parent_path = pwd.parent().unwrap_or_else(|| Path::new(""));
         let parent_items = if parent_path.to_string_lossy().is_empty() {
             vec![PathBuf::new()]
         } else {
             items::read_dir(parent_path)?
         };
+
         let grandparent_path = parent_path
             .parent()
             .unwrap_or_else(|| Path::new(""))
@@ -83,13 +70,43 @@ impl App {
         } else {
             items::read_dir(&grandparent_path)?
         };
+
         Ok(App {
-            items: StatefulList::with_items(items::read_dir(&pwd)?),
+            child_items,
+            items: StatefulList::with_items(items),
             parent_items,
             grandparent_items,
             pwd,
             grandparent_path,
         })
+    }
+
+    fn next(&mut self) {
+        let i = match self.items.state.selected() {
+            Some(i) => {
+                if i >= self.items.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.items.state.select(Some(i))
+    }
+
+    fn previous(&mut self) {
+        let i = match self.items.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.items.state.select(Some(i));
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
@@ -112,6 +129,7 @@ impl App {
         };
 
         *self = Self {
+            child_items: self.items.items.clone(),
             items: StatefulList::with_items(self.parent_items.clone()),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
@@ -161,11 +179,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
                 // TODO: change directory
                 KeyCode::Enter => return Ok(()),
                 // next
-                KeyCode::Char('j') => app.items.next(),
-                KeyCode::Down => app.items.next(),
+                KeyCode::Char('j') => app.next(),
+                KeyCode::Down => app.next(),
                 // previous
-                KeyCode::Char('k') => app.items.previous(),
-                KeyCode::Up => app.items.previous(),
+                KeyCode::Char('k') => app.previous(),
+                KeyCode::Up => app.previous(),
                 // parent
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
