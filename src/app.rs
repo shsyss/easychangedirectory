@@ -77,13 +77,10 @@ impl App {
         };
         let child_items = Self::get_items(child_path)?;
 
-        let parent_path = pwd.parent().unwrap_or_else(|| Path::new(""));
-        let parent_items = Self::get_items(parent_path)?;
+        let parent_path = Self::get_parent_path(&pwd);
+        let parent_items = Self::get_items(&parent_path)?;
 
-        let grandparent_path = parent_path
-            .parent()
-            .unwrap_or_else(|| Path::new(""))
-            .to_path_buf();
+        let grandparent_path = Self::get_parent_path(parent_path);
         let grandparent_items = Self::get_items(&grandparent_path)?;
 
         Ok(App {
@@ -111,11 +108,7 @@ impl App {
             return Ok(());
         };
 
-        let grandparent_path = self
-            .grandparent_path
-            .parent()
-            .unwrap_or_else(|| Path::new(""))
-            .to_path_buf();
+        let grandparent_path = Self::get_parent_path(&self.grandparent_path);
         let grandparent_items = Self::get_items(&grandparent_path)?;
 
         *self = Self {
@@ -128,6 +121,13 @@ impl App {
         };
 
         Ok(())
+    }
+
+    fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
+        path.as_ref()
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf()
     }
 
     fn get_items<P: AsRef<Path>>(path: P) -> io::Result<Vec<PathBuf>> {
