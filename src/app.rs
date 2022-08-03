@@ -26,6 +26,34 @@ impl<T> StatefulList<T> {
         state.select(Some(0));
         StatefulList { state, items }
     }
+
+    fn next(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i))
+    }
+
+    fn previous(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
 }
 
 pub struct App {
@@ -47,29 +75,16 @@ impl App {
         } else {
             PathBuf::new()
         };
-
-        let child_items = if child_path.to_string_lossy().is_empty() {
-            vec![PathBuf::new()]
-        } else {
-            items::read_dir(child_path)?
-        };
+        let child_items = Self::get_items(child_path)?;
 
         let parent_path = pwd.parent().unwrap_or_else(|| Path::new(""));
-        let parent_items = if parent_path.to_string_lossy().is_empty() {
-            vec![PathBuf::new()]
-        } else {
-            items::read_dir(parent_path)?
-        };
+        let parent_items = Self::get_items(parent_path)?;
 
         let grandparent_path = parent_path
             .parent()
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf();
-        let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
-            vec![PathBuf::new()]
-        } else {
-            items::read_dir(&grandparent_path)?
-        };
+        let grandparent_items = Self::get_items(&grandparent_path)?;
 
         Ok(App {
             child_items,
@@ -82,31 +97,11 @@ impl App {
     }
 
     fn next(&mut self) {
-        let i = match self.items.state.selected() {
-            Some(i) => {
-                if i >= self.items.items.len() - 1 {
-                    0
-                } else {
-                    i + 1
-                }
-            }
-            None => 0,
-        };
-        self.items.state.select(Some(i))
+        self.items.next();
     }
 
     fn previous(&mut self) {
-        let i = match self.items.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.items.len() - 1
-                } else {
-                    i - 1
-                }
-            }
-            None => 0,
-        };
-        self.items.state.select(Some(i));
+        self.items.previous();
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
@@ -121,12 +116,7 @@ impl App {
             .parent()
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf();
-
-        let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
-            vec![PathBuf::new()]
-        } else {
-            items::read_dir(&grandparent_path)?
-        };
+        let grandparent_items = Self::get_items(&grandparent_path)?;
 
         *self = Self {
             child_items: self.items.items.clone(),
@@ -138,6 +128,14 @@ impl App {
         };
 
         Ok(())
+    }
+
+    fn get_items<P: AsRef<Path>>(path: P) -> io::Result<Vec<PathBuf>> {
+        Ok(if path.as_ref().to_string_lossy().is_empty() {
+            vec![PathBuf::new()]
+        } else {
+            items::read_dir(path)?
+        })
     }
 }
 
