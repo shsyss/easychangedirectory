@@ -8,6 +8,7 @@ path = "./src/main.rs"
 name = "ecd"
 
 [dependencies]
+anyhow = "1.0.60"
 crossterm = "0.24.0"
 tui = "0.18.0"
 

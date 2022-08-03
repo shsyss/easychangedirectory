@@ -1,12 +1,39 @@
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use crossterm::{
+    event::{DisableMouseCapture, EnableMouseCapture},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
 use std::env;
-use std::path::PathBuf;
+use std::io;
 use tui::backend::Backend;
-use tui::Terminal;
+use tui::{backend::CrosstermBackend, Terminal};
 
 use crate::frame::ui;
 
-pub fn run<B: Backend>(terminal: &mut Terminal<B>) -> crossterm::Result<()> {
+pub fn app() -> anyhow::Result<()> {
+    // setup terminal
+    enable_raw_mode()?;
+    let mut stdout = io::stdout();
+    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    self::run(&mut terminal)?;
+
+    // restore terminal
+    disable_raw_mode()?;
+    execute!(
+        terminal.backend_mut(),
+        LeaveAlternateScreen,
+        DisableMouseCapture
+    )?;
+    terminal.show_cursor()?;
+
+    Ok(())
+}
+
+fn run<B: Backend>(terminal: &mut Terminal<B>) -> crossterm::Result<()> {
     let current_dir = env::current_dir()?;
     let mut pwd = env::current_dir()?;
     loop {
