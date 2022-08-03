@@ -1,13 +1,13 @@
-use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use crossterm::{
-    event::{DisableMouseCapture, EnableMouseCapture},
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::env;
-use std::io;
-use tui::backend::Backend;
-use tui::{backend::CrosstermBackend, Terminal};
+use std::{env, io};
+use tui::{
+    backend::{Backend, CrosstermBackend},
+    Terminal,
+};
 
 use crate::frame::ui;
 

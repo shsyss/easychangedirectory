@@ -1,5 +1,4 @@
 use std::path::{Path, PathBuf};
-
 use tui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout},
