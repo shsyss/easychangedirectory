@@ -1,6 +1,8 @@
-use easychangedirectory::app;
+use easychangedirectory::{app, app_info};
 
 fn main() {
+    app_info();
+
     match app() {
         Ok(_) => (),
         Err(e) => {
