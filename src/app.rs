@@ -28,6 +28,34 @@ impl<T> StatefulList<T> {
             items,
         }
     }
+
+    fn next(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i))
+    }
+
+    fn previous(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
 }
 
 pub struct App {
@@ -78,10 +106,12 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
             // TODO 右に選択しているフォルダ直下のファイルのリスト
             // TODO ↑k →l ↓j ←h
             match key.code {
-                KeyCode::Enter => return Ok(()),
                 KeyCode::Backspace => return Ok(()),
+                KeyCode::Enter => return Ok(()),
                 KeyCode::Esc => return Ok(()),
                 KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
+                KeyCode::Down => app.items.next(),
+                KeyCode::Up => app.items.previous(),
                 _ => {}
             }
         }
@@ -101,13 +131,15 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         })
         .collect::<Vec<_>>();
 
-    let items = List::new(items).block(
-        Block::default()
-            .title("easychangedirectory")
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Cyan))
-            .border_type(BorderType::Rounded),
-    );
+    let items = List::new(items)
+        .block(
+            Block::default()
+                .title("easychangedirectory")
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Cyan))
+                .border_type(BorderType::Rounded),
+        )
+        .highlight_symbol("> ");
 
     f.render_stateful_widget(items, size, &mut app.items.state);
 }
