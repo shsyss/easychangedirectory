@@ -81,6 +81,12 @@ impl App {
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
+        let pwd = if let Some(pwd) = self.pwd.parent() {
+            pwd.to_path_buf()
+        } else {
+            return Ok(());
+        };
+
         let grandparent_path = self
             .grandparent_path
             .parent()
@@ -94,7 +100,7 @@ impl App {
             items: StatefulList::with_items(self.parent_items.clone()),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
-            pwd: self.pwd.parent().unwrap().to_path_buf(),
+            pwd,
             grandparent_path: grandparent_path.to_path_buf(),
         };
         Ok(())
