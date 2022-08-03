@@ -69,14 +69,24 @@ impl App {
     fn new() -> anyhow::Result<App> {
         let pwd = env::current_dir()?;
         let parent_path = pwd.parent().unwrap_or_else(|| Path::new(""));
+        let parent_items = if parent_path.to_string_lossy().is_empty() {
+            vec![PathBuf::new()]
+        } else {
+            items::read_dir(parent_path)?
+        };
         let grandparent_path = parent_path
             .parent()
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf();
+        let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
+            vec![PathBuf::new()]
+        } else {
+            items::read_dir(&grandparent_path)?
+        };
         Ok(App {
             items: StatefulList::with_items(items::read_dir(&pwd)?),
-            parent_items: items::read_dir(parent_path)?,
-            grandparent_items: items::read_dir(&grandparent_path)?,
+            parent_items,
+            grandparent_items,
             pwd,
             grandparent_path,
         })
@@ -92,12 +102,13 @@ impl App {
         let grandparent_path = self
             .grandparent_path
             .parent()
-            .unwrap_or_else(|| Path::new(""));
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf();
 
         let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
             vec![PathBuf::new()]
         } else {
-            items::read_dir(grandparent_path)?
+            items::read_dir(&grandparent_path)?
         };
 
         *self = Self {
@@ -105,7 +116,7 @@ impl App {
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
             pwd,
-            grandparent_path: grandparent_path.to_path_buf(),
+            grandparent_path,
         };
 
         Ok(())
