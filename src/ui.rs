@@ -1,0 +1,85 @@
+use std::path::Path;
+use tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout},
+    style::{Color, Modifier, Style},
+    text::{Span, Spans},
+    widgets::ListItem,
+    widgets::{Block, Borders, List},
+    Frame,
+};
+
+use crate::App;
+
+pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
+    // Overall style
+    f.render_widget(
+        Block::default().style(Style::default().bg(Color::Rgb(0, 0, 40))),
+        f.size(),
+    );
+
+    // layout
+    let chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(20),
+            Constraint::Percentage(30),
+            Constraint::Percentage(30),
+        ])
+        .split(f.size());
+
+    // grandparent
+    let grandparent_items = set_items(&app.grandparent_items);
+    let grandparent_items = List::new(grandparent_items).block(
+        Block::default()
+            .borders(Borders::RIGHT)
+            .border_style(Style::default().fg(Color::Gray)),
+    );
+    f.render_widget(grandparent_items, chunks[0]);
+
+    // parent
+    let parent_items = set_items(&app.parent_items);
+    let parent_items = List::new(parent_items).block(
+        Block::default()
+            .borders(Borders::RIGHT)
+            .border_style(Style::default().fg(Color::Gray)),
+    );
+    f.render_widget(parent_items, chunks[1]);
+
+    // current
+    let items: Vec<ListItem> = set_items(&app.items.items);
+    let items = List::new(items)
+        .block(
+            Block::default()
+                .borders(Borders::RIGHT)
+                .border_style(Style::default().fg(Color::Gray)),
+        )
+        .highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .add_modifier(Modifier::UNDERLINED),
+        )
+        .highlight_symbol("> ");
+    f.render_stateful_widget(items, chunks[2], &mut app.items.state);
+}
+
+fn set_items(items: &[String]) -> Vec<ListItem> {
+    items
+        .iter()
+        .map(|p| {
+            let lines = if Path::new(p).is_dir() {
+                vec![Spans::from(Span::styled(
+                    p,
+                    Style::default().fg(Color::Blue),
+                ))]
+            } else {
+                vec![Spans::from(Span::styled(
+                    p,
+                    Style::default().fg(Color::Gray),
+                ))]
+            };
+            ListItem::new(lines)
+        })
+        .collect()
+}

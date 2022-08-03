@@ -3,22 +3,18 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{env, io, path::Path};
+use std::{env, io};
 use tui::{
     backend::{Backend, CrosstermBackend},
-    layout::{Alignment, Constraint, Direction, Layout},
-    style::{Color, Modifier, Style},
-    text::{Span, Spans},
-    widgets::{Block, BorderType, Borders, List, Row, Table, Widget},
-    widgets::{ListItem, ListState},
-    Frame, Terminal,
+    widgets::ListState,
+    Terminal,
 };
 
-use crate::items;
+use crate::{items, ui};
 
-struct StatefulList<T> {
-    state: ListState,
-    items: Vec<T>,
+pub struct StatefulList<T> {
+    pub state: ListState,
+    pub items: Vec<T>,
 }
 
 impl<T> StatefulList<T> {
@@ -58,9 +54,9 @@ impl<T> StatefulList<T> {
 }
 
 pub struct App {
-    items: StatefulList<String>,
-    parent_items: Vec<String>,
-    grandparent_items: Vec<String>,
+    pub items: StatefulList<String>,
+    pub parent_items: Vec<String>,
+    pub grandparent_items: Vec<String>,
 }
 
 impl App {
@@ -106,98 +102,27 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
         if let Event::Key(key) = event::read()? {
             // 終了key
             // TODO BackspaceとEscの時は開始前に戻して、ctrl+cとEnterは現在のディレクトリに移動
-            // TODO 中央に現在のディレクトリのファイルのリスト
-            // TODO 左に一つ上ののディレクトリのファイルのリスト
             // TODO 右に選択しているフォルダ直下のファイルのリスト
             // TODO →l ←h
             match key.code {
                 // finish
                 KeyCode::Backspace => return Ok(()),
                 KeyCode::Esc => return Ok(()),
+                KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
                 // TODO: change directory
                 KeyCode::Enter => return Ok(()),
-                // ctrl + c
-                KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
-                // move
+                // up and down move
                 KeyCode::Char('k') => app.items.previous(),
                 KeyCode::Char('j') => app.items.next(),
-                KeyCode::Down => app.items.next(),
                 KeyCode::Up => app.items.previous(),
+                KeyCode::Down => app.items.next(),
+                // TODO: left and right move
+                KeyCode::Char('h') => {}
+                KeyCode::Char('l') => {}
+                KeyCode::Left => {}
+                KeyCode::Right => {}
                 _ => {}
             }
         }
     }
-}
-
-pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
-    // Overall style
-    f.render_widget(
-        Block::default().style(Style::default().bg(Color::Rgb(0, 0, 40))),
-        f.size(),
-    );
-
-    // layout
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([
-            Constraint::Percentage(20),
-            Constraint::Percentage(20),
-            Constraint::Percentage(30),
-            Constraint::Percentage(30),
-        ])
-        .split(f.size());
-
-    // grandparent
-    let grandparent_items = set_items(&app.grandparent_items);
-    let grandparent_items = List::new(grandparent_items).block(
-        Block::default()
-            .borders(Borders::RIGHT)
-            .border_style(Style::default().fg(Color::Gray)),
-    );
-    f.render_widget(grandparent_items, chunks[0]);
-
-    // parent
-    let parent_items = set_items(&app.parent_items);
-    let parent_items = List::new(parent_items).block(
-        Block::default()
-            .borders(Borders::RIGHT)
-            .border_style(Style::default().fg(Color::Gray)),
-    );
-    f.render_widget(parent_items, chunks[1]);
-
-    // current
-    let items: Vec<ListItem> = set_items(&app.items.items);
-    let items = List::new(items)
-        .block(
-            Block::default()
-                .borders(Borders::RIGHT)
-                .border_style(Style::default().fg(Color::Gray)),
-        )
-        .highlight_style(
-            Style::default()
-                .add_modifier(Modifier::BOLD)
-                .add_modifier(Modifier::UNDERLINED),
-        )
-        .highlight_symbol("> ");
-    f.render_stateful_widget(items, chunks[2], &mut app.items.state);
-}
-
-fn set_items(items: &[String]) -> Vec<ListItem> {
-    items
-        .iter()
-        .map(|p| {
-            let lines = if Path::new(p).is_dir() {
-                vec![Spans::from(Span::styled(
-                    p,
-                    Style::default().fg(Color::Blue),
-                ))]
-            } else {
-                vec![Spans::from(Span::styled(
-                    p,
-                    Style::default().fg(Color::Gray),
-                ))]
-            };
-            ListItem::new(lines)
-        })
-        .collect()
 }
