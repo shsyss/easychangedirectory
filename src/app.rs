@@ -140,16 +140,13 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .items
         .iter()
         .map(|p| {
-            let lines = if Path::new(p).is_file() {
+            let lines = if Path::new(p).is_dir() {
                 vec![Spans::from(Span::styled(
                     p,
                     Style::default().fg(Color::Blue),
                 ))]
             } else {
-                vec![Spans::from(Span::styled(
-                    p,
-                    Style::default().fg(Color::Green),
-                ))]
+                vec![Spans::from(Span::styled(p, Style::default()))]
             };
             ListItem::new(lines)
         })
@@ -157,6 +154,11 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     let items = List::new(items)
         .block(Block::default().borders(Borders::all()))
+        .highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .add_modifier(Modifier::UNDERLINED),
+        )
         .highlight_symbol("> ");
 
     f.render_stateful_widget(items, chunks[2], &mut app.items.state);
