@@ -55,10 +55,10 @@ impl<T> StatefulList<T> {
 
 pub struct App {
     pub items: StatefulList<PathBuf>,
-    pub parent_items: Vec<PathBuf>,
-    pub grandparent_items: Vec<PathBuf>,
+    pub parent_items: Option<Vec<PathBuf>>,
+    pub grandparent_items: Option<Vec<PathBuf>>,
     pwd: PathBuf,
-    grandparent_path: PathBuf,
+    grandparent_path: Option<PathBuf>,
 }
 
 impl App {
@@ -70,21 +70,29 @@ impl App {
         let grandparent_items = items::read_dir(&grandparent_path)?;
         Ok(App {
             items: StatefulList::with_items(items),
-            parent_items,
-            grandparent_items,
+            parent_items: Some(parent_items),
+            grandparent_items: Some(grandparent_items),
             pwd,
-            grandparent_path,
+            grandparent_path: Some(grandparent_path),
         })
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
-        let grandparent_items = items::read_dir(self.grandparent_path.parent().unwrap())?;
+        let grandparent_items =
+            items::read_dir(self.grandparent_path.as_ref().unwrap().parent().unwrap())?;
         *self = Self {
-            items: StatefulList::with_items(self.parent_items.clone()),
+            items: StatefulList::with_items(self.parent_items.clone().unwrap()),
             parent_items: self.grandparent_items.clone(),
-            grandparent_items,
+            grandparent_items: Some(grandparent_items),
             pwd: self.pwd.parent().unwrap().to_path_buf(),
-            grandparent_path: self.grandparent_path.parent().unwrap().to_path_buf(),
+            grandparent_path: Some(
+                self.grandparent_path
+                    .as_ref()
+                    .unwrap()
+                    .parent()
+                    .unwrap()
+                    .to_path_buf(),
+            ),
         };
         Ok(())
     }
