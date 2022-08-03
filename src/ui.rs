@@ -62,6 +62,15 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         )
         .highlight_symbol("> ");
     f.render_stateful_widget(items, chunks[2], &mut app.items.state);
+
+    // child
+    // let child_items = set_items(&app.parent_items);
+    // let child_items = List::new(child_items).block(
+    //     Block::default()
+    //         .borders(Borders::RIGHT)
+    //         .border_style(Style::default().fg(Color::Gray)),
+    // );
+    // f.render_widget(child_items, chunks[3]);
 }
 
 fn set_items(items: &[PathBuf]) -> Vec<ListItem> {

@@ -57,6 +57,7 @@ impl<T> StatefulList<T> {
 }
 
 pub struct App {
+    // pub child_items: Vec<PathBuf>,
     pub items: StatefulList<PathBuf>,
     pub parent_items: Vec<PathBuf>,
     pub grandparent_items: Vec<PathBuf>,
@@ -67,14 +68,15 @@ pub struct App {
 impl App {
     fn new() -> anyhow::Result<App> {
         let pwd = env::current_dir()?;
-        let items = items::read_dir(&pwd)?;
-        let parent_items = items::read_dir(pwd.parent().unwrap())?;
-        let grandparent_path = pwd.parent().unwrap().parent().unwrap().to_path_buf();
-        let grandparent_items = items::read_dir(&grandparent_path)?;
+        let parent_path = pwd.parent().unwrap_or_else(|| Path::new(""));
+        let grandparent_path = parent_path
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf();
         Ok(App {
-            items: StatefulList::with_items(items),
-            parent_items,
-            grandparent_items,
+            items: StatefulList::with_items(items::read_dir(&pwd)?),
+            parent_items: items::read_dir(parent_path)?,
+            grandparent_items: items::read_dir(&grandparent_path)?,
             pwd,
             grandparent_path,
         })
@@ -91,11 +93,13 @@ impl App {
             .grandparent_path
             .parent()
             .unwrap_or_else(|| Path::new(""));
+
         let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
             vec![PathBuf::new()]
         } else {
             items::read_dir(grandparent_path)?
         };
+
         *self = Self {
             items: StatefulList::with_items(self.parent_items.clone()),
             parent_items: self.grandparent_items.clone(),
@@ -103,6 +107,7 @@ impl App {
             pwd,
             grandparent_path: grandparent_path.to_path_buf(),
         };
+
         Ok(())
     }
 }
@@ -137,7 +142,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
             // 終了key
             // TODO BackspaceとEscの時は開始前に戻して、ctrl+cとEnterは現在のディレクトリに移動
             // TODO 右に選択しているフォルダ直下のファイルのリスト
-            // TODO →l ←h
             match key.code {
                 // finish
                 KeyCode::Backspace => return Ok(()),
