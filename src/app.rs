@@ -3,12 +3,12 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{env, io};
+use std::{env, io, path::Path};
 use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    text::Spans,
+    text::{Span, Spans},
     widgets::{Block, BorderType, Borders, List, Row, Table, Widget},
     widgets::{ListItem, ListState},
     Frame, Terminal,
@@ -104,12 +104,13 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
             // TODO 中央に現在のディレクトリのファイルのリスト
             // TODO 左に一つ上ののディレクトリのファイルのリスト
             // TODO 右に選択しているフォルダ直下のファイルのリスト
-            // TODO ↑k →l ↓j ←h
+            // TODO →l ←h
             match key.code {
                 // finish
                 KeyCode::Backspace => return Ok(()),
-                KeyCode::Enter => return Ok(()),
                 KeyCode::Esc => return Ok(()),
+                // TODO: change directory
+                KeyCode::Enter => return Ok(()),
                 // ctrl + c
                 KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
                 // move
@@ -124,27 +125,39 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
 }
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
-    let size = f.size();
+    let chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(10),
+            Constraint::Percentage(10),
+            Constraint::Max(100),
+            Constraint::Percentage(20),
+        ])
+        .split(f.size());
 
     let items = app
         .items
         .items
         .iter()
         .map(|p| {
-            let mut lines = vec![Spans::from(p.clone())];
+            let lines = if Path::new(p).is_file() {
+                vec![Spans::from(Span::styled(
+                    p,
+                    Style::default().fg(Color::Blue),
+                ))]
+            } else {
+                vec![Spans::from(Span::styled(
+                    p,
+                    Style::default().fg(Color::Green),
+                ))]
+            };
             ListItem::new(lines)
         })
         .collect::<Vec<_>>();
 
     let items = List::new(items)
-        .block(
-            Block::default()
-                .title("easychangedirectory")
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Cyan))
-                .border_type(BorderType::Rounded),
-        )
+        .block(Block::default().borders(Borders::all()))
         .highlight_symbol("> ");
 
-    f.render_stateful_widget(items, size, &mut app.items.state);
+    f.render_stateful_widget(items, chunks[2], &mut app.items.state);
 }
