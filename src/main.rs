@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    app::run(&mut terminal)?;
+    let res = app::run(&mut terminal);
 
     // restore terminal
     disable_raw_mode()?;
@@ -26,6 +26,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         DisableMouseCapture
     )?;
     terminal.show_cursor()?;
+
+    if let Err(err) = res {
+        eprintln!("\x1b[31merror:\x1b[m  {}", err);
+    }
 
     Ok(())
 }
