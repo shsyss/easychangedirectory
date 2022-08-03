@@ -71,7 +71,7 @@ impl App {
         let items = items::read_dir(&pwd)?;
 
         let child_path = if items[0].is_dir() {
-            pwd.join(&items[0])
+            items[0].clone()
         } else {
             PathBuf::new()
         };
