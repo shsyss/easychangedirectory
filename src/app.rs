@@ -60,14 +60,20 @@ impl<T> StatefulList<T> {
 
 pub struct App {
     items: StatefulList<String>,
+    parent_items: Vec<String>,
+    grandparent_items: Vec<String>,
 }
 
 impl App {
     fn new() -> anyhow::Result<App> {
         let pwd = env::current_dir()?;
-        let items = items::read_dir(pwd)?;
+        let items = items::read_dir(&pwd)?;
+        let parent_items = items::read_dir(pwd.parent().unwrap())?;
+        let grandparent_items = items::read_dir(pwd.parent().unwrap().parent().unwrap())?;
         Ok(App {
             items: StatefulList::with_items(items),
+            parent_items,
+            grandparent_items,
         })
     }
 }
@@ -125,19 +131,42 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
 }
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
+    // layout
     let chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage(10),
-            Constraint::Percentage(10),
+            Constraint::Percentage(20),
+            Constraint::Percentage(20),
             Constraint::Max(100),
             Constraint::Percentage(20),
         ])
         .split(f.size());
 
-    let items = app
-        .items
-        .items
+    // grandparent
+    let items = set_items(&app.grandparent_items);
+    let items = List::new(items).block(Block::default().borders(Borders::all()));
+    f.render_widget(items, chunks[0]);
+
+    // parent
+    let items = set_items(&app.parent_items);
+    let items = List::new(items).block(Block::default().borders(Borders::all()));
+    f.render_widget(items, chunks[1]);
+
+    // current
+    let items = set_items(&app.items.items);
+    let items = List::new(items)
+        .block(Block::default().borders(Borders::all()))
+        .highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .add_modifier(Modifier::UNDERLINED),
+        )
+        .highlight_symbol("> ");
+    f.render_stateful_widget(items, chunks[2], &mut app.items.state);
+}
+
+fn set_items(items: &[String]) -> Vec<ListItem> {
+    items
         .iter()
         .map(|p| {
             let lines = if Path::new(p).is_dir() {
@@ -150,16 +179,5 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
             };
             ListItem::new(lines)
         })
-        .collect::<Vec<_>>();
-
-    let items = List::new(items)
-        .block(Block::default().borders(Borders::all()))
-        .highlight_style(
-            Style::default()
-                .add_modifier(Modifier::BOLD)
-                .add_modifier(Modifier::UNDERLINED),
-        )
-        .highlight_symbol("> ");
-
-    f.render_stateful_widget(items, chunks[2], &mut app.items.state);
+        .collect()
 }
