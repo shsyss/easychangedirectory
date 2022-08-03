@@ -96,17 +96,7 @@ impl App {
     fn next(&mut self) -> anyhow::Result<()> {
         self.items.next();
 
-        let i = self.items.state.selected().unwrap_or(0);
-
-        let selected_path = self.items.items[i].clone();
-        let child_path = if selected_path.is_dir() {
-            selected_path
-        } else {
-            PathBuf::new()
-        };
-        let child_items = Self::get_items(child_path)?;
-
-        self.child_items = child_items;
+        self.update_child_items()?;
 
         Ok(())
     }
@@ -114,20 +104,32 @@ impl App {
     fn previous(&mut self) -> anyhow::Result<()> {
         self.items.previous();
 
-        let i = self.items.state.selected().unwrap_or(0);
-
-        let selected_path = self.items.items[i].clone();
-        let child_path = if selected_path.is_dir() {
-            selected_path
-        } else {
-            PathBuf::new()
-        };
-        let child_items = Self::get_items(child_path)?;
-
-        self.child_items = child_items;
+        self.update_child_items()?;
 
         Ok(())
     }
+
+    // fn move_child(&mut self) -> anyhow::Result<()> {
+    //     let pwd = if let Some(pwd) = self.pwd.parent() {
+    //         pwd.to_path_buf()
+    //     } else {
+    //         return Ok(());
+    //     };
+
+    //     let grandparent_path = Self::get_parent_path(&self.grandparent_path);
+    //     let grandparent_items = Self::get_items(&grandparent_path)?;
+
+    //     *self = Self {
+    //         child_items: self.items.items.clone(),
+    //         items: StatefulList::with_items(self.parent_items.clone()),
+    //         parent_items: self.grandparent_items.clone(),
+    //         grandparent_items,
+    //         pwd,
+    //         grandparent_path,
+    //     };
+
+    //     Ok(())
+    // }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
         let pwd = if let Some(pwd) = self.pwd.parent() {
@@ -165,6 +167,22 @@ impl App {
             items::read_dir(path)?
         })
     }
+
+    fn update_child_items(&mut self) -> anyhow::Result<()> {
+        let i = self.items.state.selected().unwrap_or(0);
+
+        let selected_path = self.items.items[i].clone();
+        let child_path = if selected_path.is_dir() {
+            selected_path
+        } else {
+            PathBuf::new()
+        };
+        let child_items = Self::get_items(child_path)?;
+
+        self.child_items = child_items;
+
+        Ok(())
+    }
 }
 
 pub fn app() -> anyhow::Result<()> {
@@ -194,9 +212,6 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
     loop {
         terminal.draw(|f| ui(f, &mut app))?;
         if let Event::Key(key) = event::read()? {
-            // 終了key
-            // TODO BackspaceとEscの時は開始前に戻して、ctrl+cとEnterは現在のディレクトリに移動
-            // TODO 右に選択しているフォルダ直下のファイルのリスト
             match key.code {
                 // finish
                 KeyCode::Backspace => return Ok(()),

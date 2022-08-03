@@ -77,6 +77,7 @@ fn set_items(items: &[PathBuf]) -> Vec<ListItem> {
     items
         .iter()
         .filter_map(|p| {
+            // TODO: アクセスできないフォルダを省く
             let filename = p.file_name()?.to_string_lossy().to_string();
             let lines = if p.is_dir() {
                 vec![Spans::from(Span::styled(
