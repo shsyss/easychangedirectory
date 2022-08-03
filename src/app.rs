@@ -23,10 +23,9 @@ struct StatefulList<T> {
 
 impl<T> StatefulList<T> {
     fn with_items(items: Vec<T>) -> StatefulList<T> {
-        StatefulList {
-            state: ListState::default(),
-            items,
-        }
+        let mut state = ListState::default();
+        state.select(Some(0));
+        StatefulList { state, items }
     }
 
     fn next(&mut self) {
@@ -131,31 +130,49 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
 }
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
+    // Overall style
+    f.render_widget(
+        Block::default().style(Style::default().bg(Color::Rgb(0, 0, 40))),
+        f.size(),
+    );
+
     // layout
     let chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage(20),
             Constraint::Percentage(20),
-            Constraint::Max(100),
-            Constraint::Percentage(20),
+            Constraint::Percentage(30),
+            Constraint::Percentage(30),
         ])
         .split(f.size());
 
     // grandparent
-    let items = set_items(&app.grandparent_items);
-    let items = List::new(items).block(Block::default().borders(Borders::RIGHT));
-    f.render_widget(items, chunks[0]);
+    let grandparent_items = set_items(&app.grandparent_items);
+    let grandparent_items = List::new(grandparent_items).block(
+        Block::default()
+            .borders(Borders::RIGHT)
+            .border_style(Style::default().fg(Color::Gray)),
+    );
+    f.render_widget(grandparent_items, chunks[0]);
 
     // parent
-    let items = set_items(&app.parent_items);
-    let items = List::new(items).block(Block::default().borders(Borders::RIGHT));
-    f.render_widget(items, chunks[1]);
+    let parent_items = set_items(&app.parent_items);
+    let parent_items = List::new(parent_items).block(
+        Block::default()
+            .borders(Borders::RIGHT)
+            .border_style(Style::default().fg(Color::Gray)),
+    );
+    f.render_widget(parent_items, chunks[1]);
 
     // current
-    let items = set_items(&app.items.items);
+    let items: Vec<ListItem> = set_items(&app.items.items);
     let items = List::new(items)
-        .block(Block::default().borders(Borders::RIGHT))
+        .block(
+            Block::default()
+                .borders(Borders::RIGHT)
+                .border_style(Style::default().fg(Color::Gray)),
+        )
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
@@ -175,7 +192,10 @@ fn set_items(items: &[String]) -> Vec<ListItem> {
                     Style::default().fg(Color::Blue),
                 ))]
             } else {
-                vec![Spans::from(Span::styled(p, Style::default()))]
+                vec![Spans::from(Span::styled(
+                    p,
+                    Style::default().fg(Color::Gray),
+                ))]
             };
             ListItem::new(lines)
         })
