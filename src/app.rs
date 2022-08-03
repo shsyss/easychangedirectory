@@ -3,7 +3,10 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{env, io, path::PathBuf};
+use std::{
+    env, io,
+    path::{Path, PathBuf},
+};
 use tui::{
     backend::{Backend, CrosstermBackend},
     widgets::ListState,
@@ -78,13 +81,21 @@ impl App {
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
-        let grandparent_items = items::read_dir(self.grandparent_path.parent().unwrap())?;
+        let grandparent_path = self
+            .grandparent_path
+            .parent()
+            .unwrap_or_else(|| Path::new(""));
+        let grandparent_items = if grandparent_path.to_string_lossy().is_empty() {
+            vec![PathBuf::new()]
+        } else {
+            items::read_dir(grandparent_path)?
+        };
         *self = Self {
             items: StatefulList::with_items(self.parent_items.clone()),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
             pwd: self.pwd.parent().unwrap().to_path_buf(),
-            grandparent_path: self.grandparent_path.parent().unwrap().to_path_buf(),
+            grandparent_path: grandparent_path.to_path_buf(),
         };
         Ok(())
     }
@@ -128,12 +139,13 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<(
                 KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
                 // TODO: change directory
                 KeyCode::Enter => return Ok(()),
-                // up and down move
-                KeyCode::Char('k') => app.items.previous(),
+                // next
                 KeyCode::Char('j') => app.items.next(),
-                KeyCode::Up => app.items.previous(),
                 KeyCode::Down => app.items.next(),
-                // TODO: left move
+                // previous
+                KeyCode::Char('k') => app.items.previous(),
+                KeyCode::Up => app.items.previous(),
+                // parent
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
                 // TODO: right move
