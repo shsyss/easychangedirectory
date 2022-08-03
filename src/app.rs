@@ -3,7 +3,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{env, io, path::PathBuf};
+use std::{env, io};
 use tui::{
     backend::{Backend, CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout},
@@ -13,6 +13,8 @@ use tui::{
     widgets::{ListItem, ListState},
     Frame, Terminal,
 };
+
+use crate::items;
 
 struct StatefulList<T> {
     state: ListState,
@@ -29,19 +31,16 @@ impl<T> StatefulList<T> {
 }
 
 pub struct App {
-    items: StatefulList<PathBuf>,
+    items: StatefulList<String>,
 }
 
 impl App {
-    fn new() -> App {
-        App {
-            items: StatefulList::with_items(vec![
-                env::current_dir().unwrap(),
-                env::current_dir().unwrap(),
-                env::current_dir().unwrap(),
-                env::current_dir().unwrap(),
-            ]),
-        }
+    fn new() -> anyhow::Result<App> {
+        let pwd = env::current_dir()?;
+        let items = items::read_dir(pwd)?;
+        Ok(App {
+            items: StatefulList::with_items(items),
+        })
     }
 }
 
@@ -53,7 +52,7 @@ pub fn app() -> anyhow::Result<()> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let app = App::new();
+    let app = App::new()?;
     self::run(&mut terminal, app)?;
 
     // restore terminal
@@ -78,12 +77,12 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
             // TODO 左に一つ上ののディレクトリのファイルのリスト
             // TODO 右に選択しているフォルダ直下のファイルのリスト
             // TODO ↑k →l ↓j ←h
-            if (key.modifiers == KeyModifiers::CONTROL && key.code == KeyCode::Char('c'))
-                || key.code == KeyCode::Enter
-                || key.code == KeyCode::Esc
-                || key.code == KeyCode::Backspace
-            {
-                return Ok(());
+            match key.code {
+                KeyCode::Enter => return Ok(()),
+                KeyCode::Backspace => return Ok(()),
+                KeyCode::Esc => return Ok(()),
+                KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
+                _ => {}
             }
         }
     }
@@ -91,16 +90,13 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     let size = f.size();
-    let style = Style::default()
-        .fg(Color::Yellow)
-        .add_modifier(Modifier::ITALIC);
 
     let items = app
         .items
         .items
         .iter()
         .map(|p| {
-            let mut lines = vec![Spans::from(p.to_string_lossy().to_string())];
+            let mut lines = vec![Spans::from(p.clone())];
             ListItem::new(lines)
         })
         .collect::<Vec<_>>();
