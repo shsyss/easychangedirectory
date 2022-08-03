@@ -1,5 +1,4 @@
 mod app;
-mod frame;
 mod info;
 
 pub use app::app;
