@@ -106,10 +106,15 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> crossterm::Resul
             // TODO 右に選択しているフォルダ直下のファイルのリスト
             // TODO ↑k →l ↓j ←h
             match key.code {
+                // finish
                 KeyCode::Backspace => return Ok(()),
                 KeyCode::Enter => return Ok(()),
                 KeyCode::Esc => return Ok(()),
+                // ctrl + c
                 KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(()),
+                // move
+                KeyCode::Char('k') => app.items.previous(),
+                KeyCode::Char('j') => app.items.next(),
                 KeyCode::Down => app.items.next(),
                 KeyCode::Up => app.items.previous(),
                 _ => {}
