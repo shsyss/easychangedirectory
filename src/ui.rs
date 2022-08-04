@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use tui::{
     backend::Backend,
     layout::{Constraint, Direction, Layout},
@@ -9,7 +8,7 @@ use tui::{
     Frame,
 };
 
-use crate::App;
+use crate::{app::Item, App};
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Overall style
@@ -25,7 +24,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
             Constraint::Percentage(20),
             Constraint::Percentage(20),
             Constraint::Max(100),
-            Constraint::Percentage(20),
+            Constraint::Percentage(30),
         ])
         .split(f.size());
 
@@ -73,11 +72,11 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_widget(child_items, chunks[3]);
 }
 
-fn set_items(items: &[PathBuf]) -> Vec<ListItem> {
+fn set_items(items: &[Item]) -> Vec<ListItem> {
     items
         .iter()
         .filter_map(|p| {
-            let filename = p.file_name()?.to_string_lossy().to_string();
+            let filename = p.path.file_name()?.to_string_lossy().to_string();
             let lines = if p.is_dir() {
                 vec![Spans::from(Span::styled(
                     filename,

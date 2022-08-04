@@ -63,11 +63,32 @@ impl<T> StatefulList<T> {
     }
 }
 
+#[derive(Clone)]
+pub enum State {
+    File,
+    Dir,
+    RelationDir,
+    Content,
+    None,
+}
+
+#[derive(Clone)]
+pub struct Item {
+    pub path: PathBuf,
+    pub state: State,
+}
+
+impl Item {
+    pub fn is_dir(&self) -> bool {
+        matches!(self.state, State::Dir | State::RelationDir)
+    }
+}
+
 pub struct App {
-    pub child_items: Vec<PathBuf>,
-    pub items: StatefulList<PathBuf>,
-    pub parent_items: Vec<PathBuf>,
-    pub grandparent_items: Vec<PathBuf>,
+    pub child_items: Vec<Item>,
+    pub items: StatefulList<Item>,
+    pub parent_items: Vec<Item>,
+    pub grandparent_items: Vec<Item>,
     pwd: PathBuf,
     grandparent_path: PathBuf,
 }
@@ -78,7 +99,7 @@ impl App {
         let items = items::read_dir(&pwd)?;
 
         let child_path = if items[0].is_dir() {
-            items[0].clone()
+            items[0].path.clone()
         } else {
             PathBuf::new()
         };
@@ -117,18 +138,22 @@ impl App {
     }
 
     fn move_child(&mut self) -> anyhow::Result<()> {
+        // TODO: 直近のpwdを選択
         let i = self.items.state.selected().unwrap();
-        let selected_path = self.items.items[i].clone();
-        let pwd = if selected_path.is_dir() {
-            selected_path
+        let selected_item = self.items.items[i].clone();
+        let pwd = if selected_item.is_dir() {
+            selected_item.path
         } else {
             return Ok(());
         };
 
         let child_items = if self.child_items[0].is_dir() {
-            Self::get_items(&self.child_items[0])?
+            Self::get_items(&self.child_items[0].path)?
         } else {
-            vec![PathBuf::new()]
+            vec![Item {
+                path: PathBuf::new(),
+                state: State::None,
+            }]
         };
 
         *self = Self {
@@ -172,17 +197,20 @@ impl App {
             .to_path_buf()
     }
 
-    fn get_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<PathBuf>> {
+    fn get_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
-            vec![PathBuf::new()]
+            vec![Item {
+                path: PathBuf::new(),
+                state: State::None,
+            }]
         } else {
             items::read_dir(path)?
         })
     }
 
     fn get_pwd_index(&self) -> usize {
-        for (i, path) in self.parent_items.iter().enumerate() {
-            if *path == self.pwd {
+        for (i, item) in self.parent_items.iter().enumerate() {
+            if item.path == self.pwd {
                 return i;
             }
         }
@@ -193,13 +221,21 @@ impl App {
     fn update_child_items(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap_or(0);
 
-        let selected_path = self.items.items[i].clone();
-        let child_items = if selected_path.is_dir() {
-            Self::get_items(selected_path)?
-        } else if let Ok(s) = fs::read_to_string(selected_path) {
-            s.lines().map(PathBuf::from).collect()
+        let selected_item = &self.items.items[i];
+        let child_items = if selected_item.is_dir() {
+            Self::get_items(&selected_item.path)?
+        } else if let Ok(s) = fs::read_to_string(&selected_item.path) {
+            s.lines()
+                .map(|s| Item {
+                    path: PathBuf::from(s),
+                    state: State::Content,
+                })
+                .collect()
         } else {
-            vec![PathBuf::new()]
+            vec![Item {
+                path: PathBuf::new(),
+                state: State::None,
+            }]
         };
 
         self.child_items = child_items;
