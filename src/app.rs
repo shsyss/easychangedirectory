@@ -152,6 +152,13 @@ impl App {
 
         let child_items = if self.child_items[0].is_dir() {
             Self::get_items(&self.child_items[0].path)?
+        } else if let Ok(s) = fs::read_to_string(&self.child_items[0].path) {
+            s.lines()
+                .map(|s| Item {
+                    path: PathBuf::from(s),
+                    state: State::Content,
+                })
+                .collect()
         } else {
             vec![Item {
                 path: PathBuf::new(),

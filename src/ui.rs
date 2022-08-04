@@ -2,7 +2,7 @@ use tui::{
     backend::Backend,
     layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    text::{Span, Spans},
+    text::Span,
     widgets::ListItem,
     widgets::{Block, Borders, List},
     Frame,
@@ -19,7 +19,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         Block::default()
             .title(Span::styled(
                 app.get_pwd_str(),
-                Style::default().fg(Color::Rgb(255, 150, 20)),
+                Style::default().fg(Color::Yellow),
             ))
             .style(Style::default().bg(Color::Rgb(0, 0, 40))),
         f.size(),
