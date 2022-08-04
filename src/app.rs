@@ -23,21 +23,6 @@ pub struct StatefulList<T> {
 }
 
 impl<T> StatefulList<T> {
-    fn with_items(items: Vec<T>) -> StatefulList<T> {
-        let mut state = ListState::default();
-        state.select(Some(0));
-        StatefulList { state, items }
-    }
-    fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
-        let mut state = ListState::default();
-        state.select(Some(index));
-        StatefulList { state, items }
-    }
-    fn with_items_unselect(items: Vec<T>) -> StatefulList<T> {
-        let mut state = ListState::default();
-        state.select(None);
-        StatefulList { state, items }
-    }
     fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -64,14 +49,29 @@ impl<T> StatefulList<T> {
         };
         self.state.select(Some(i));
     }
-    fn selected(&mut self) -> usize {
-        self.state.selected().unwrap()
-    }
     fn select(&mut self, index: usize) {
         self.state.select(Some(index));
     }
+    fn selected(&mut self) -> usize {
+        self.state.selected().unwrap()
+    }
     fn unselect(&mut self) {
         self.state.select(None);
+    }
+    fn with_items(items: Vec<T>) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(Some(0));
+        StatefulList { state, items }
+    }
+    fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(Some(index));
+        StatefulList { state, items }
+    }
+    fn with_items_option(items: Vec<T>, index: Option<usize>) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(index);
+        StatefulList { state, items }
     }
 }
 
@@ -97,6 +97,12 @@ pub struct Item {
 }
 
 impl Item {
+    pub fn default() -> Self {
+        Self {
+            path: PathBuf::new(),
+            state: State::None,
+        }
+    }
     pub fn filename(&self) -> Option<String> {
         Some(self.path.file_name()?.to_string_lossy().to_string())
     }
@@ -120,12 +126,6 @@ impl Item {
     fn is_file(&self) -> bool {
         matches!(self.state, State::File)
     }
-    pub fn default() -> Self {
-        Self {
-            path: PathBuf::new(),
-            state: State::None,
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -139,13 +139,6 @@ pub struct App {
 }
 
 impl App {
-    fn generate_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
-        Ok(if path.as_ref().to_string_lossy().is_empty() {
-            vec![Item::default()]
-        } else {
-            items::read_dir(path)?
-        })
-    }
     fn generate_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
         for (i, item) in items.iter().enumerate() {
             if item.path == path.as_ref() {
@@ -153,6 +146,13 @@ impl App {
             }
         }
         0
+    }
+    fn generate_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+        Ok(if path.as_ref().to_string_lossy().is_empty() {
+            vec![Item::default()]
+        } else {
+            items::read_dir(path)?
+        })
     }
     pub fn get_child_items(&self) -> Vec<Item> {
         self.child_items.items.clone()
@@ -197,14 +197,14 @@ impl App {
         } else {
             return Ok(());
         };
+
+        let i = self.get_index(Family::Child);
+
         *self = Self {
             child_items: StatefulList::with_items(
                 self.get_child_items()[0].generate_child_items()?,
             ),
-            items: StatefulList::with_items_select(
-                self.get_child_items(),
-                self.get_index(Family::Child),
-            ),
+            items: StatefulList::with_items_select(self.get_child_items(), i),
             parent_items: StatefulList::with_items(self.get_items()),
             grandparent_items: StatefulList::with_items(self.get_parent_items()),
             pwd,
@@ -223,7 +223,7 @@ impl App {
         };
         Ok(())
     }
-    fn move_down(&mut self) -> anyhow::Result<()> {
+    fn move_next(&mut self) -> anyhow::Result<()> {
         self.items.next();
         self.update_child_items()?;
         Ok(())
@@ -254,7 +254,7 @@ impl App {
 
         Ok(())
     }
-    fn move_up(&mut self) -> anyhow::Result<()> {
+    fn move_previous(&mut self) -> anyhow::Result<()> {
         self.items.previous();
         self.update_child_items()?;
         Ok(())
@@ -277,7 +277,7 @@ impl App {
         let gi = Self::generate_index(&grandparent_items, &parent_path);
 
         let mut app = App {
-            child_items: StatefulList::with_items_unselect(Self::generate_items(child_path)?),
+            child_items: StatefulList::with_items_option(Self::generate_items(child_path)?, None),
             items: StatefulList::with_items(items),
             parent_items: StatefulList::with_items(parent_items),
             grandparent_items: StatefulList::with_items(grandparent_items),
@@ -336,11 +336,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
                 // TODO: change directory
                 KeyCode::Enter => return Ok(app.pwd),
                 // next
-                KeyCode::Char('j') => app.move_down()?,
-                KeyCode::Down => app.move_down()?,
+                KeyCode::Char('j') => app.move_next()?,
+                KeyCode::Down => app.move_next()?,
                 // previous
-                KeyCode::Char('k') => app.move_up()?,
-                KeyCode::Up => app.move_up()?,
+                KeyCode::Char('k') => app.move_previous()?,
+                KeyCode::Up => app.move_previous()?,
                 // parent
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
