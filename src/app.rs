@@ -61,7 +61,7 @@ impl<T> StatefulList<T> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum State {
     File,
     Dir,
@@ -112,6 +112,7 @@ impl Item {
     }
 }
 
+// TODO: itemsは全部StatefulListにする
 #[derive(Debug)]
 pub struct App {
     pub child_items: Vec<Item>,
@@ -144,6 +145,14 @@ impl App {
         }
         0
     }
+    fn get_index_child(&self) -> usize {
+        for (i, item) in self.child_items.iter().enumerate() {
+            if item.state == State::RelationalDir {
+                return i;
+            }
+        }
+        0
+    }
     fn get_index_parent(&self) -> usize {
         for (i, item) in self.parent_items.iter().enumerate() {
             if item.path == self.pwd {
@@ -164,7 +173,6 @@ impl App {
         self.pwd.to_string_lossy().to_string()
     }
     fn move_child(&mut self) -> anyhow::Result<()> {
-        // TODO: 直近のpwdを選択
         let i = self.items.state.selected().unwrap();
         let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
@@ -178,7 +186,10 @@ impl App {
         };
         *self = Self {
             child_items: self.child_items[0].generate_child_items()?,
-            items: StatefulList::with_items(self.child_items.clone()),
+            items: StatefulList::with_items_select(
+                self.child_items.clone(),
+                self.get_index_child(),
+            ),
             parent_items: self.items.items.clone(),
             grandparent_items: self.parent_items.clone(),
             pwd,
@@ -210,7 +221,9 @@ impl App {
         };
 
         let grandparent_path = Self::get_parent_path(&self.grandparent_path);
-        let grandparent_items = Self::generate_items(&grandparent_path)?;
+        let mut grandparent_items = Self::generate_items(&grandparent_path)?;
+        let i = Self::get_index(&grandparent_items, &self.grandparent_path);
+        grandparent_items[i].change_state(State::RelationalDir);
 
         *self = Self {
             child_items: self.items.items.clone(),
