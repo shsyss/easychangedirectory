@@ -140,6 +140,7 @@ pub struct App {
     grandparent_path: PathBuf,
 }
 
+const JUMP: usize = 4;
 impl App {
     fn generate_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
         path.as_ref()
@@ -204,7 +205,7 @@ impl App {
         let child_items = self.get_child_items();
         let selected_ci = self.get_index(Family::Child);
         let ci = if child_items[selected_ci].is_dir() {
-            // TODO
+            // TODO: list生成時のselectがoneselfと同じ
             Some(selected_ci)
         } else {
             None
@@ -237,10 +238,26 @@ impl App {
         };
         Ok(())
     }
+    fn move_end(&mut self) {
+        self.items.select(self.items.items.len() - 1);
+    }
+    fn move_home(&mut self) {
+        self.items.select(0);
+    }
     fn move_next(&mut self) -> anyhow::Result<()> {
         let i = self.items.next();
         self.update_child_items(i)?;
         Ok(())
+    }
+    fn move_page_down(&mut self) {
+        let last = self.items.items.len() - 1;
+        let i = self.get_index(Family::Oneself);
+        self.items
+            .select(if i > last - JUMP { last } else { i + JUMP });
+    }
+    fn move_page_up(&mut self) {
+        let i = self.get_index(Family::Oneself);
+        self.items.select(if i < JUMP { 0 } else { i - JUMP });
     }
     fn move_parent(&mut self) -> anyhow::Result<()> {
         // TODO: contentからmoveするときにcontentをhighlightしてしまう
@@ -365,7 +382,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
                 // right move
                 KeyCode::Char('l') => app.move_child()?,
                 KeyCode::Right => app.move_child()?,
-                // TODO: home,end pageUp,pageDown
+                // home end pageUp pageDown
+                KeyCode::Home => app.move_home(),
+                KeyCode::End => app.move_end(),
+                KeyCode::PageUp => app.move_page_up(),
+                KeyCode::PageDown => app.move_page_down(),
                 _ => {}
             }
         }
