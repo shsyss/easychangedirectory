@@ -238,9 +238,6 @@ impl App {
     }
     fn move_next(&mut self) -> anyhow::Result<()> {
         let i = self.items.next();
-        if self.get_items()[i].is_file() {
-            self.child_items.unselect();
-        }
         self.update_child_items(i)?;
         Ok(())
     }
@@ -272,9 +269,6 @@ impl App {
     }
     fn move_previous(&mut self) -> anyhow::Result<()> {
         let i = self.items.previous();
-        if self.get_items()[i].is_file() {
-            self.child_items.unselect();
-        }
         self.update_child_items(i)?;
         Ok(())
     }
@@ -312,6 +306,9 @@ impl App {
     fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
         self.child_items =
             StatefulList::with_items(self.get_items()[index].generate_child_items()?);
+        if self.get_items()[index].is_file() {
+            self.child_items.unselect();
+        }
         Ok(())
     }
 }
