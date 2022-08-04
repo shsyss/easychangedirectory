@@ -27,13 +27,11 @@ impl<T> StatefulList<T> {
         state.select(Some(0));
         StatefulList { state, items }
     }
-
     fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
         let mut state = ListState::default();
         state.select(Some(index));
         StatefulList { state, items }
     }
-
     fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -47,7 +45,6 @@ impl<T> StatefulList<T> {
         };
         self.state.select(Some(i))
     }
-
     fn previous(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -79,6 +76,10 @@ pub struct Item {
 }
 
 impl Item {
+    fn change_state(&mut self, state: State) -> Self {
+        self.state = state;
+        self.clone()
+    }
     pub fn filename(&self) -> Option<String> {
         Some(self.path.file_name()?.to_string_lossy().to_string())
     }
@@ -130,13 +131,12 @@ impl App {
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf()
     }
-    fn get_pwd_index(&self) -> usize {
-        for (i, item) in self.parent_items.iter().enumerate() {
-            if item.path == self.pwd {
+    fn get_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
+        for (i, item) in items.iter().enumerate() {
+            if item.path == path.as_ref() {
                 return i;
             }
         }
-
         0
     }
     pub fn get_pwd_str(&self) -> String {
@@ -145,7 +145,7 @@ impl App {
     fn move_child(&mut self) -> anyhow::Result<()> {
         // TODO: 直近のpwdを選択
         let i = self.items.state.selected().unwrap();
-        let selected_item = self.items.items[i].clone();
+        let selected_item = self.items.items[i].change_state(State::RelationDir);
         let pwd = if selected_item.is_dir() {
             selected_item.path
         } else {
@@ -160,7 +160,6 @@ impl App {
             pwd,
             grandparent_path: Self::get_parent_path(&self.pwd),
         };
-
         Ok(())
     }
     fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
@@ -191,7 +190,10 @@ impl App {
 
         *self = Self {
             child_items: self.items.items.clone(),
-            items: StatefulList::with_items_select(self.parent_items.clone(), self.get_pwd_index()),
+            items: StatefulList::with_items_select(
+                self.parent_items.clone(),
+                Self::get_index(&self.parent_items, &self.pwd),
+            ),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
             pwd,
