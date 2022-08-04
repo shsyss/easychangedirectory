@@ -38,7 +38,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .split(f.size());
 
     // grandparent
-    let grandparent_items = set_items(&app.grandparent_items);
+    let grandparent_items = set_items(&app.grandparent_items.items);
     let grandparent_items = List::new(grandparent_items).block(
         Block::default()
             .borders(Borders::RIGHT)
@@ -47,7 +47,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_widget(grandparent_items, chunks[0]);
 
     // parent
-    let parent_items = set_items(&app.parent_items);
+    let parent_items = set_items(&app.parent_items.items);
     let parent_items = List::new(parent_items).block(
         Block::default()
             .borders(Borders::RIGHT)
@@ -72,7 +72,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_stateful_widget(items, chunks[2], &mut app.items.state);
 
     // child
-    let child_items = set_items(&app.child_items);
+    let child_items = set_items(&app.child_items.items);
     let child_items = List::new(child_items).block(Block::default());
     f.render_widget(child_items, chunks[3]);
 }

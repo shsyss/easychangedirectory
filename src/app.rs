@@ -115,27 +115,24 @@ impl Item {
 // TODO: itemsは全部StatefulListにする
 #[derive(Debug)]
 pub struct App {
-    pub child_items: Vec<Item>,
+    pub child_items: StatefulList<Item>,
     pub items: StatefulList<Item>,
-    pub parent_items: Vec<Item>,
-    pub grandparent_items: Vec<Item>,
+    pub parent_items: StatefulList<Item>,
+    pub grandparent_items: StatefulList<Item>,
     pwd: PathBuf,
     grandparent_path: PathBuf,
 }
 
 impl App {
+    pub fn child_items(&self) -> Vec<Item> {
+        self.child_items.items.clone()
+    }
     fn generate_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
             vec![Item::default()]
         } else {
             items::read_dir(path)?
         })
-    }
-    fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
-        path.as_ref()
-            .parent()
-            .unwrap_or_else(|| Path::new(""))
-            .to_path_buf()
     }
     fn get_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
         for (i, item) in items.iter().enumerate() {
@@ -146,31 +143,43 @@ impl App {
         0
     }
     fn get_index_child(&self) -> usize {
-        for (i, item) in self.child_items.iter().enumerate() {
+        for (i, item) in self.child_items().iter().enumerate() {
             if item.state == State::RelationalDir {
                 return i;
             }
         }
         0
     }
-    fn get_index_parent(&self) -> usize {
-        for (i, item) in self.parent_items.iter().enumerate() {
-            if item.path == self.pwd {
-                return i;
-            }
-        }
-        0
-    }
     fn get_index_grandparent(&self) -> usize {
-        for (i, item) in self.grandparent_items.iter().enumerate() {
+        for (i, item) in self.grandparent_items().iter().enumerate() {
             if item.path == self.pwd.parent().unwrap().to_path_buf() {
                 return i;
             }
         }
         0
     }
+    fn get_index_parent(&self) -> usize {
+        for (i, item) in self.parent_items().iter().enumerate() {
+            if item.path == self.pwd {
+                return i;
+            }
+        }
+        0
+    }
+    fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
+        path.as_ref()
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf()
+    }
     pub fn get_pwd_str(&self) -> String {
         self.pwd.to_string_lossy().to_string()
+    }
+    pub fn grandparent_items(&self) -> Vec<Item> {
+        self.grandparent_items.items.clone()
+    }
+    pub fn items(&self) -> Vec<Item> {
+        self.items.items.clone()
     }
     fn move_child(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap();
@@ -185,13 +194,10 @@ impl App {
             return Ok(());
         };
         *self = Self {
-            child_items: self.child_items[0].generate_child_items()?,
-            items: StatefulList::with_items_select(
-                self.child_items.clone(),
-                self.get_index_child(),
-            ),
-            parent_items: self.items.items.clone(),
-            grandparent_items: self.parent_items.clone(),
+            child_items: StatefulList::with_items(self.child_items()[0].generate_child_items()?),
+            items: StatefulList::with_items_select(self.child_items(), self.get_index_child()),
+            parent_items: StatefulList::with_items(self.items()),
+            grandparent_items: StatefulList::with_items(self.parent_items()),
             pwd,
             grandparent_path: Self::get_parent_path(&self.pwd),
         };
@@ -199,10 +205,10 @@ impl App {
     }
     fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
         *self = Self {
-            child_items: vec![Item::default()],
-            items: StatefulList::with_items(self.child_items.clone()),
-            parent_items: self.items.items.clone(),
-            grandparent_items: self.parent_items.clone(),
+            child_items: StatefulList::with_items(vec![Item::default()]),
+            items: StatefulList::with_items(self.child_items()),
+            parent_items: StatefulList::with_items(self.items()),
+            grandparent_items: StatefulList::with_items(self.parent_items()),
             pwd: selected_item.path,
             grandparent_path: Self::get_parent_path(&self.pwd),
         };
@@ -226,13 +232,10 @@ impl App {
         grandparent_items[i].change_state(State::RelationalDir);
 
         *self = Self {
-            child_items: self.items.items.clone(),
-            items: StatefulList::with_items_select(
-                self.parent_items.clone(),
-                self.get_index_parent(),
-            ),
-            parent_items: self.grandparent_items.clone(),
-            grandparent_items,
+            child_items: StatefulList::with_items(self.items()),
+            items: StatefulList::with_items_select(self.parent_items(), self.get_index_parent()),
+            parent_items: StatefulList::with_items(self.grandparent_items()),
+            grandparent_items: StatefulList::with_items(grandparent_items),
             pwd,
             grandparent_path,
         };
@@ -253,7 +256,6 @@ impl App {
         } else {
             PathBuf::new()
         };
-        let child_items = Self::generate_items(child_path)?;
         let parent_path = Self::get_parent_path(&pwd);
         let grandparent_path = Self::get_parent_path(&parent_path);
         let mut parent_items = Self::generate_items(&parent_path)?;
@@ -266,17 +268,20 @@ impl App {
         grandparent_items[j].change_state(State::RelationalDir);
 
         Ok(App {
-            child_items,
+            child_items: StatefulList::with_items(Self::generate_items(child_path)?),
             items: StatefulList::with_items(items),
-            parent_items,
-            grandparent_items,
+            parent_items: StatefulList::with_items(parent_items),
+            grandparent_items: StatefulList::with_items(grandparent_items),
             pwd,
             grandparent_path,
         })
     }
+    pub fn parent_items(&self) -> Vec<Item> {
+        self.parent_items.items.clone()
+    }
     fn update_child_items(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap_or(0);
-        self.child_items = self.items.items[i].generate_child_items()?;
+        self.child_items = StatefulList::with_items(self.items()[i].generate_child_items()?);
         Ok(())
     }
 }
