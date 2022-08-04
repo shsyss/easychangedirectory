@@ -106,13 +106,13 @@ impl App {
         } else {
             PathBuf::new()
         };
-        let child_items = Self::get_items(child_path)?;
+        let child_items = Self::create_items(child_path)?;
 
         let parent_path = Self::get_parent_path(&pwd);
-        let parent_items = Self::get_items(&parent_path)?;
+        let parent_items = Self::create_items(&parent_path)?;
 
         let grandparent_path = Self::get_parent_path(parent_path);
-        let grandparent_items = Self::get_items(&grandparent_path)?;
+        let grandparent_items = Self::create_items(&grandparent_path)?;
 
         Ok(App {
             child_items,
@@ -151,7 +151,7 @@ impl App {
         };
 
         let child_items = if self.child_items[0].is_dir() {
-            Self::get_items(&self.child_items[0].path)?
+            Self::create_items(&self.child_items[0].path)?
         } else if let Ok(s) = fs::read_to_string(&self.child_items[0].path) {
             s.lines()
                 .map(|s| Item {
@@ -186,7 +186,7 @@ impl App {
         };
 
         let grandparent_path = Self::get_parent_path(&self.grandparent_path);
-        let grandparent_items = Self::get_items(&grandparent_path)?;
+        let grandparent_items = Self::create_items(&grandparent_path)?;
 
         *self = Self {
             child_items: self.items.items.clone(),
@@ -207,7 +207,7 @@ impl App {
             .to_path_buf()
     }
 
-    fn get_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+    fn create_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
             vec![Item {
                 path: PathBuf::new(),
@@ -237,7 +237,7 @@ impl App {
 
         let selected_item = &self.items.items[i];
         let child_items = if selected_item.is_dir() {
-            Self::get_items(&selected_item.path)?
+            Self::create_items(&selected_item.path)?
         } else if let Ok(s) = fs::read_to_string(&selected_item.path) {
             s.lines()
                 .map(|s| Item {
