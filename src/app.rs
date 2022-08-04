@@ -65,6 +65,7 @@ impl<T> StatefulList<T> {
 pub enum State {
     File,
     Dir,
+    RelationalFile,
     RelationalDir,
     Content,
     None,

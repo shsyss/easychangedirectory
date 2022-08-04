@@ -44,7 +44,11 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
             .borders(Borders::RIGHT)
             .border_style(Style::default().fg(Color::Gray)),
     );
-    f.render_widget(grandparent_items, chunks[0]);
+    f.render_stateful_widget(
+        grandparent_items,
+        chunks[0],
+        &mut app.grandparent_items.state,
+    );
 
     // parent
     let parent_items = set_items(&app.parent_items.items);
@@ -53,7 +57,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
             .borders(Borders::RIGHT)
             .border_style(Style::default().fg(Color::Gray)),
     );
-    f.render_widget(parent_items, chunks[1]);
+    f.render_stateful_widget(parent_items, chunks[1], &mut app.parent_items.state);
 
     // current
     let items: Vec<ListItem> = set_items(&app.items.items);
@@ -74,7 +78,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // child
     let child_items = set_items(&app.child_items.items);
     let child_items = List::new(child_items).block(Block::default());
-    f.render_widget(child_items, chunks[3]);
+    f.render_stateful_widget(child_items, chunks[3], &mut app.child_items.state);
 }
 
 fn set_items(items: &[Item]) -> Vec<ListItem> {
@@ -85,7 +89,7 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
             let style = match item.state {
                 State::Content | State::None | State::File => Style::default().fg(Color::Gray),
                 State::Dir => Style::default().fg(Color::Blue),
-                State::RelationalDir => Style::default().fg(Color::Green),
+                State::RelationalDir | State::RelationalFile => Style::default().fg(Color::Green),
             };
             Some(ListItem::new(Span::styled(filename, style)))
         })
