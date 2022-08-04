@@ -87,7 +87,8 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
         .filter_map(|item| {
             let filename = item.filename()?;
             let style = match item.state {
-                State::Content | State::None | State::File => Style::default().fg(Color::Gray),
+                State::None | State::File => Style::default().fg(Color::Gray),
+                State::Content => Style::default().fg(Color::White),
                 State::Dir => Style::default().fg(Color::Blue),
                 State::RelationDir => Style::default().fg(Color::Green),
             };
