@@ -131,9 +131,17 @@ impl App {
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf()
     }
-    fn get_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
-        for (i, item) in items.iter().enumerate() {
-            if item.path == path.as_ref() {
+    fn get_index_parent(&self) -> usize {
+        for (i, item) in self.parent_items.iter().enumerate() {
+            if item.path == self.pwd {
+                return i;
+            }
+        }
+        0
+    }
+    fn get_index_grandparent(&self) -> usize {
+        for (i, item) in self.grandparent_items.iter().enumerate() {
+            if item.path == self.pwd.parent().unwrap().to_path_buf() {
                 return i;
             }
         }
@@ -192,7 +200,7 @@ impl App {
             child_items: self.items.items.clone(),
             items: StatefulList::with_items_select(
                 self.parent_items.clone(),
-                Self::get_index(&self.parent_items, &self.pwd),
+                self.get_index_parent(),
             ),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
@@ -217,21 +225,24 @@ impl App {
             PathBuf::new()
         };
         let child_items = Self::generate_items(child_path)?;
-
         let parent_path = Self::get_parent_path(&pwd);
-        let parent_items = Self::generate_items(&parent_path)?;
+        let grandparent_path = Self::get_parent_path(&parent_path);
 
-        let grandparent_path = Self::get_parent_path(parent_path);
-        let grandparent_items = Self::generate_items(&grandparent_path)?;
-
-        Ok(App {
+        let mut app = App {
             child_items,
             items: StatefulList::with_items(items),
-            parent_items,
-            grandparent_items,
+            parent_items: Self::generate_items(&parent_path)?,
+            grandparent_items: Self::generate_items(&grandparent_path)?,
             pwd,
             grandparent_path,
-        })
+        };
+
+        let i = app.get_index_parent();
+        app.parent_items[i].change_state(State::RelationDir);
+        let i = app.get_index_grandparent();
+        app.grandparent_items[i].change_state(State::RelationDir);
+
+        Ok(app)
     }
     fn update_child_items(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap_or(0);
