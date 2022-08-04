@@ -32,7 +32,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_widget(
         Block::default()
             .title(Span::styled(
-                app.get_pwd_str(),
+                app.generate_pwd_str(),
                 Style::default().fg(Color::Yellow),
             ))
             .style(Style::default().bg(Color::Rgb(0, 0, 40))),
