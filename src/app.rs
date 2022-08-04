@@ -84,7 +84,7 @@ impl Item {
     }
     fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
         Ok(if self.is_dir() {
-            App::create_items(&self.path)?
+            App::generate_items(&self.path)?
         } else if let Ok(s) = fs::read_to_string(&self.path) {
             s.lines()
                 .map(|s| Item {
@@ -114,7 +114,7 @@ pub struct App {
 }
 
 impl App {
-    fn create_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+    fn generate_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
             vec![Item {
                 path: PathBuf::new(),
@@ -176,7 +176,7 @@ impl App {
         };
 
         let grandparent_path = Self::get_parent_path(&self.grandparent_path);
-        let grandparent_items = Self::create_items(&grandparent_path)?;
+        let grandparent_items = Self::generate_items(&grandparent_path)?;
 
         *self = Self {
             child_items: self.items.items.clone(),
@@ -203,13 +203,13 @@ impl App {
         } else {
             PathBuf::new()
         };
-        let child_items = Self::create_items(child_path)?;
+        let child_items = Self::generate_items(child_path)?;
 
         let parent_path = Self::get_parent_path(&pwd);
-        let parent_items = Self::create_items(&parent_path)?;
+        let parent_items = Self::generate_items(&parent_path)?;
 
         let grandparent_path = Self::get_parent_path(parent_path);
-        let grandparent_items = Self::create_items(&grandparent_path)?;
+        let grandparent_items = Self::generate_items(&grandparent_path)?;
 
         Ok(App {
             child_items,
