@@ -73,11 +73,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     // child
     let child_items = set_items(&app.child_items);
-    let child_items = List::new(child_items).block(
-        Block::default()
-            .borders(Borders::RIGHT)
-            .border_style(Style::default().fg(Color::Gray)),
-    );
+    let child_items = List::new(child_items).block(Block::default());
     f.render_widget(child_items, chunks[3]);
 }
 
