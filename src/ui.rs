@@ -75,9 +75,9 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 fn set_items(items: &[Item]) -> Vec<ListItem> {
     items
         .iter()
-        .filter_map(|p| {
-            let filename = p.path.file_name()?.to_string_lossy().to_string();
-            let lines = if p.is_dir() {
+        .filter_map(|item| {
+            let filename = item.filename()?;
+            let lines = if item.is_dir() {
                 vec![Spans::from(Span::styled(
                     filename,
                     Style::default().fg(Color::Blue),

@@ -82,6 +82,9 @@ impl Item {
     pub fn is_dir(&self) -> bool {
         matches!(self.state, State::Dir | State::RelationDir)
     }
+    pub fn filename(&self) -> Option<String> {
+        Some(self.path.file_name()?.to_string_lossy().to_string())
+    }
 }
 
 pub struct App {
