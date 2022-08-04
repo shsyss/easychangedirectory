@@ -253,8 +253,13 @@ impl App {
         let pwd = env::current_dir()?;
         let items = items::read_dir(&pwd)?;
 
+        // Initial selection is 0
+        let mut is_child_content = false;
         let child_path = if items[0].is_dir() {
             items[0].path.clone()
+        } else if items[0].is_file() {
+            is_child_content = true;
+            PathBuf::new()
         } else {
             PathBuf::new()
         };
@@ -278,6 +283,9 @@ impl App {
 
         app.parent_items.select(pi);
         app.grandparent_items.select(gi);
+        if is_child_content {
+            app.child_items.unselect();
+        }
 
         Ok(app)
     }
