@@ -65,7 +65,7 @@ impl<T> StatefulList<T> {
 pub enum State {
     File,
     Dir,
-    RelationDir,
+    RelationalDir,
     Content,
     None,
 }
@@ -99,7 +99,7 @@ impl Item {
         })
     }
     pub fn is_dir(&self) -> bool {
-        matches!(self.state, State::Dir | State::RelationDir)
+        matches!(self.state, State::Dir | State::RelationalDir)
     }
     fn is_file(&self) -> bool {
         matches!(self.state, State::File)
@@ -160,7 +160,7 @@ impl App {
         let i = self.items.state.selected().unwrap();
         let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
-            self.items.items[i].change_state(State::RelationDir);
+            self.items.items[i].change_state(State::RelationalDir);
             selected_item.path
         } else if selected_item.is_file() {
             self.move_content(selected_item)?;
@@ -245,9 +245,10 @@ impl App {
             grandparent_path,
         };
 
+        //
         let (i, j) = (app.get_index_parent(), app.get_index_grandparent());
-        app.parent_items[i].change_state(State::RelationDir);
-        app.grandparent_items[j].change_state(State::RelationDir);
+        app.parent_items[i].change_state(State::RelationalDir);
+        app.grandparent_items[j].change_state(State::RelationalDir);
 
         Ok(app)
     }
