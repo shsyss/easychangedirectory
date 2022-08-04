@@ -17,7 +17,10 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Overall style
     f.render_widget(
         Block::default()
-            .title(app.get_pwd_str())
+            .title(Span::styled(
+                app.get_pwd_str(),
+                Style::default().fg(Color::Magenta),
+            ))
             .style(Style::default().bg(Color::Rgb(0, 0, 40))),
         f.size(),
     );
@@ -88,8 +91,7 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
                 State::Dir => Style::default().fg(Color::Blue),
                 State::RelationDir => Style::default().fg(Color::Green),
             };
-            let lines = vec![Spans::from(Span::styled(filename, style))];
-            Some(ListItem::new(lines))
+            Some(ListItem::new(Span::styled(filename, style)))
         })
         .collect()
 }
