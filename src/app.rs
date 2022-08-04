@@ -188,6 +188,7 @@ impl App {
         })
     }
     fn move_child(&mut self) -> anyhow::Result<()> {
+        //
         let i = self.items.state.selected().unwrap();
         let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
@@ -214,7 +215,7 @@ impl App {
 
         *self = Self {
             child_items: StatefulList::with_items_option(
-                self.get_child_items()[0].generate_child_items()?,
+                self.get_child_items()[selected_ci].generate_child_items()?,
                 ci,
             ),
             items: StatefulList::with_items_select(child_items, i),
@@ -242,6 +243,7 @@ impl App {
         Ok(())
     }
     fn move_parent(&mut self) -> anyhow::Result<()> {
+        // TODO: contentからmoveするときにcontentをhighlightしてしまう
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
         } else {
