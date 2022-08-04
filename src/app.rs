@@ -5,7 +5,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::{
-    env, io,
+    env, fs, io,
     path::{Path, PathBuf},
 };
 use tui::{
@@ -179,12 +179,13 @@ impl App {
         let i = self.items.state.selected().unwrap_or(0);
 
         let selected_path = self.items.items[i].clone();
-        let child_path = if selected_path.is_dir() {
-            selected_path
+        let child_items = if selected_path.is_dir() {
+            Self::get_items(selected_path)?
+        } else if let Ok(s) = fs::read_to_string(selected_path) {
+            s.lines().map(PathBuf::from).collect()
         } else {
-            PathBuf::new()
+            vec![PathBuf::new()]
         };
-        let child_items = Self::get_items(child_path)?;
 
         self.child_items = child_items;
 
