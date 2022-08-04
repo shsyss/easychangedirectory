@@ -221,6 +221,10 @@ impl App {
         0
     }
 
+    pub fn get_pwd_str(&self) -> String {
+        self.pwd.to_string_lossy().to_string()
+    }
+
     fn update_child_items(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap_or(0);
 

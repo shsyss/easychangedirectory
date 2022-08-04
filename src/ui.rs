@@ -16,7 +16,9 @@ use crate::{
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Overall style
     f.render_widget(
-        Block::default().style(Style::default().bg(Color::Rgb(0, 0, 40))),
+        Block::default()
+            .title(app.get_pwd_str())
+            .style(Style::default().bg(Color::Rgb(0, 0, 40))),
         f.size(),
     );
 
@@ -29,6 +31,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
             Constraint::Max(100),
             Constraint::Percentage(30),
         ])
+        .margin(1)
         .split(f.size());
 
     // grandparent
