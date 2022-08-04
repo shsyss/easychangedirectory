@@ -7,7 +7,7 @@ description = "cli tool to comfortably change directories"
 
 [[bin]]
 path = "./src/main.rs"
-name = "ecd"
+name = "ed"
 
 [dependencies]
 anyhow = "1.0.59"

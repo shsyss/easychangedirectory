@@ -158,7 +158,6 @@ impl App {
             self.move_content(selected_item)?;
             return Ok(());
         };
-
         *self = Self {
             child_items: self.child_items[0].generate_child_items()?,
             items: StatefulList::with_items(self.child_items.clone()),
@@ -295,6 +294,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
                 // right move
                 KeyCode::Char('l') => app.move_child()?,
                 KeyCode::Right => app.move_child()?,
+                // TODO: home,end pageUp,pageDown
                 _ => {}
             }
         }
