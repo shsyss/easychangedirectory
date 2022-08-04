@@ -13,6 +13,20 @@ use crate::{
     App,
 };
 
+struct Standard;
+
+impl Standard {
+    fn block<'a>() -> Block<'a> {
+        Block::default()
+            .borders(Borders::RIGHT)
+            .border_style(Style::default().fg(Color::Gray))
+    }
+
+    fn highlight_style() -> Style {
+        Style::default().fg(Color::Green)
+    }
+}
+
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Overall style
     f.render_widget(
@@ -39,11 +53,9 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     // grandparent
     let grandparent_items = set_items(&app.grandparent_items.items);
-    let grandparent_items = List::new(grandparent_items).block(
-        Block::default()
-            .borders(Borders::RIGHT)
-            .border_style(Style::default().fg(Color::Gray)),
-    );
+    let grandparent_items = List::new(grandparent_items)
+        .block(Standard::block())
+        .highlight_style(Standard::highlight_style());
     f.render_stateful_widget(
         grandparent_items,
         chunks[0],
@@ -52,21 +64,15 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     // parent
     let parent_items = set_items(&app.parent_items.items);
-    let parent_items = List::new(parent_items).block(
-        Block::default()
-            .borders(Borders::RIGHT)
-            .border_style(Style::default().fg(Color::Gray)),
-    );
+    let parent_items = List::new(parent_items)
+        .block(Standard::block())
+        .highlight_style(Standard::highlight_style());
     f.render_stateful_widget(parent_items, chunks[1], &mut app.parent_items.state);
 
     // current
     let items: Vec<ListItem> = set_items(&app.items.items);
     let items = List::new(items)
-        .block(
-            Block::default()
-                .borders(Borders::RIGHT)
-                .border_style(Style::default().fg(Color::Gray)),
-        )
+        .block(Standard::block())
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
@@ -77,7 +83,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     // child
     let child_items = set_items(&app.child_items.items);
-    let child_items = List::new(child_items).block(Block::default());
+    let child_items = List::new(child_items).highlight_style(Standard::highlight_style());
     f.render_stateful_widget(child_items, chunks[3], &mut app.child_items.state);
 }
 
