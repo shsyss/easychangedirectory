@@ -102,6 +102,12 @@ impl Item {
     pub fn is_dir(&self) -> bool {
         matches!(self.state, State::Dir | State::RelationDir)
     }
+    fn default() -> Self {
+        Self {
+            path: PathBuf::new(),
+            state: State::None,
+        }
+    }
 }
 
 pub struct App {
@@ -149,6 +155,7 @@ impl App {
         let pwd = if selected_item.is_dir() {
             selected_item.path
         } else {
+            self.move_content(selected_item)?;
             return Ok(());
         };
 
@@ -161,6 +168,17 @@ impl App {
             grandparent_path: Self::get_parent_path(&self.pwd),
         };
 
+        Ok(())
+    }
+    fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
+        *self = Self {
+            child_items: vec![Item::default()],
+            items: StatefulList::with_items(self.child_items.clone()),
+            parent_items: self.items.items.clone(),
+            grandparent_items: self.parent_items.clone(),
+            pwd: selected_item.path,
+            grandparent_path: Self::get_parent_path(&self.pwd),
+        };
         Ok(())
     }
     fn move_down(&mut self) -> anyhow::Result<()> {
