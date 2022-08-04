@@ -97,47 +97,36 @@ pub struct App {
 }
 
 impl App {
-    fn new() -> anyhow::Result<App> {
-        let pwd = env::current_dir()?;
-        let items = items::read_dir(&pwd)?;
-
-        let child_path = if items[0].is_dir() {
-            items[0].path.clone()
+    fn create_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+        Ok(if path.as_ref().to_string_lossy().is_empty() {
+            vec![Item {
+                path: PathBuf::new(),
+                state: State::None,
+            }]
         } else {
-            PathBuf::new()
-        };
-        let child_items = Self::create_items(child_path)?;
-
-        let parent_path = Self::get_parent_path(&pwd);
-        let parent_items = Self::create_items(&parent_path)?;
-
-        let grandparent_path = Self::get_parent_path(parent_path);
-        let grandparent_items = Self::create_items(&grandparent_path)?;
-
-        Ok(App {
-            child_items,
-            items: StatefulList::with_items(items),
-            parent_items,
-            grandparent_items,
-            pwd,
-            grandparent_path,
+            items::read_dir(path)?
         })
     }
 
-    fn next(&mut self) -> anyhow::Result<()> {
-        self.items.next();
-
-        self.update_child_items()?;
-
-        Ok(())
+    fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
+        path.as_ref()
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf()
     }
 
-    fn previous(&mut self) -> anyhow::Result<()> {
-        self.items.previous();
+    fn get_pwd_index(&self) -> usize {
+        for (i, item) in self.parent_items.iter().enumerate() {
+            if item.path == self.pwd {
+                return i;
+            }
+        }
 
-        self.update_child_items()?;
+        0
+    }
 
-        Ok(())
+    pub fn get_pwd_str(&self) -> String {
+        self.pwd.to_string_lossy().to_string()
     }
 
     fn move_child(&mut self) -> anyhow::Result<()> {
@@ -178,6 +167,14 @@ impl App {
         Ok(())
     }
 
+    fn move_down(&mut self) -> anyhow::Result<()> {
+        self.items.next();
+
+        self.update_child_items()?;
+
+        Ok(())
+    }
+
     fn move_parent(&mut self) -> anyhow::Result<()> {
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
@@ -200,36 +197,39 @@ impl App {
         Ok(())
     }
 
-    fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
-        path.as_ref()
-            .parent()
-            .unwrap_or_else(|| Path::new(""))
-            .to_path_buf()
+    fn move_up(&mut self) -> anyhow::Result<()> {
+        self.items.previous();
+
+        self.update_child_items()?;
+
+        Ok(())
     }
 
-    fn create_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
-        Ok(if path.as_ref().to_string_lossy().is_empty() {
-            vec![Item {
-                path: PathBuf::new(),
-                state: State::None,
-            }]
+    fn new() -> anyhow::Result<App> {
+        let pwd = env::current_dir()?;
+        let items = items::read_dir(&pwd)?;
+
+        let child_path = if items[0].is_dir() {
+            items[0].path.clone()
         } else {
-            items::read_dir(path)?
+            PathBuf::new()
+        };
+        let child_items = Self::create_items(child_path)?;
+
+        let parent_path = Self::get_parent_path(&pwd);
+        let parent_items = Self::create_items(&parent_path)?;
+
+        let grandparent_path = Self::get_parent_path(parent_path);
+        let grandparent_items = Self::create_items(&grandparent_path)?;
+
+        Ok(App {
+            child_items,
+            items: StatefulList::with_items(items),
+            parent_items,
+            grandparent_items,
+            pwd,
+            grandparent_path,
         })
-    }
-
-    fn get_pwd_index(&self) -> usize {
-        for (i, item) in self.parent_items.iter().enumerate() {
-            if item.path == self.pwd {
-                return i;
-            }
-        }
-
-        0
-    }
-
-    pub fn get_pwd_str(&self) -> String {
-        self.pwd.to_string_lossy().to_string()
     }
 
     fn update_child_items(&mut self) -> anyhow::Result<()> {
@@ -297,11 +297,11 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
                 // TODO: change directory
                 KeyCode::Enter => return Ok(app.pwd),
                 // next
-                KeyCode::Char('j') => app.next()?,
-                KeyCode::Down => app.next()?,
+                KeyCode::Char('j') => app.move_down()?,
+                KeyCode::Down => app.move_down()?,
                 // previous
-                KeyCode::Char('k') => app.previous()?,
-                KeyCode::Up => app.previous()?,
+                KeyCode::Char('k') => app.move_up()?,
+                KeyCode::Up => app.move_up()?,
                 // parent
                 KeyCode::Char('h') => app.move_parent()?,
                 KeyCode::Left => app.move_parent()?,
