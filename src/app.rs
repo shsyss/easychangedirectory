@@ -23,7 +23,7 @@ pub struct StatefulList<T> {
 }
 
 impl<T> StatefulList<T> {
-    fn next(&mut self) {
+    fn next(&mut self) -> usize {
         let i = match self.state.selected() {
             Some(i) => {
                 if i >= self.items.len() - 1 {
@@ -34,9 +34,10 @@ impl<T> StatefulList<T> {
             }
             None => 0,
         };
-        self.state.select(Some(i))
+        self.state.select(Some(i));
+        i
     }
-    fn previous(&mut self) {
+    fn previous(&mut self) -> usize {
         let i = match self.state.selected() {
             Some(i) => {
                 if i == 0 {
@@ -48,6 +49,7 @@ impl<T> StatefulList<T> {
             None => 0,
         };
         self.state.select(Some(i));
+        i
     }
     fn select(&mut self, index: usize) {
         self.state.select(Some(index));
@@ -139,6 +141,15 @@ pub struct App {
 }
 
 impl App {
+    fn generate_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
+        path.as_ref()
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_path_buf()
+    }
+    pub fn generate_pwd_str(&self) -> String {
+        self.pwd.to_string_lossy().to_string()
+    }
     pub fn get_child_items(&self) -> Vec<Item> {
         self.child_items.items.clone()
     }
@@ -160,15 +171,6 @@ impl App {
     }
     pub fn get_parent_items(&self) -> Vec<Item> {
         self.parent_items.items.clone()
-    }
-    fn generate_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
-        path.as_ref()
-            .parent()
-            .unwrap_or_else(|| Path::new(""))
-            .to_path_buf()
-    }
-    pub fn generate_pwd_str(&self) -> String {
-        self.pwd.to_string_lossy().to_string()
     }
     fn make_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
         for (i, item) in items.iter().enumerate() {
