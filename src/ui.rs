@@ -8,7 +8,10 @@ use tui::{
     Frame,
 };
 
-use crate::{app::Item, App};
+use crate::{
+    app::{Item, State},
+    App,
+};
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Overall style
@@ -77,17 +80,12 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
         .iter()
         .filter_map(|item| {
             let filename = item.filename()?;
-            let lines = if item.is_dir() {
-                vec![Spans::from(Span::styled(
-                    filename,
-                    Style::default().fg(Color::Blue),
-                ))]
-            } else {
-                vec![Spans::from(Span::styled(
-                    filename,
-                    Style::default().fg(Color::Gray),
-                ))]
+            let style = match item.state {
+                State::Content | State::None | State::File => Style::default().fg(Color::Gray),
+                State::Dir => Style::default().fg(Color::Blue),
+                State::RelationDir => Style::default().fg(Color::Green),
             };
+            let lines = vec![Spans::from(Span::styled(filename, style))];
             Some(ListItem::new(lines))
         })
         .collect()
