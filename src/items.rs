@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::app::{Item, State};
 
@@ -21,10 +21,7 @@ pub fn read_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
             })
             .collect()
     } else {
-        return Ok(vec![Item {
-            path: PathBuf::new(),
-            state: State::None,
-        }]);
+        return Ok(vec![Item::default()]);
     };
 
     Ok(items)

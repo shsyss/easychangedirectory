@@ -93,16 +93,13 @@ impl Item {
                 })
                 .collect()
         } else {
-            vec![Item {
-                path: PathBuf::new(),
-                state: State::None,
-            }]
+            vec![Item::default()]
         })
     }
     pub fn is_dir(&self) -> bool {
         matches!(self.state, State::Dir | State::RelationDir)
     }
-    fn default() -> Self {
+    pub fn default() -> Self {
         Self {
             path: PathBuf::new(),
             state: State::None,
@@ -122,10 +119,7 @@ pub struct App {
 impl App {
     fn generate_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
-            vec![Item {
-                path: PathBuf::new(),
-                state: State::None,
-            }]
+            vec![Item::default()]
         } else {
             items::read_dir(path)?
         })
