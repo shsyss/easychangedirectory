@@ -19,7 +19,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         Block::default()
             .title(Span::styled(
                 app.get_pwd_str(),
-                Style::default().fg(Color::Magenta),
+                Style::default().fg(Color::Rgb(255, 150, 20)),
             ))
             .style(Style::default().bg(Color::Rgb(0, 0, 40))),
         f.size(),
