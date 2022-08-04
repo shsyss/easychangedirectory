@@ -95,7 +95,6 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
             let style = match item.state {
                 State::Content | State::None | State::File => Style::default().fg(Color::Gray),
                 State::Dir => Style::default().fg(Color::Blue),
-                State::RelationalDir | State::RelationalFile => Style::default().fg(Color::Green),
             };
             Some(ListItem::new(Span::styled(filename, style)))
         })
