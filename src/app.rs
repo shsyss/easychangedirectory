@@ -16,6 +16,7 @@ use tui::{
 
 use crate::{items, ui};
 
+#[derive(Debug)]
 pub struct StatefulList<T> {
     pub state: ListState,
     pub items: Vec<T>,
@@ -60,7 +61,7 @@ impl<T> StatefulList<T> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum State {
     File,
     Dir,
@@ -69,7 +70,7 @@ pub enum State {
     None,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Item {
     pub path: PathBuf,
     pub state: State,
@@ -100,6 +101,9 @@ impl Item {
     pub fn is_dir(&self) -> bool {
         matches!(self.state, State::Dir | State::RelationDir)
     }
+    fn is_file(&self) -> bool {
+        matches!(self.state, State::File)
+    }
     pub fn default() -> Self {
         Self {
             path: PathBuf::new(),
@@ -108,6 +112,7 @@ impl Item {
     }
 }
 
+#[derive(Debug)]
 pub struct App {
     pub child_items: Vec<Item>,
     pub items: StatefulList<Item>,
@@ -153,11 +158,14 @@ impl App {
     fn move_child(&mut self) -> anyhow::Result<()> {
         // TODO: 直近のpwdを選択
         let i = self.items.state.selected().unwrap();
-        let selected_item = self.items.items[i].change_state(State::RelationDir);
+        let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
+            self.items.items[i].change_state(State::RelationDir);
             selected_item.path
-        } else {
+        } else if selected_item.is_file() {
             self.move_content(selected_item)?;
+            return Ok(());
+        } else {
             return Ok(());
         };
         *self = Self {
@@ -237,10 +245,9 @@ impl App {
             grandparent_path,
         };
 
-        let i = app.get_index_parent();
+        let (i, j) = (app.get_index_parent(), app.get_index_grandparent());
         app.parent_items[i].change_state(State::RelationDir);
-        let i = app.get_index_grandparent();
-        app.grandparent_items[i].change_state(State::RelationDir);
+        app.grandparent_items[j].change_state(State::RelationDir);
 
         Ok(app)
     }
