@@ -1,12 +1,18 @@
+use std::fs;
 use std::path::{Path, PathBuf};
-use std::{fs, io};
 
-pub fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<PathBuf>> {
-    Ok(fs::read_dir(&path)?
-        .filter_map(|entry| {
-            let entry = entry.ok()?;
-            let filepath = entry.path();
-            Some(filepath)
-        })
-        .collect())
+pub fn read_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<PathBuf>> {
+    let items = if let Ok(read_dir) = fs::read_dir(&path) {
+        read_dir
+            .filter_map(|entry| {
+                let entry = entry.ok()?;
+                let filepath = entry.path();
+                Some(filepath)
+            })
+            .collect()
+    } else {
+        return Ok(vec![PathBuf::new()]);
+    };
+
+    Ok(items)
 }

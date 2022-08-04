@@ -167,7 +167,7 @@ impl App {
             .to_path_buf()
     }
 
-    fn get_items<P: AsRef<Path>>(path: P) -> io::Result<Vec<PathBuf>> {
+    fn get_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<PathBuf>> {
         Ok(if path.as_ref().to_string_lossy().is_empty() {
             vec![PathBuf::new()]
         } else {
