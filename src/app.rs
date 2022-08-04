@@ -33,6 +33,11 @@ impl<T> StatefulList<T> {
         state.select(Some(index));
         StatefulList { state, items }
     }
+    fn with_items_unselect(items: Vec<T>) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(None);
+        StatefulList { state, items }
+    }
     fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -59,6 +64,9 @@ impl<T> StatefulList<T> {
         };
         self.state.select(Some(i));
     }
+    fn selected(&mut self) -> usize {
+        self.state.selected().unwrap()
+    }
     fn select(&mut self, index: usize) {
         self.state.select(Some(index));
     }
@@ -78,6 +86,7 @@ pub enum State {
 pub enum Family {
     Grandparent,
     Parent,
+    Oneself,
     Child,
 }
 
@@ -155,6 +164,7 @@ impl App {
         let items = match family {
             Family::Grandparent => &self.grandparent_items,
             Family::Parent => &self.parent_items,
+            Family::Oneself => &self.items,
             Family::Child => &self.child_items,
         };
 
@@ -227,17 +237,17 @@ impl App {
 
         let grandparent_path = Self::get_parent_path(&self.grandparent_path);
         let grandparent_items = Self::generate_items(&grandparent_path)?;
-        let i = self.get_index(Family::Grandparent);
-        // grandparent_items[i].change_state(State::RelationalDir);
+
+        let ci = self.get_index(Family::Oneself);
+        let i = self.get_index(Family::Parent);
+        let pi = self.get_index(Family::Grandparent);
+        let gi = Self::generate_index(&grandparent_items, &self.grandparent_path);
 
         *self = Self {
-            child_items: StatefulList::with_items(self.get_items()),
-            items: StatefulList::with_items_select(
-                self.get_parent_items(),
-                self.get_index(Family::Parent),
-            ),
-            parent_items: StatefulList::with_items(self.get_grandparent_items()),
-            grandparent_items: StatefulList::with_items(grandparent_items),
+            child_items: StatefulList::with_items_select(self.get_items(), ci),
+            items: StatefulList::with_items_select(self.get_parent_items(), i),
+            parent_items: StatefulList::with_items_select(self.get_grandparent_items(), pi),
+            grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
             pwd,
             grandparent_path,
         };
@@ -254,12 +264,8 @@ impl App {
         let items = items::read_dir(&pwd)?;
 
         // Initial selection is 0
-        let mut is_child_content = false;
         let child_path = if items[0].is_dir() {
             items[0].path.clone()
-        } else if items[0].is_file() {
-            is_child_content = true;
-            PathBuf::new()
         } else {
             PathBuf::new()
         };
@@ -267,13 +273,11 @@ impl App {
         let grandparent_path = Self::get_parent_path(&parent_path);
         let parent_items = Self::generate_items(&parent_path)?;
         let grandparent_items = Self::generate_items(&grandparent_path)?;
-        let (pi, gi) = (
-            Self::generate_index(&parent_items, &pwd),
-            Self::generate_index(&grandparent_items, &parent_path),
-        );
+        let pi = Self::generate_index(&parent_items, &pwd);
+        let gi = Self::generate_index(&grandparent_items, &parent_path);
 
         let mut app = App {
-            child_items: StatefulList::with_items(Self::generate_items(child_path)?),
+            child_items: StatefulList::with_items_unselect(Self::generate_items(child_path)?),
             items: StatefulList::with_items(items),
             parent_items: StatefulList::with_items(parent_items),
             grandparent_items: StatefulList::with_items(grandparent_items),
@@ -283,14 +287,11 @@ impl App {
 
         app.parent_items.select(pi);
         app.grandparent_items.select(gi);
-        if is_child_content {
-            app.child_items.unselect();
-        }
 
         Ok(app)
     }
     fn update_child_items(&mut self) -> anyhow::Result<()> {
-        let i = self.items.state.selected().unwrap_or(0);
+        let i = self.items.selected();
         self.child_items = StatefulList::with_items(self.get_items()[i].generate_child_items()?);
         Ok(())
     }
