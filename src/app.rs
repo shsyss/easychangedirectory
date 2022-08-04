@@ -105,7 +105,7 @@ impl Item {
             state: State::None,
         }
     }
-    pub fn filename(&self) -> Option<String> {
+    pub fn generate_filename(&self) -> Option<String> {
         Some(self.path.file_name()?.to_string_lossy().to_string())
     }
     fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
@@ -237,8 +237,11 @@ impl App {
         Ok(())
     }
     fn move_next(&mut self) -> anyhow::Result<()> {
-        self.items.next();
-        self.update_child_items()?;
+        let i = self.items.next();
+        if self.get_items()[i].is_file() {
+            self.child_items.unselect();
+        }
+        self.update_child_items(i)?;
         Ok(())
     }
     fn move_parent(&mut self) -> anyhow::Result<()> {
@@ -268,8 +271,11 @@ impl App {
         Ok(())
     }
     fn move_previous(&mut self) -> anyhow::Result<()> {
-        self.items.previous();
-        self.update_child_items()?;
+        let i = self.items.previous();
+        if self.get_items()[i].is_file() {
+            self.child_items.unselect();
+        }
+        self.update_child_items(i)?;
         Ok(())
     }
     fn new() -> anyhow::Result<App> {
@@ -303,9 +309,9 @@ impl App {
 
         Ok(app)
     }
-    fn update_child_items(&mut self) -> anyhow::Result<()> {
-        let i = self.items.selected();
-        self.child_items = StatefulList::with_items(self.get_items()[i].generate_child_items()?);
+    fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
+        self.child_items =
+            StatefulList::with_items(self.get_items()[index].generate_child_items()?);
         Ok(())
     }
 }

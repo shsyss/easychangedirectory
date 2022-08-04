@@ -91,7 +91,7 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
     items
         .iter()
         .filter_map(|item| {
-            let filename = item.filename()?;
+            let filename = item.generate_filename()?;
             let style = match item.state {
                 State::Content | State::None | State::File => Style::default().fg(Color::Gray),
                 State::Dir => Style::default().fg(Color::Blue),
