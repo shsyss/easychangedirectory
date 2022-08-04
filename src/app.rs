@@ -79,11 +79,28 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn is_dir(&self) -> bool {
-        matches!(self.state, State::Dir | State::RelationDir)
-    }
     pub fn filename(&self) -> Option<String> {
         Some(self.path.file_name()?.to_string_lossy().to_string())
+    }
+    fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
+        Ok(if self.is_dir() {
+            App::create_items(&self.path)?
+        } else if let Ok(s) = fs::read_to_string(&self.path) {
+            s.lines()
+                .map(|s| Item {
+                    path: PathBuf::from(s),
+                    state: State::Content,
+                })
+                .collect()
+        } else {
+            vec![Item {
+                path: PathBuf::new(),
+                state: State::None,
+            }]
+        })
+    }
+    pub fn is_dir(&self) -> bool {
+        matches!(self.state, State::Dir | State::RelationDir)
     }
 }
 
@@ -107,14 +124,12 @@ impl App {
             items::read_dir(path)?
         })
     }
-
     fn get_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
         path.as_ref()
             .parent()
             .unwrap_or_else(|| Path::new(""))
             .to_path_buf()
     }
-
     fn get_pwd_index(&self) -> usize {
         for (i, item) in self.parent_items.iter().enumerate() {
             if item.path == self.pwd {
@@ -124,11 +139,9 @@ impl App {
 
         0
     }
-
     pub fn get_pwd_str(&self) -> String {
         self.pwd.to_string_lossy().to_string()
     }
-
     fn move_child(&mut self) -> anyhow::Result<()> {
         // TODO: 直近のpwdを選択
         let i = self.items.state.selected().unwrap();
@@ -139,24 +152,8 @@ impl App {
             return Ok(());
         };
 
-        let child_items = if self.child_items[0].is_dir() {
-            Self::create_items(&self.child_items[0].path)?
-        } else if let Ok(s) = fs::read_to_string(&self.child_items[0].path) {
-            s.lines()
-                .map(|s| Item {
-                    path: PathBuf::from(s),
-                    state: State::Content,
-                })
-                .collect()
-        } else {
-            vec![Item {
-                path: PathBuf::new(),
-                state: State::None,
-            }]
-        };
-
         *self = Self {
-            child_items,
+            child_items: self.child_items[0].generate_child_items()?,
             items: StatefulList::with_items(self.child_items.clone()),
             parent_items: self.items.items.clone(),
             grandparent_items: self.parent_items.clone(),
@@ -166,15 +163,11 @@ impl App {
 
         Ok(())
     }
-
     fn move_down(&mut self) -> anyhow::Result<()> {
         self.items.next();
-
         self.update_child_items()?;
-
         Ok(())
     }
-
     fn move_parent(&mut self) -> anyhow::Result<()> {
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
@@ -196,15 +189,11 @@ impl App {
 
         Ok(())
     }
-
     fn move_up(&mut self) -> anyhow::Result<()> {
         self.items.previous();
-
         self.update_child_items()?;
-
         Ok(())
     }
-
     fn new() -> anyhow::Result<App> {
         let pwd = env::current_dir()?;
         let items = items::read_dir(&pwd)?;
@@ -231,29 +220,9 @@ impl App {
             grandparent_path,
         })
     }
-
     fn update_child_items(&mut self) -> anyhow::Result<()> {
         let i = self.items.state.selected().unwrap_or(0);
-
-        let selected_item = &self.items.items[i];
-        let child_items = if selected_item.is_dir() {
-            Self::create_items(&selected_item.path)?
-        } else if let Ok(s) = fs::read_to_string(&selected_item.path) {
-            s.lines()
-                .map(|s| Item {
-                    path: PathBuf::from(s),
-                    state: State::Content,
-                })
-                .collect()
-        } else {
-            vec![Item {
-                path: PathBuf::new(),
-                state: State::None,
-            }]
-        };
-
-        self.child_items = child_items;
-
+        self.child_items = self.items.items[i].generate_child_items()?;
         Ok(())
     }
 }
