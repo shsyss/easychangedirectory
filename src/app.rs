@@ -28,6 +28,12 @@ impl<T> StatefulList<T> {
         StatefulList { state, items }
     }
 
+    fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(Some(index));
+        StatefulList { state, items }
+    }
+
     fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
@@ -138,7 +144,6 @@ impl App {
     }
 
     fn move_parent(&mut self) -> anyhow::Result<()> {
-        // TODO: pwdのフォルダにカーソルを合わせる
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
         } else {
@@ -150,7 +155,7 @@ impl App {
 
         *self = Self {
             child_items: self.items.items.clone(),
-            items: StatefulList::with_items(self.parent_items.clone()),
+            items: StatefulList::with_items_select(self.parent_items.clone(), self.get_pwd_index()),
             parent_items: self.grandparent_items.clone(),
             grandparent_items,
             pwd,
@@ -173,6 +178,16 @@ impl App {
         } else {
             items::read_dir(path)?
         })
+    }
+
+    fn get_pwd_index(&self) -> usize {
+        for (i, path) in self.parent_items.iter().enumerate() {
+            if *path == self.pwd {
+                return i;
+            }
+        }
+
+        0
     }
 
     fn update_child_items(&mut self) -> anyhow::Result<()> {
