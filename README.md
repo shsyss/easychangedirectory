@@ -26,7 +26,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 | `PageUp` | Skip a little and move up |
 | `PageDown` | Skip a little and move down |
 | `Enter` | Change directory to current directory |
-| `Backspace` `Esc` `ctrl + c` | Exit and return to the original directory |
+| `Backspace` `Esc` `ctrl + c` | Exit and return to original directory |
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
