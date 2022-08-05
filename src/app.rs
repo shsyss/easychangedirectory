@@ -65,14 +65,14 @@ impl<T> StatefulList<T> {
         state.select(Some(0));
         StatefulList { state, items }
     }
-    fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
-        let mut state = ListState::default();
-        state.select(Some(index));
-        StatefulList { state, items }
-    }
     fn with_items_option(items: Vec<T>, index: Option<usize>) -> StatefulList<T> {
         let mut state = ListState::default();
         state.select(index);
+        StatefulList { state, items }
+    }
+    fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
+        let mut state = ListState::default();
+        state.select(Some(index));
         StatefulList { state, items }
     }
 }
@@ -105,9 +105,6 @@ impl Item {
             state: State::None,
         }
     }
-    pub fn generate_filename(&self) -> Option<String> {
-        Some(self.path.file_name()?.to_string_lossy().to_string())
-    }
     fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
         Ok(if self.is_dir() {
             App::make_items(&self.path)?
@@ -121,6 +118,9 @@ impl Item {
         } else {
             vec![Item::default()]
         })
+    }
+    pub fn generate_filename(&self) -> Option<String> {
+        Some(self.path.file_name()?.to_string_lossy().to_string())
     }
     pub fn is_dir(&self) -> bool {
         matches!(self.state, State::Dir)
@@ -173,6 +173,11 @@ impl App {
     pub fn get_parent_items(&self) -> Vec<Item> {
         self.parent_items.items.clone()
     }
+    /// 作業ブロック
+    fn is_contents_in_working_block(&self) -> bool {
+        let i = self.parent_items.selected();
+        self.get_parent_items()[i].is_file()
+    }
     fn make_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
         for (i, item) in items.iter().enumerate() {
             if item.path == path.as_ref() {
@@ -192,7 +197,6 @@ impl App {
         let i = self.items.state.selected().unwrap();
         let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
-            // self.items.select(0);
             selected_item.path
         } else if selected_item.is_file() {
             self.move_content(selected_item)?;
@@ -204,8 +208,7 @@ impl App {
         let child_items = self.get_child_items();
         let selected_ci = self.get_index(Family::Child);
         let ci = if child_items[selected_ci].is_dir() {
-            // TODO: list生成時のselectがoneselfと同じ
-            Some(selected_ci)
+            Some(0)
         } else {
             None
         };
@@ -227,7 +230,6 @@ impl App {
         Ok(())
     }
     fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
-        // TODO: parent_itemsのselectが0になる
         let pi = self.get_index(Family::Oneself);
         let gi = self.get_index(Family::Parent);
 
@@ -263,7 +265,6 @@ impl App {
         self.items.select(if i < JUMP { 0 } else { i - JUMP });
     }
     fn move_parent(&mut self) -> anyhow::Result<()> {
-        // TODO: contentからmoveするときにcontentをhighlightしてしまう
         let pwd = if let Some(pwd) = self.pwd.parent() {
             pwd.to_path_buf()
         } else {
@@ -336,11 +337,6 @@ impl App {
             self.child_items.unselect();
         }
         Ok(())
-    }
-    /// 作業ブロック
-    fn is_contents_in_working_block(&self) -> bool {
-        let i = self.parent_items.selected();
-        self.get_parent_items()[i].is_file()
     }
 }
 
