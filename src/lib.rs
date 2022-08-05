@@ -5,5 +5,5 @@ mod shell;
 mod ui;
 
 pub use app::{app, App};
-pub use cli::app_info;
+pub use cli::build_cli;
 pub use ui::ui;

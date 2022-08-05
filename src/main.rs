@@ -1,9 +1,9 @@
 use std::process;
 
-use easychangedirectory::{app, app_info};
+use easychangedirectory::{app, build_cli};
 
 fn main() {
-  app_info();
+  build_cli().get_matches();
 
   let path = match app() {
     Ok(path) => path,

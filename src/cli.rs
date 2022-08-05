@@ -1,5 +1,5 @@
-use clap::command;
+use clap::{command, Command};
 
-pub fn app_info() {
-  command!().get_matches();
+pub fn build_cli() -> Command<'static> {
+  command!()
 }
