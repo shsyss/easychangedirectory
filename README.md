@@ -12,4 +12,4 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Usage
 
-## Install
+## Installation
