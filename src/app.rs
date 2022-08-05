@@ -85,6 +85,7 @@ pub enum State {
   None,
 }
 
+// for identification
 pub enum Family {
   Grandparent,
   Parent,
@@ -93,12 +94,12 @@ pub enum Family {
 }
 
 #[derive(Debug, Clone)]
-pub enum ItemType {
+pub enum TypeItem {
   Path(PathBuf),
   Content(String),
 }
 
-impl ItemType {
+impl TypeItem {
   fn new_path() -> Self {
     Self::Path(PathBuf::new())
   }
@@ -109,19 +110,19 @@ impl ItemType {
 
 #[derive(Debug, Clone)]
 pub struct Item {
-  pub item: ItemType,
+  pub item: TypeItem,
   pub state: State,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { item: ItemType::new_path(), state: State::None }
+    Self { item: TypeItem::new_path(), state: State::None }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     Ok(if self.is_dir() {
       App::make_items(&self.get_path().unwrap())?
     } else if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
-      s.lines().map(|s| Item { item: ItemType::from_path(s), state: State::Content }).collect()
+      s.lines().map(|s| Item { item: TypeItem::from_path(s), state: State::Content }).collect()
     } else {
       vec![Item::default()]
     })
@@ -136,7 +137,7 @@ impl Item {
     matches!(self.state, State::File)
   }
   fn get_path(&self) -> Option<PathBuf> {
-    if let ItemType::Path(path) = &self.item {
+    if let TypeItem::Path(path) = &self.item {
       Some(path.clone())
     } else {
       None
@@ -189,14 +190,13 @@ impl App {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
   }
-  fn make_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
-    // TODO: findで抽象化
-    for (i, item) in items.iter().enumerate() {
-      if item.get_path().unwrap() == path.as_ref() {
-        return i;
-      }
+  fn generate_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
+    let generate_item = items.iter().enumerate().find(|(_, item)| item.get_path().unwrap() == path.as_ref());
+    if let Some((i, _)) = generate_item {
+      i
+    } else {
+      0
     }
-    0
   }
   fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
     Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { items::read_dir(path)? })
@@ -282,7 +282,7 @@ impl App {
     let ci = if self.is_contents_in_working_block() { None } else { Some(self.get_index(Family::Oneself)) };
     let i = self.get_index(Family::Parent);
     let pi = self.get_index(Family::Grandparent);
-    let gi = Self::make_index(&grandparent_items, &self.grandparent_path);
+    let gi = Self::generate_index(&grandparent_items, &self.grandparent_path);
 
     *self = Self {
       child_items: StatefulList::with_items_option(self.get_items(), ci),
@@ -310,8 +310,8 @@ impl App {
     let grandparent_path = Self::generate_parent_path(&parent_path);
     let parent_items = Self::make_items(&parent_path)?;
     let grandparent_items = Self::make_items(&grandparent_path)?;
-    let pi = Self::make_index(&parent_items, &pwd);
-    let gi = Self::make_index(&grandparent_items, &parent_path);
+    let pi = Self::generate_index(&parent_items, &pwd);
+    let gi = Self::generate_index(&grandparent_items, &parent_path);
 
     let mut app = App {
       child_items: StatefulList::with_items_option(Self::make_items(child_path)?, None),
