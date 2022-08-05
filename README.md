@@ -1,4 +1,4 @@
-# easychangedirectory
+# easychangedirectory (unfinished)
 
 > **cli tool to comfortably change directories**
 
@@ -7,6 +7,8 @@
 [![Rust](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml/badge.svg)](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml)
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
+
+[Features](#features) / [Usage](#usage) / [Installlation](#installation)
 
 ## Features
 
