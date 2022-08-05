@@ -92,27 +92,32 @@ pub enum Family {
   Child,
 }
 
+enum ItemType {
+  Path(PathBuf),
+  Content(String),
+}
+
 #[derive(Debug, Clone)]
 pub struct Item {
-  pub path: PathBuf,
+  pub item: PathBuf,
   pub state: State,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { path: PathBuf::new(), state: State::None }
+    Self { item: PathBuf::new(), state: State::None }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     Ok(if self.is_dir() {
-      App::make_items(&self.path)?
-    } else if let Ok(s) = fs::read_to_string(&self.path) {
-      s.lines().map(|s| Item { path: PathBuf::from(s), state: State::Content }).collect()
+      App::make_items(&self.item)?
+    } else if let Ok(s) = fs::read_to_string(&self.item) {
+      s.lines().map(|s| Item { item: PathBuf::from(s), state: State::Content }).collect()
     } else {
       vec![Item::default()]
     })
   }
   pub fn generate_filename(&self) -> Option<String> {
-    Some(self.path.file_name()?.to_string_lossy().to_string())
+    Some(self.item.file_name()?.to_string_lossy().to_string())
   }
   pub fn is_dir(&self) -> bool {
     matches!(self.state, State::Dir)
@@ -169,7 +174,7 @@ impl App {
   }
   fn make_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
     for (i, item) in items.iter().enumerate() {
-      if item.path == path.as_ref() {
+      if item.item == path.as_ref() {
         return i;
       }
     }
@@ -182,7 +187,7 @@ impl App {
     let i = self.items.state.selected().unwrap();
     let selected_item = self.items.items[i].clone();
     let pwd = if selected_item.is_dir() {
-      selected_item.path
+      selected_item.item
     } else if selected_item.is_file() {
       self.move_content(selected_item)?;
       return Ok(());
@@ -202,7 +207,6 @@ impl App {
     let gi = self.get_index(Family::Parent);
 
     *self = Self {
-      // TODO: visualstudio2019からmove_childするとpanic
       child_items: StatefulList::with_items_option(self.get_child_items()[selected_ci].generate_child_items()?, ci),
       items: StatefulList::with_items_select(child_items, i),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
@@ -221,7 +225,7 @@ impl App {
       items: StatefulList::with_items(self.get_child_items()),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
-      pwd: selected_item.path,
+      pwd: selected_item.item,
       grandparent_path: Self::generate_parent_path(&self.pwd),
     };
     Ok(())
@@ -282,7 +286,7 @@ impl App {
     let items = items::read_dir(&pwd)?;
 
     // Initial selection is 0
-    let child_path = if items[0].is_dir() { items[0].path.clone() } else { PathBuf::new() };
+    let child_path = if items[0].is_dir() { items[0].item.clone() } else { PathBuf::new() };
     let parent_path = Self::generate_parent_path(&pwd);
     let grandparent_path = Self::generate_parent_path(&parent_path);
     let parent_items = Self::make_items(&parent_path)?;
