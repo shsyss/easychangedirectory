@@ -1,4 +1,4 @@
-use easychangedirectory::{app, build_cli};
+use easychangedirectory::{app, build_cli, change_dir};
 
 fn main() -> anyhow::Result<()> {
   build_cli().get_matches();
@@ -10,6 +10,8 @@ fn main() -> anyhow::Result<()> {
       return Ok(());
     }
   };
+
+  change_dir(path)?;
 
   Ok(())
 }

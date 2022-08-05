@@ -191,6 +191,10 @@ impl App {
     };
 
     let child_items = self.get_child_items();
+    if child_items.is_empty() {
+      return Ok(());
+    }
+
     let selected_ci = self.get_index(Family::Child);
     let ci = None;
     let i = self.get_index(Family::Child);
@@ -198,6 +202,7 @@ impl App {
     let gi = self.get_index(Family::Parent);
 
     *self = Self {
+      // TODO: visualstudio2019からmove_childするとpanic
       child_items: StatefulList::with_items_option(self.get_child_items()[selected_ci].generate_child_items()?, ci),
       items: StatefulList::with_items_select(child_items, i),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
@@ -309,6 +314,7 @@ impl App {
 }
 
 pub fn app() -> anyhow::Result<PathBuf> {
+  // TODO: 画像も見れるように
   // setup terminal
   enable_raw_mode()?;
   let mut stdout = io::stdout();
