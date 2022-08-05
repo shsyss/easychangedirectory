@@ -162,7 +162,7 @@ impl App {
   pub fn get_parent_items(&self) -> Vec<Item> {
     self.parent_items.items.clone()
   }
-  /// 作業ブロック
+  /// If the working block is "content" `true`
   fn is_contents_in_working_block(&self) -> bool {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
@@ -319,7 +319,14 @@ pub fn app() -> anyhow::Result<PathBuf> {
   let app = App::new()?;
   let path = match self::run(&mut terminal, app) {
     Ok(path) => path,
-    Err(e) => bail!(e),
+    Err(e) => {
+      // restore terminal
+      disable_raw_mode()?;
+      execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
+      terminal.show_cursor()?;
+
+      bail!(e)
+    }
   };
 
   // restore terminal
