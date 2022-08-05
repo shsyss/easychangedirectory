@@ -11,6 +11,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 [Features](#features) / [Support](#support) / [Usage](#usage) / [Installlation](#installation) / [After-this](#after-this)
 
 ## Features
+**demo**
 - Can change paths visually
 
 ## Usage
@@ -45,3 +46,4 @@ I can't say for sure because I don't have it, but I think the program will proba
 
 ## After this
 - Complete the above
+- Image Preview
