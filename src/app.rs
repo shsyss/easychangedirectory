@@ -207,11 +207,7 @@ impl App {
 
         let child_items = self.get_child_items();
         let selected_ci = self.get_index(Family::Child);
-        let ci = if child_items[selected_ci].is_dir() {
-            Some(0)
-        } else {
-            None
-        };
+        let ci = None;
         let i = self.get_index(Family::Child);
         let pi = self.get_index(Family::Oneself);
         let gi = self.get_index(Family::Parent);
