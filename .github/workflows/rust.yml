@@ -20,4 +20,4 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
       - name: Format check
-        run: cargo fmt --all -- --check --verbose
+        run: cargo fmt --all --check --verbose
