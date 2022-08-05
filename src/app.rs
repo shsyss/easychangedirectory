@@ -54,7 +54,7 @@ impl<T> StatefulList<T> {
     fn select(&mut self, index: usize) {
         self.state.select(Some(index));
     }
-    fn selected(&mut self) -> usize {
+    fn selected(&self) -> usize {
         self.state.selected().unwrap()
     }
     fn unselect(&mut self) {
@@ -189,7 +189,6 @@ impl App {
         })
     }
     fn move_child(&mut self) -> anyhow::Result<()> {
-        //
         let i = self.items.state.selected().unwrap();
         let selected_item = self.items.items[i].clone();
         let pwd = if selected_item.is_dir() {
@@ -228,11 +227,15 @@ impl App {
         Ok(())
     }
     fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
+        // TODO: parent_itemsのselectが0になる
+        let pi = self.get_index(Family::Oneself);
+        let gi = self.get_index(Family::Parent);
+
         *self = Self {
             child_items: StatefulList::with_items(vec![Item::default()]),
             items: StatefulList::with_items(self.get_child_items()),
-            parent_items: StatefulList::with_items(self.get_items()),
-            grandparent_items: StatefulList::with_items(self.get_parent_items()),
+            parent_items: StatefulList::with_items_select(self.get_items(), pi),
+            grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
             pwd: selected_item.path,
             grandparent_path: Self::generate_parent_path(&self.pwd),
         };
@@ -270,13 +273,17 @@ impl App {
         let grandparent_path = Self::generate_parent_path(&self.grandparent_path);
         let grandparent_items = Self::make_items(&grandparent_path)?;
 
-        let ci = self.get_index(Family::Oneself);
+        let ci = if self.is_contents_in_working_block() {
+            None
+        } else {
+            Some(self.get_index(Family::Oneself))
+        };
         let i = self.get_index(Family::Parent);
         let pi = self.get_index(Family::Grandparent);
         let gi = Self::make_index(&grandparent_items, &self.grandparent_path);
 
         *self = Self {
-            child_items: StatefulList::with_items_select(self.get_items(), ci),
+            child_items: StatefulList::with_items_option(self.get_items(), ci),
             items: StatefulList::with_items_select(self.get_parent_items(), i),
             parent_items: StatefulList::with_items_select(self.get_grandparent_items(), pi),
             grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
@@ -329,6 +336,11 @@ impl App {
             self.child_items.unselect();
         }
         Ok(())
+    }
+    /// 作業ブロック
+    fn is_contents_in_working_block(&self) -> bool {
+        let i = self.parent_items.selected();
+        self.get_parent_items()[i].is_file()
     }
 }
 
