@@ -1,4 +1,4 @@
-use anyhow::bail;
+use anyhow::{bail, Context};
 use crossterm::{
   event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
   execute,
@@ -92,38 +92,55 @@ pub enum Family {
   Child,
 }
 
-enum ItemType {
+#[derive(Debug, Clone)]
+pub enum ItemType {
   Path(PathBuf),
   Content(String),
 }
 
+impl ItemType {
+  fn new_path() -> Self {
+    Self::Path(PathBuf::new())
+  }
+  fn from_path(s: &str) -> Self {
+    Self::Path(PathBuf::from(s))
+  }
+}
+
 #[derive(Debug, Clone)]
 pub struct Item {
-  pub item: PathBuf,
+  pub item: ItemType,
   pub state: State,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { item: PathBuf::new(), state: State::None }
+    Self { item: ItemType::new_path(), state: State::None }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     Ok(if self.is_dir() {
-      App::make_items(&self.item)?
-    } else if let Ok(s) = fs::read_to_string(&self.item) {
-      s.lines().map(|s| Item { item: PathBuf::from(s), state: State::Content }).collect()
+      App::make_items(&self.get_path().unwrap())?
+    } else if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
+      s.lines().map(|s| Item { item: ItemType::from_path(s), state: State::Content }).collect()
     } else {
       vec![Item::default()]
     })
   }
   pub fn generate_filename(&self) -> Option<String> {
-    Some(self.item.file_name()?.to_string_lossy().to_string())
+    Some(self.get_path()?.file_name()?.to_string_lossy().to_string())
   }
   pub fn is_dir(&self) -> bool {
     matches!(self.state, State::Dir)
   }
   fn is_file(&self) -> bool {
     matches!(self.state, State::File)
+  }
+  fn get_path(&self) -> Option<PathBuf> {
+    if let ItemType::Path(path) = &self.item {
+      Some(path.clone())
+    } else {
+      None
+    }
   }
 }
 
@@ -173,8 +190,9 @@ impl App {
     self.get_parent_items()[i].is_file()
   }
   fn make_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
+    // TODO: findで抽象化
     for (i, item) in items.iter().enumerate() {
-      if item.item == path.as_ref() {
+      if item.get_path().unwrap() == path.as_ref() {
         return i;
       }
     }
@@ -187,7 +205,7 @@ impl App {
     let i = self.items.state.selected().unwrap();
     let selected_item = self.items.items[i].clone();
     let pwd = if selected_item.is_dir() {
-      selected_item.item
+      selected_item.get_path().unwrap()
     } else if selected_item.is_file() {
       self.move_content(selected_item)?;
       return Ok(());
@@ -225,7 +243,7 @@ impl App {
       items: StatefulList::with_items(self.get_child_items()),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
-      pwd: selected_item.item,
+      pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
     };
     Ok(())
@@ -237,6 +255,7 @@ impl App {
     self.items.select(0);
   }
   fn move_next(&mut self) -> anyhow::Result<()> {
+    // TODO: リストを新しく作った時（selectが解除）、当fnかmove_previousすると0がselectされる
     let i = self.items.next();
     self.update_child_items(i)?;
     Ok(())
@@ -286,7 +305,7 @@ impl App {
     let items = items::read_dir(&pwd)?;
 
     // Initial selection is 0
-    let child_path = if items[0].is_dir() { items[0].item.clone() } else { PathBuf::new() };
+    let child_path = if items[0].is_dir() { items[0].get_path().unwrap() } else { PathBuf::new() };
     let parent_path = Self::generate_parent_path(&pwd);
     let grandparent_path = Self::generate_parent_path(&parent_path);
     let parent_items = Self::make_items(&parent_path)?;
