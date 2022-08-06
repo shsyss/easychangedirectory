@@ -337,7 +337,6 @@ impl App {
 }
 
 pub fn app() -> anyhow::Result<PathBuf> {
-  // TODO: 画像も見れるように
   // setup terminal
   enable_raw_mode()?;
   let mut stdout = io::stdout();
