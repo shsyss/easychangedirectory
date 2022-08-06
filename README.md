@@ -1,6 +1,6 @@
 # easychangedirectory (unfinished)
 
-> **cli tool to comfortably change directories**
+> **cli tool to comfortably change directories.**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
@@ -8,7 +8,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Support](#support) / [Usage](#usage) / [Installlation](#installation) / [After this](#after-this)
+[Features](#features) / [Support](#support) / [Usage](#usage) / [Installation](#installation) / [After this](#after-this)
 
 ## Features
 
