@@ -1,5 +1,5 @@
 {
-  "name": "easychangedirectory devcontainer",
+  "name": "easychangedirectory",
   "extensions": [
     "rust-lang.rust-analyzer",
     "serayuzgur.crates",
@@ -7,9 +7,7 @@
     "ms-vsliveshare.vsliveshare",
     "aaron-bond.better-comments",
     "VisualStudioExptTeam.vscodeintellicode",
-    "christian-kohler.path-intellisense",
-    
-    
+    "christian-kohler.path-intellisense"
     // "vadimcn.vscode-lldb"
   ],
   "dockerFile": "Dockerfile",
