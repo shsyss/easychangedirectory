@@ -1,15 +1,16 @@
 {
   "name": "easychangedirectory",
   "extensions": [
-    "rust-lang.rust-analyzer",
-    "serayuzgur.crates",
-    "enkia.tokyo-night",
-    "ms-vsliveshare.vsliveshare",
-    "aaron-bond.better-comments",
-    "VisualStudioExptTeam.vscodeintellicode",
-    "christian-kohler.path-intellisense"
-    // "vadimcn.vscode-lldb"
-  ],
+	"rust-lang.rust-analyzer",
+	"serayuzgur.crates",
+	"enkia.tokyo-night",
+	"ms-vsliveshare.vsliveshare",
+	"aaron-bond.better-comments",
+	"VisualStudioExptTeam.vscodeintellicode",
+	"christian-kohler.path-intellisense",
+	"bungcip.better-toml",
+	"ms-azuretools.vscode-docker"
+],
   "dockerFile": "Dockerfile",
   "settings": {
     "editor.formatOnSave": true,
