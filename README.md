@@ -12,9 +12,9 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Features
 
-![demo](./assets/demo.gif)
-
 - Can change paths visually
+
+![demo](./assets/demo.gif)
 
 ## Usage
 

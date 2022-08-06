@@ -255,7 +255,6 @@ impl App {
     self.items.select(0);
   }
   fn move_next(&mut self) -> anyhow::Result<()> {
-    // TODO: リストを新しく作った時（selectが解除）、当fnかmove_previousすると0がselectされる
     let i = self.items.next();
     self.update_child_items(i)?;
     Ok(())
@@ -328,7 +327,9 @@ impl App {
     Ok(app)
   }
   fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
-    self.child_items = StatefulList::with_items(self.get_items()[index].generate_child_items()?);
+    let ci = self.child_items.state.selected();
+
+    self.child_items = StatefulList::with_items_option(self.get_items()[index].generate_child_items()?, ci);
     if self.get_items()[index].is_file() {
       self.child_items.unselect();
     }

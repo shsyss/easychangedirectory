@@ -1,5 +1,5 @@
 use clap::{command, Command};
 
 pub fn build_cli() -> Command<'static> {
-  command!()
+  command!().bin_name("ed")
 }
