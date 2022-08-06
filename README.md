@@ -1,6 +1,6 @@
 # easychangedirectory (unfinished)
 
-> **cli tool to comfortably change directories**
+> **cli tool to comfortably change directories.**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
@@ -8,7 +8,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Support](#support) / [Usage](#usage) / [Installlation](#installation) / [After this](#after-this)
+[Features](#features) / [Support](#support) / [Usage](#usage) / [Installation](#installation) / [After this](#after-this)
 
 ## Features
 
@@ -38,6 +38,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ### OS
 
 - Windows
+- Linux
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
 
@@ -45,6 +46,8 @@ I can't say for sure because I don't have it, but I think the program will proba
 
 - Powershell
 - Bash
+- Zsh
+- Fish
 
 ## Installation
 

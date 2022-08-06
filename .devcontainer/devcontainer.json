@@ -1,17 +1,17 @@
 {
-  "name": "easychangedirectory devcontainer",
+  "name": "easychangedirectory",
   "extensions": [
-    "cschleiden.vscode-github-actions",
-    "ms-vsliveshare.vsliveshare",
-    "matklad.rust-analyzer",
+    "rust-lang.rust-analyzer",
+    "bungcip.better-toml",
     "serayuzgur.crates",
-    "vadimcn.vscode-lldb"
+    "VisualStudioExptTeam.vscodeintellicode",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker"
   ],
   "dockerFile": "Dockerfile",
   "settings": {
     "editor.formatOnSave": true,
-    // "terminal.integrated.shell.linux": "/usr/bin/zsh",
-    "terminal.integrated.profiles.linux":{
+    "terminal.integrated.profiles.linux": {
       "bash": {
         "path": "bash",
         "icon": "terminal-bash"
@@ -21,10 +21,6 @@
       },
       "fish": {
         "path": "fish"
-      },
-      "tmux": {
-        "path": "tmux",
-        "icon": "terminal-tmux"
       },
       "pwsh": {
         "path": "pwsh",
