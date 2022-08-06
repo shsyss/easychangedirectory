@@ -8,7 +8,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Support](#support) / [Usage](#usage) / [Installlation](#installation) / [After-this](#after-this)
+[Features](#features) / [Support](#support) / [Usage](#usage) / [Installlation](#installation) / [After this](#after-this)
 
 ## Features
 
