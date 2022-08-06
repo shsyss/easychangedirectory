@@ -213,20 +213,27 @@ impl App {
       return Ok(());
     };
 
-    let child_items = self.get_child_items();
-    if child_items.is_empty() {
+    let old_child_items = self.get_child_items();
+    if old_child_items.is_empty() {
       return Ok(());
     }
 
     let selected_ci = self.get_index(Family::Child);
+
+    // The index of `items` is set to the index of `child_items` if it is selected. If not, it is set to `0`.
+    let (child_items, i) = if let Some(items) = self.get_child_items().get(selected_ci) {
+      (items.generate_child_items()?, self.get_index(Family::Child))
+    } else {
+      (self.get_child_items()[0].generate_child_items()?, 0)
+    };
+
     let ci = None;
-    let i = self.get_index(Family::Child);
     let pi = self.get_index(Family::Oneself);
     let gi = self.get_index(Family::Parent);
 
     *self = Self {
-      child_items: StatefulList::with_items_option(self.get_child_items()[selected_ci].generate_child_items()?, ci),
-      items: StatefulList::with_items_select(child_items, i),
+      child_items: StatefulList::with_items_option(child_items, ci),
+      items: StatefulList::with_items_select(old_child_items, i),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd,
