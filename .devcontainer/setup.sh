@@ -18,5 +18,5 @@ export PATH=/root/.cargo/bin:$PATH
 # rustup component add rustfmt
 # rustup component add clippy
 
-cargo install cargo-expand
+# cargo install cargo-expand
 # cargo install cargo-edit
