@@ -45,6 +45,8 @@ I can't say for sure because I don't have it, but I think the program will proba
 
 - Powershell
 - Bash
+- Zsh
+- Fish
 
 ## Installation
 

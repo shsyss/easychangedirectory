@@ -1,11 +1,16 @@
 {
   "name": "easychangedirectory devcontainer",
   "extensions": [
-    "cschleiden.vscode-github-actions",
-    "ms-vsliveshare.vsliveshare",
-    "matklad.rust-analyzer",
+    "rust-lang.rust-analyzer",
     "serayuzgur.crates",
-    "vadimcn.vscode-lldb"
+    "enkia.tokyo-night",
+    "ms-vsliveshare.vsliveshare",
+    "aaron-bond.better-comments",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "christian-kohler.path-intellisense",
+    
+    
+    // "vadimcn.vscode-lldb"
   ],
   "dockerFile": "Dockerfile",
   "settings": {
@@ -21,10 +26,6 @@
       },
       "fish": {
         "path": "fish"
-      },
-      "tmux": {
-        "path": "tmux",
-        "icon": "terminal-tmux"
       },
       "pwsh": {
         "path": "pwsh",
