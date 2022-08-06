@@ -1,21 +1,17 @@
 {
   "name": "easychangedirectory",
   "extensions": [
-	"rust-lang.rust-analyzer",
-	"serayuzgur.crates",
-	"enkia.tokyo-night",
-	"ms-vsliveshare.vsliveshare",
-	"aaron-bond.better-comments",
-	"VisualStudioExptTeam.vscodeintellicode",
-	"christian-kohler.path-intellisense",
-	"bungcip.better-toml",
-	"ms-azuretools.vscode-docker"
-],
+    "rust-lang.rust-analyzer",
+    "bungcip.better-toml",
+    "serayuzgur.crates",
+    "VisualStudioExptTeam.vscodeintellicode",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker"
+  ],
   "dockerFile": "Dockerfile",
   "settings": {
     "editor.formatOnSave": true,
-    // "terminal.integrated.shell.linux": "/usr/bin/zsh",
-    "terminal.integrated.profiles.linux":{
+    "terminal.integrated.profiles.linux": {
       "bash": {
         "path": "bash",
         "icon": "terminal-bash"

@@ -38,6 +38,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ### OS
 
 - Windows
+- Linux
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
 
