@@ -5,8 +5,5 @@ use std::{
 };
 
 pub fn change_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
-  let child = Command::new("ls").stdin(Stdio::piped()).stdout(Stdio::piped()).spawn()?;
-  dbg!(child.stdout.unwrap());
-
   Ok(())
 }

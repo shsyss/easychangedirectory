@@ -33,12 +33,12 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
-## Support
+## Support (I don't know up to the version.)
 
 ### OS
 
 - Windows
-- Linux
+- Linux (Ubuntu)
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
 
