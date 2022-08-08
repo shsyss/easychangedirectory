@@ -1,10 +1,12 @@
 use std::{
-  env,
+  any, env,
   io::{self, Write},
   path::Path,
   process::{Command, Stdio},
+  time::Duration,
 };
 
+use anyhow::anyhow;
 use serde::Serialize;
 use tinytemplate::TinyTemplate;
 
@@ -19,16 +21,22 @@ impl Context {
   }
 }
 
-// static SHELL_COMMAND_TEMPLATE: &str = "cd -- {path}";
+// static SHELL_COMMAND_TEMPLATE: &str = "cd {path}";
+static SHELL_COMMAND_TEMPLATE: &str = r#"echo {path}"#;
 
 pub fn change_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
-  // let mut temp = TinyTemplate::new();
-  // temp.add_template("bash", SHELL_COMMAND_TEMPLATE)?;
+  let cmd_name = "bash";
+  let mut temp = TinyTemplate::new();
+  temp.add_template(cmd_name, SHELL_COMMAND_TEMPLATE)?;
 
-  // let context = Context::new(&path);
+  let context = Context::new(&path);
 
-  // let shell_command = temp.render("bash", &context)?;
-  let path = path.as_ref().to_string_lossy().to_string();
+  let shell_cmd = temp.render(cmd_name, &context)?;
+  Command::new(cmd_name).args(&["--noprofile", "--norc", "-c", &shell_cmd]).stdout(Stdio::inherit()).output()?;
+
+  std::thread::sleep(Duration::new(1, 0));
+
+  dbg!(env::current_dir()?);
 
   // writeln!(io::stdout(), "cd {}", path).pipe;
 
