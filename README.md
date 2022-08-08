@@ -33,21 +33,16 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
-## Support (I don't know up to the version.)
+## Support
 
-### OS
-
-- Windows
-- Linux (Ubuntu)
+|   Shell    | Windows | Linux (Ubuntu) |
+--|:--:|--
+| Bash       <td style="background-color: green"> <td style="background-color: green">
+| Fish       <td style="background-color: red"> <td style="background-color: green">
+| Powershell <td style="background-color: green"> <td style="background-color: green">
+| Zsh        <td style="background-color: red"> <td style="background-color: green">
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
-
-### shell
-
-- Powershell
-- Bash
-- Zsh
-- Fish
 
 ## Installation
 
