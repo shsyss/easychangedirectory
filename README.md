@@ -36,11 +36,11 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ## Support
 
 |   Shell    | Windows | Linux (Ubuntu) |
---|:--:|--
-| Bash       <td style="background-color: green"> <td style="background-color: green">
-| Fish       <td style="background-color: red"> <td style="background-color: green">
-| Powershell <td style="background-color: green"> <td style="background-color: green">
-| Zsh        <td style="background-color: red"> <td style="background-color: green">
+--|:--:|:--:
+| **Bash**       | OK | OK
+| **Fish**       | *NO* | OK
+| **Powershell** | OK | OK
+| **Zsh**        | *NO* | OK
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
 
