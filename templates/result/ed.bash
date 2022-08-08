@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cd /workspaces/easychangedirectory
+cd C:\Users\ohs10700

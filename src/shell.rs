@@ -1,10 +1,8 @@
 use std::{
-  env,
-  fs::{self, File},
+  fs::File,
   io::Write,
   path::Path,
   process::{Command, Stdio},
-  time::Duration,
 };
 
 use serde::Serialize;
@@ -21,7 +19,7 @@ impl Context {
   }
 }
 
-static SHELL_COMMAND_TEMPLATE: &str = r#"cd -P {path}"#;
+static SHELL_COMMAND_TEMPLATE: &str = r#"cd {path}"#;
 
 pub fn change_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
   // let cmd_name = "bash";
@@ -40,7 +38,7 @@ pub fn change_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
   let mut f = File::create(filepath)?;
   f.write_all(shell_script.as_bytes())?;
 
-  Command::new(cmd_name).args(&[filepath]).stdout(Stdio::inherit()).output()?;
+  Command::new(cmd_name).args(&[filepath]).status()?;
 
   // Command::new(cmd_name).args(&["-c", &shell_script]).stdout(Stdio::inherit()).output()?;
 
