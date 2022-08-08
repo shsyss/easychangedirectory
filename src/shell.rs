@@ -1,12 +1,12 @@
 use std::{
-  any, env,
-  io::{self, Write},
+  env,
+  fs::{self, File},
+  io::Write,
   path::Path,
   process::{Command, Stdio},
   time::Duration,
 };
 
-use anyhow::anyhow;
 use serde::Serialize;
 use tinytemplate::TinyTemplate;
 
@@ -21,24 +21,28 @@ impl Context {
   }
 }
 
-// static SHELL_COMMAND_TEMPLATE: &str = "cd {path}";
-static SHELL_COMMAND_TEMPLATE: &str = r#"echo {path}"#;
+static SHELL_COMMAND_TEMPLATE: &str = r#"cd -P {path}"#;
 
 pub fn change_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<()> {
-  let cmd_name = "bash";
+  // let cmd_name = "bash";
   let mut temp = TinyTemplate::new();
-  temp.add_template(cmd_name, SHELL_COMMAND_TEMPLATE)?;
+  // temp.add_template(cmd_name, SHELL_COMMAND_TEMPLATE)?;
 
   let context = Context::new(&path);
 
-  let shell_cmd = temp.render(cmd_name, &context)?;
-  Command::new(cmd_name).args(&["--noprofile", "--norc", "-c", &shell_cmd]).stdout(Stdio::inherit()).output()?;
+  // let shell_cmd = temp.render(cmd_name, &context)?;
+  // Command::new(cmd_name).args(&["-c", &shell_cmd]).stdout(Stdio::inherit()).output()?;
 
-  std::thread::sleep(Duration::new(1, 0));
+  let cmd_name = ".";
+  temp.add_template(cmd_name, include_str!("../templates/bash.txt"))?;
+  let shell_script = temp.render(cmd_name, &context)?;
+  let filepath = "./templates/result/ed.bash";
+  let mut f = File::create(filepath)?;
+  f.write_all(shell_script.as_bytes())?;
 
-  dbg!(env::current_dir()?);
+  Command::new(cmd_name).args(&[filepath]).stdout(Stdio::inherit()).output()?;
 
-  // writeln!(io::stdout(), "cd {}", path).pipe;
+  // Command::new(cmd_name).args(&["-c", &shell_script]).stdout(Stdio::inherit()).output()?;
 
   Ok(())
 }
