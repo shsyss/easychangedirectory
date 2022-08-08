@@ -9,7 +9,7 @@ include!("./src/cli.rs");
 fn main() -> Result<(), Error> {
   let mut cmd = build_cli();
   let bin_name = "ed";
-  let out_dir = "./completion";
+  let out_dir = "./completions";
   generate_to(Bash, &mut cmd, bin_name, out_dir)?;
   generate_to(Zsh, &mut cmd, bin_name, out_dir)?;
   generate_to(Fish, &mut cmd, bin_name, out_dir)?;

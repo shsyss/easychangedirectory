@@ -35,19 +35,14 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 ## Support
 
-### OS
-
-- Windows
-- Linux
+|   Shell    | Windows | Linux (Ubuntu) |
+--|:--:|:--:
+| **Bash**       | OK | OK
+| **Fish**       | *NO* | OK
+| **Powershell** | OK | OK
+| **Zsh**        | *NO* | OK
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
-
-### shell
-
-- Powershell
-- Bash
-- Zsh
-- Fish
 
 ## Installation
 

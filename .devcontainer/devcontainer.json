@@ -6,7 +6,8 @@
     "serayuzgur.crates",
     "VisualStudioExptTeam.vscodeintellicode",
     "christian-kohler.path-intellisense",
-    "streetsidesoftware.code-spell-checker"
+    "streetsidesoftware.code-spell-checker",
+    "shd101wyy.markdown-preview-enhanced"
   ],
   "dockerFile": "Dockerfile",
   "settings": {

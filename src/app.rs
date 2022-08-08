@@ -119,6 +119,11 @@ impl Item {
     Self { item: TypeItem::new_path(), state: State::None }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
+    if self.is_symlink() {
+      if let TypeItem::Path(path) = &self.item {
+        return App::make_items(path.read_link()?);
+      }
+    }
     Ok(if self.is_dir() {
       App::make_items(&self.get_path().unwrap())?
     } else if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
@@ -135,6 +140,9 @@ impl Item {
   }
   fn is_file(&self) -> bool {
     matches!(self.state, State::File)
+  }
+  fn is_symlink(&self) -> bool {
+    self.get_path().unwrap().is_symlink()
   }
   fn get_path(&self) -> Option<PathBuf> {
     if let TypeItem::Path(path) = &self.item {
@@ -340,11 +348,13 @@ impl App {
     if self.get_items()[index].is_file() {
       self.child_items.unselect();
     }
+
     Ok(())
   }
 }
 
 pub fn app() -> anyhow::Result<PathBuf> {
+  // TODO: symlinkの解決
   // setup terminal
   enable_raw_mode()?;
   let mut stdout = io::stdout();
