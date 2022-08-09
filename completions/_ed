@@ -15,6 +15,7 @@ _ed() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
+'--init=[Configure shell]:SHELL: ' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

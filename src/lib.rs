@@ -1,5 +1,6 @@
 mod app;
 mod cli;
+pub mod init;
 pub mod items;
 mod shell;
 mod ui;
@@ -7,4 +8,5 @@ mod ui;
 pub use app::{app, App};
 pub use cli::build_cli;
 pub use shell::change_dir;
+
 pub use ui::ui;

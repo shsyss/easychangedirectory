@@ -354,7 +354,6 @@ impl App {
 }
 
 pub fn app() -> anyhow::Result<PathBuf> {
-  // TODO: symlinkの解決
   // setup terminal
   enable_raw_mode()?;
   let mut stdout = io::stdout();

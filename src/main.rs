@@ -1,7 +1,12 @@
-use easychangedirectory::{app, build_cli, change_dir};
+use easychangedirectory::{app, build_cli, change_dir, init};
 
 fn main() -> anyhow::Result<()> {
-  build_cli().get_matches();
+  let matches = build_cli().get_matches();
+
+  if let Some(shell) = matches.get_one::<String>("init") {
+    init::run(shell)?;
+    return Ok(());
+  }
 
   let path = match app() {
     Ok(path) => path,
