@@ -50,3 +50,4 @@ I can't say for sure because I don't have it, but I think the program will proba
 
 - Complete the above
 - Image Preview
+- Bug: Highlight shifted when moving left or right during search

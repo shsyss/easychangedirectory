@@ -45,10 +45,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     top_chunks[0],
   );
 
-  let item = Item {
-    item: TypeItem::SearchText(app.search.iter().map(|c| c.to_string()).collect::<Vec<_>>().join("")),
-    state: State::Search,
-  };
+  let item = Item { item: TypeItem::SearchText(app.search.clone()), state: State::Search };
   let search_items = vec![item];
   let search_items = set_items(&search_items);
   let search_text = List::new(search_items).highlight_symbol("> ");
@@ -82,7 +79,8 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   f.render_stateful_widget(parent_items, bottom_chunks[1], &mut app.parent_items.state);
 
   // current
-  let items: Vec<ListItem> = set_items(&app.items.items);
+  let searched_items = app.search_sort_to_vec();
+  let items: Vec<ListItem> = set_items(&searched_items);
   let items = List::new(items)
     .block(Standard::block())
     .highlight_style(Style::default().add_modifier(Modifier::BOLD).add_modifier(Modifier::UNDERLINED))

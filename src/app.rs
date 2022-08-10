@@ -170,7 +170,7 @@ pub struct App {
   pub grandparent_items: StatefulList<Item>,
   pwd: PathBuf,
   grandparent_path: PathBuf,
-  pub search: Vec<char>,
+  pub search: String,
 }
 
 const JUMP: usize = 4;
@@ -257,7 +257,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: Vec::new(),
+      search: String::new(),
     };
     Ok(())
   }
@@ -273,7 +273,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: Vec::new(),
+      search: String::new(),
     };
     Ok(())
   }
@@ -320,7 +320,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
       pwd,
       grandparent_path,
-      search: Vec::new(),
+      search: String::new(),
     };
 
     Ok(())
@@ -351,13 +351,27 @@ impl App {
       grandparent_items: StatefulList::with_items(grandparent_items),
       pwd,
       grandparent_path,
-      search: Vec::new(),
+      search: String::new(),
     };
 
     app.parent_items.select(pi);
     app.grandparent_items.select(gi);
 
     Ok(app)
+  }
+  pub fn search_sort_to_vec(&self) -> Vec<Item> {
+    self
+      .items
+      .items
+      .iter()
+      .filter_map(|item| -> Option<Item> {
+        if item.get_path()?.file_name()?.to_string_lossy().to_string().contains(&self.search) {
+          Some(item.clone())
+        } else {
+          None
+        }
+      })
+      .collect()
   }
   fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
     let ci = self.child_items.state.selected();
