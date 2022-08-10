@@ -82,6 +82,7 @@ pub enum State {
   File,
   Dir,
   Content,
+  Search,
   None,
 }
 
@@ -97,6 +98,7 @@ pub enum Family {
 pub enum TypeItem {
   Path(PathBuf),
   Content(String),
+  SearchText(String),
 }
 
 impl TypeItem {
@@ -153,14 +155,22 @@ impl Item {
   }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Mode {
+  Normal,
+  Search,
+}
+
 #[derive(Debug)]
 pub struct App {
+  pub mode: Mode,
   pub child_items: StatefulList<Item>,
   pub items: StatefulList<Item>,
   pub parent_items: StatefulList<Item>,
   pub grandparent_items: StatefulList<Item>,
   pwd: PathBuf,
   grandparent_path: PathBuf,
+  pub search: Vec<char>,
 }
 
 const JUMP: usize = 4;
@@ -240,12 +250,14 @@ impl App {
     let gi = self.get_index(Family::Parent);
 
     *self = Self {
+      mode: self.mode,
       child_items: StatefulList::with_items_option(child_items, ci),
       items: StatefulList::with_items_select(old_child_items, i),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
+      search: Vec::new(),
     };
     Ok(())
   }
@@ -254,12 +266,14 @@ impl App {
     let gi = self.get_index(Family::Parent);
 
     *self = Self {
+      mode: self.mode,
       child_items: StatefulList::with_items(vec![Item::default()]),
       items: StatefulList::with_items(self.get_child_items()),
       parent_items: StatefulList::with_items_select(self.get_items(), pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
+      search: Vec::new(),
     };
     Ok(())
   }
@@ -299,12 +313,14 @@ impl App {
     let gi = Self::generate_index(&grandparent_items, &self.grandparent_path);
 
     *self = Self {
+      mode: self.mode,
       child_items: StatefulList::with_items_option(self.get_items(), ci),
       items: StatefulList::with_items_select(self.get_parent_items(), i),
       parent_items: StatefulList::with_items_select(self.get_grandparent_items(), pi),
       grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
       pwd,
       grandparent_path,
+      search: Vec::new(),
     };
 
     Ok(())
@@ -328,12 +344,14 @@ impl App {
     let gi = Self::generate_index(&grandparent_items, &parent_path);
 
     let mut app = App {
+      mode: Mode::Normal,
       child_items: StatefulList::with_items_option(Self::make_items(child_path)?, None),
       items: StatefulList::with_items(items),
       parent_items: StatefulList::with_items(parent_items),
       grandparent_items: StatefulList::with_items(grandparent_items),
       pwd,
       grandparent_path,
+      search: Vec::new(),
     };
 
     app.parent_items.select(pi);
@@ -387,41 +405,73 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
   loop {
     terminal.draw(|f| ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
-      match key.code {
-        // finish
-        KeyCode::Backspace => return Ok(current),
-        KeyCode::Esc => return Ok(current),
-        KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-        // TODO: change directory
-        KeyCode::Enter => return Ok(app.pwd),
+      match app.mode {
+        Mode::Normal => {
+          match key.code {
+            // finish
+            KeyCode::Backspace => return Ok(current),
+            KeyCode::Esc => return Ok(current),
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
+            // TODO: change directory
+            KeyCode::Enter => return Ok(app.pwd),
 
-        // home
-        KeyCode::Home => app.move_home(),
-        KeyCode::Char('k') if key.modifiers == KeyModifiers::ALT => app.move_home(),
-        // end
-        KeyCode::End => app.move_end(),
-        KeyCode::Char('j') if key.modifiers == KeyModifiers::ALT => app.move_end(),
-        // pageUp
-        KeyCode::PageUp => app.move_page_up(),
-        // ? TODO: shift + k move_page_up
-        // pageDown
-        KeyCode::PageDown => app.move_page_down(),
-        // ? TODO: shift + j move_page_down
-        // next
-        KeyCode::Char('j') => app.move_next()?,
-        KeyCode::Down => app.move_next()?,
-        // previous
-        KeyCode::Char('k') => app.move_previous()?,
-        KeyCode::Up => app.move_previous()?,
-        // parent
-        KeyCode::Char('h') => app.move_parent()?,
-        KeyCode::Left => app.move_parent()?,
-        // right move
-        KeyCode::Char('l') => app.move_child()?,
-        KeyCode::Right => app.move_child()?,
+            // home
+            KeyCode::Home => app.move_home(),
+            KeyCode::Char('k') if key.modifiers == KeyModifiers::ALT => app.move_home(),
+            // end
+            KeyCode::End => app.move_end(),
+            KeyCode::Char('j') if key.modifiers == KeyModifiers::ALT => app.move_end(),
+            // pageUp
+            KeyCode::PageUp => app.move_page_up(),
+            // ? TODO: shift + k move_page_up
+            // pageDown
+            KeyCode::PageDown => app.move_page_down(),
+            // ? TODO: shift + j move_page_down
+            // next
+            KeyCode::Char('j') => app.move_next()?,
+            KeyCode::Down => app.move_next()?,
+            // previous
+            KeyCode::Char('k') => app.move_previous()?,
+            KeyCode::Up => app.move_previous()?,
+            // parent
+            KeyCode::Char('h') => app.move_parent()?,
+            KeyCode::Left => app.move_parent()?,
+            // right move
+            KeyCode::Char('l') => app.move_child()?,
+            KeyCode::Right => app.move_child()?,
 
-        // ? TODO: mouse event
-        _ => {}
+            // ? TODO: mouse event
+            KeyCode::Char('s') => app.mode = Mode::Search,
+            _ => {}
+          }
+        }
+        Mode::Search => {
+          match key.code {
+            // finish
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
+            KeyCode::Enter => return Ok(app.pwd),
+
+            KeyCode::Esc => app.mode = Mode::Normal,
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
+
+            KeyCode::Char(c) => app.search.push(c),
+            KeyCode::Backspace => {
+              app.search.pop();
+            }
+
+            // move
+            KeyCode::Home => app.move_home(),
+            KeyCode::End => app.move_end(),
+            KeyCode::PageUp => app.move_page_up(),
+            KeyCode::PageDown => app.move_page_down(),
+            KeyCode::Down => app.move_next()?,
+            KeyCode::Up => app.move_previous()?,
+            KeyCode::Left => app.move_parent()?,
+            KeyCode::Right => app.move_child()?,
+
+            _ => {}
+          }
+        }
       }
     }
   }

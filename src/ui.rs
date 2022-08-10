@@ -3,13 +3,13 @@ use tui::{
   layout::{Constraint, Direction, Layout},
   style::{Color, Modifier, Style},
   text::Span,
-  widgets::ListItem,
   widgets::{Block, Borders, List},
+  widgets::{ListItem, ListState},
   Frame,
 };
 
 use crate::{
-  app::{Item, State},
+  app::{Item, Mode, State, TypeItem},
   App,
 };
 
@@ -21,7 +21,7 @@ impl Standard {
   }
 
   fn highlight_style() -> Style {
-    Style::default().fg(Color::Green)
+    Style::default().fg(Color::Magenta)
   }
 }
 
@@ -37,13 +37,28 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
   let top_chunks = Layout::default()
     .direction(Direction::Horizontal)
-    .constraints([Constraint::Percentage(80), Constraint::Percentage(20)])
+    .constraints([Constraint::Percentage(80), Constraint::Length(1)])
     .split(chunks[0]);
 
   f.render_widget(
     Block::default().title(Span::styled(app.generate_pwd_str(), Style::default().fg(Color::Yellow))),
     top_chunks[0],
   );
+
+  let item = Item {
+    item: TypeItem::SearchText(app.search.iter().map(|c| c.to_string()).collect::<Vec<_>>().join("")),
+    state: State::Search,
+  };
+  let search_items = vec![item];
+  let search_items = set_items(&search_items);
+  let search_text = List::new(search_items).highlight_symbol("> ");
+  let mut state = ListState::default();
+  if app.mode == Mode::Normal {
+    state.select(None);
+  } else if app.mode == Mode::Search {
+    state.select(Some(0));
+  }
+  f.render_stateful_widget(search_text, top_chunks[1], &mut state);
 
   let bottom_chunks = Layout::default()
     .direction(Direction::Horizontal)
@@ -84,12 +99,13 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
   items
     .iter()
     .filter_map(|item| {
-      let filename = item.generate_filename()?;
       let style = match item.state {
         State::Content | State::None | State::File => Style::default().fg(Color::Gray),
         State::Dir => Style::default().fg(Color::Blue),
+        State::Search => Style::default().fg(Color::Green),
       };
-      Some(ListItem::new(Span::styled(filename, style)))
+      let text = if let TypeItem::SearchText(text) = &item.item { text.clone() } else { item.generate_filename()? };
+      Some(ListItem::new(Span::styled(text, style)))
     })
     .collect()
 }
