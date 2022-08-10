@@ -144,7 +144,7 @@ impl Item {
   fn is_symlink(&self) -> bool {
     self.get_path().unwrap().is_symlink()
   }
-  fn get_path(&self) -> Option<PathBuf> {
+  pub fn get_path(&self) -> Option<PathBuf> {
     if let TypeItem::Path(path) = &self.item {
       Some(path.clone())
     } else {
