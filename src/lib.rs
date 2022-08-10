@@ -1,5 +1,6 @@
 mod app;
 mod cli;
+pub mod init;
 pub mod items;
 mod shell;
 mod ui;

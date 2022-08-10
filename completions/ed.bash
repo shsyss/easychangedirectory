@@ -19,12 +19,16 @@ _ed() {
 
     case "${cmd}" in
         ed)
-            opts="-h -V --help --version"
+            opts="-h -V --help --version --init"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --init)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
                 *)
                     COMPREPLY=()
                     ;;

@@ -21,6 +21,7 @@ Register-ArgumentCompleter -Native -CommandName 'ed' -ScriptBlock {
 
     $completions = @(switch ($command) {
         'ed' {
+            [CompletionResult]::new('--init', 'init', [CompletionResultType]::ParameterName, 'Configure shell')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')
