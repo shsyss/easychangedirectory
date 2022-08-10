@@ -403,10 +403,10 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
         KeyCode::Char('j') if key.modifiers == KeyModifiers::ALT => app.move_end(),
         // pageUp
         KeyCode::PageUp => app.move_page_up(),
-        // TODO: shift + k move_page_up
+        // ? TODO: shift + k move_page_up
         // pageDown
         KeyCode::PageDown => app.move_page_down(),
-        // TODO: shift + j move_page_down
+        // ? TODO: shift + j move_page_down
         // next
         KeyCode::Char('j') => app.move_next()?,
         KeyCode::Down => app.move_next()?,
