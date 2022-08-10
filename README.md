@@ -26,8 +26,8 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 | `l` `→`                      | Move Child directory                  |
 | `Home`                       | Move to top                           |
 | `End`                        | Move to bottom                        |
-| `PageUp`                     | Skip a little and move up             |
-| `PageDown`                   | Skip a little and move down           |
+| `PageUp` `Alt + k`           | Skip a little and move up             |
+| `PageDown` `Alt + j`         | Skip a little and move down           |
 | `Enter`                      | Change directory to current directory |
 | `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory |
 
@@ -35,12 +35,12 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 ## Support
 
-|   Shell    | Windows | Linux (Ubuntu) |
---|:--:|:--:
-| **Bash**       | OK | OK
-| **Fish**       | *NO* | OK
-| **Powershell** | OK | OK
-| **Zsh**        | *NO* | OK
+| Shell          | Windows       | Linux (Ubuntu) |
+| ---------------|:-------------:|:--------------:|
+| **Bash**       | **&#128504;** | **&#128504;**  |
+| **Fish**       | -             | **&#128504;**  |
+| **Powershell** | **&#128504;** | **&#128504;**  |
+| **Zsh**        | -             | **&#128504;**  |
 
 I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
 

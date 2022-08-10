@@ -394,6 +394,19 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
         KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
         // TODO: change directory
         KeyCode::Enter => return Ok(app.pwd),
+
+        // home
+        KeyCode::Home => app.move_home(),
+        KeyCode::Char('k') if key.modifiers == KeyModifiers::ALT => app.move_home(),
+        // end
+        KeyCode::End => app.move_end(),
+        KeyCode::Char('j') if key.modifiers == KeyModifiers::ALT => app.move_end(),
+        // pageUp
+        KeyCode::PageUp => app.move_page_up(),
+        // TODO: shift + k move_page_up
+        // pageDown
+        KeyCode::PageDown => app.move_page_down(),
+        // TODO: shift + j move_page_down
         // next
         KeyCode::Char('j') => app.move_next()?,
         KeyCode::Down => app.move_next()?,
@@ -406,11 +419,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
         // right move
         KeyCode::Char('l') => app.move_child()?,
         KeyCode::Right => app.move_child()?,
-        // home end pageUp pageDown
-        KeyCode::Home => app.move_home(),
-        KeyCode::End => app.move_end(),
-        KeyCode::PageUp => app.move_page_up(),
-        KeyCode::PageDown => app.move_page_down(),
+
+        // ? TODO: mouse event
         _ => {}
       }
     }
