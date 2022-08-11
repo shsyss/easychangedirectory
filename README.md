@@ -42,12 +42,26 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 | **Powershell** | **&#128504;** | **&#128504;**  |
 | **Zsh**        | -             | **&#128504;**  |
 
-I can't say for sure because I don't have it, but I think the program will probably work on any OS. However, I don't know anything about the outside of the program, such as installation.
-
 ## Installation
+
+### Install
+
+
+#### Register ***easychangedirectory*** in shell
+
+<details>
+<summary>Bash</summary>
+Add to `~/.bashrc`
+
+```
+eval "$(easychangedirectory --init bash)"
+```
+Run `. ~/.bashrc` as needed
+</details>
 
 ## After this
 
 - Complete the above
 - Image Preview
 - Bug: Highlight shifted when moving left or right during search
+- Bug: If the file content has a path, only the file name is displayed
