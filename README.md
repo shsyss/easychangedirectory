@@ -1,6 +1,6 @@
 # easychangedirectory (unfinished)
 
-> **cli tool to comfortably change directories.**
+> **Tools for easy cd**
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
