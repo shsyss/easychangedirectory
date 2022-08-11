@@ -44,6 +44,21 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 ## Installation
 
+### Install
+
+
+#### Register ***easychangedirectory*** in shell
+
+<details>
+<summary>Bash</summary>
+Add to `~/.bashrc`
+
+```
+eval "$(easychangedirectory --init bash)"
+```
+Run `. ~/.bashrc` as needed
+</details>
+
 ## After this
 
 - Complete the above
