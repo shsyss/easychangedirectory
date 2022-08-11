@@ -1,7 +1,9 @@
 # # easychangedirectory
-# alias ed="/workspaces/easychangedirectory/target/release/ed"
-# eval "$(ed --init bash)"
+# eval "$(easychangedirectory --init bash)"
 
-function _easychangedirectory() {
-  \builtin cd "$1"
+function ed() {
+  temp_dir="{ temp_dir }.$$"
+  easychangedirectory
+  path=`cat /tmp/_easychangedirectory.txt`
+  cd "${path}"
 }

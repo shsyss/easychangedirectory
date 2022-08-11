@@ -1,4 +1,4 @@
-use easychangedirectory::{app, build_cli, change_dir, init};
+use easychangedirectory::{app, build_cli, connect, init};
 
 fn main() -> anyhow::Result<()> {
   let matches = build_cli().get_matches();
@@ -16,7 +16,9 @@ fn main() -> anyhow::Result<()> {
     }
   };
 
-  change_dir(path)?;
+  if let Err(e) = connect::pipe_shell(path) {
+    eprintln!("\x1b[31mError:\x1b[m  {}", e);
+  }
 
   Ok(())
 }
