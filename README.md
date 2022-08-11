@@ -49,3 +49,4 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Complete the above
 - Image Preview
 - Bug: Highlight shifted when moving left or right during search
+- Bug: If the file content has a path, only the file name is displayed

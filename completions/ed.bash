@@ -19,7 +19,7 @@ _ed() {
 
     case "${cmd}" in
         ed)
-            opts="-h -V --help --version --init"
+            opts="-h -V --help --version --init <temp_path>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

@@ -20,6 +20,7 @@ _ed() {
 '--help[Print help information]' \
 '-V[Print version information]' \
 '--version[Print version information]' \
+'::temp_path:' \
 && ret=0
 }
 

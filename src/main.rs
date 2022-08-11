@@ -8,7 +8,7 @@ fn main() -> anyhow::Result<()> {
     return Ok(());
   }
 
-  let path = match app() {
+  let cd_path = match app() {
     Ok(path) => path,
     Err(e) => {
       eprintln!("\x1b[31mError:\x1b[m  {}", e);
@@ -16,8 +16,10 @@ fn main() -> anyhow::Result<()> {
     }
   };
 
-  if let Err(e) = connect::pipe_shell(path) {
-    eprintln!("\x1b[31mError:\x1b[m  {}", e);
+  if let Some(temp_path) = matches.get_one::<String>("temp_path") {
+    if let Err(e) = connect::pipe_shell(cd_path, temp_path) {
+      eprintln!("\x1b[31mError:\x1b[m  {}", e);
+    }
   }
 
   Ok(())

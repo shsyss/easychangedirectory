@@ -1,8 +1,7 @@
-use std::{env::temp_dir, fs::File, io::Write, path::PathBuf};
+use std::{fs::File, io::Write, path::PathBuf};
 
-pub fn pipe_shell(path: PathBuf) -> anyhow::Result<()> {
-  let temp_filepath = temp_dir().join("_easychangedirectory.txt");
-  let mut f = File::create(temp_filepath)?;
+pub fn pipe_shell(path: PathBuf, temp_path: &str) -> anyhow::Result<()> {
+  let mut f = File::create(temp_path)?;
   f.write_all(path.to_string_lossy().as_bytes())?;
 
   Ok(())
