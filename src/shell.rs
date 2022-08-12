@@ -10,6 +10,13 @@ function ed() \{
 }
 "#;
 
+pub const FISH: &str = r#"\
+
+"#;
+
+pub const POWERSHELL: &str = r#"\
+"#;
+
 pub const ZSH: &str = r#"\
 # # easychangedirectory
 # eval "$(easychangedirectory --init zsh)"
