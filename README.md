@@ -38,7 +38,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 | Shell          | Windows       | Linux (Ubuntu) |
 | ---------------|:-------------:|:--------------:|
 | **Bash**       | -             | **&#128504;**  |
-| **Fish**       | -             | -              |
+| **Fish**       | -             | **&#128504;**  |
 | **Powershell** | -             | -              |
 | **Zsh**        | -             | -              |
 
@@ -51,12 +51,32 @@ not yet
 
 <details>
 <summary>Bash</summary>
-Add to `~/.bashrc`
+Add to `~/.bashrc`. (Change as necessary)
 
 ```
-eval "$(easychangedirectory --init bash
+eval "$(easychangedirectory --init bash)"
 ```
 Run `. ~/.bashrc` as needed
+</details>
+
+<details>
+<summary>Fish</summary>
+Add to `~/.config/fish/config.fish`. (Change as necessary)
+
+```
+easychangedirectory --init fish | source
+```
+Run `. ~/.config/fish/config.fish` as needed
+</details>
+
+<details>
+<summary>Zsh unimplemented</summary>
+Add to `~/.zshrc`. (Change as necessary)
+
+```
+eval "$(easychangedirectory --init zsh)"
+```
+Run `. ~/.zshrc` as needed
 </details>
 
 ## After this
@@ -64,6 +84,7 @@ Run `. ~/.bashrc` as needed
 - Complete the above
 - To be able to do the same with cd
 - Image Preview
+- Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions.
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
 - Bug: Skip move does not work properly

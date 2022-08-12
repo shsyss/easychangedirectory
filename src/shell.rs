@@ -7,11 +7,11 @@ function ed() \{
     temp_path="{ temp_path }.$$"
     easychangedirectory "$\{temp_path}"
     path=`cat "$\{temp_path}"`
-    cd "$\{path}"
+    cd "$\{path}" || return
   elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
-    cd "$1"
+    cd "$1" || return
   else
     :
   fi
@@ -19,7 +19,22 @@ function ed() \{
 "#;
 
 pub const FISH: &str = r#"\
+# # easychangedirectory
+# easychangedirectory --init fish | source
 
+function ed
+  set arg_cnt (count $argv)
+  if test $arg_cnt -eq 0
+    set temp_path "{ temp_path }.$fish_pid"
+    easychangedirectory "$temp_path"
+    set path (cat "$temp_path")
+    cd "$path"
+  else if test $arg_cnt -eq 1 -a \( "x$argv[1]" = 'x-h' -o "x$argv[1]" = 'x--help' -o "x$argv[1]" = 'x-V' -o "x$argv[1]" = 'x--version' \)
+    easychangedirectory "$argv[1]"
+  else
+    cd "$argv[1]"
+  end
+end
 "#;
 
 pub const POWERSHELL: &str = r#"\
@@ -30,9 +45,17 @@ pub const ZSH: &str = r#"\
 # eval "$(easychangedirectory --init zsh)"
 
 function ed() \{
-  temp_path="{ temp_path }.$$"
-  easychangedirectory "$\{temp_path}"
-  path=`cat "$\{temp_path}"`
-  cd "$\{path}"
+  if [[ "$#" -eq 0 ]]; then
+    temp_path="{ temp_path }.$$"
+    easychangedirectory "$\{temp_path}"
+    path=`cat "$\{temp_path}"`
+    cd "$\{path}" || return
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
+    easychangedirectory "$1"
+  elif [[ "$#" -eq 1 ]]; then
+    cd "$1" || return
+  else
+    :
+  fi
 }
 "#;
