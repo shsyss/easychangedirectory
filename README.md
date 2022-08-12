@@ -51,8 +51,8 @@ not yet
 
 <details>
 <summary>Bash</summary>
-Add to `~/.bashrc`. (Change as necessary)
 
+Add to `~/.bashrc`. (Change as necessary)
 ```
 eval "$(easychangedirectory --init bash)"
 ```
@@ -61,8 +61,8 @@ Run `. ~/.bashrc` as needed
 
 <details>
 <summary>Fish</summary>
-Add to `~/.config/fish/config.fish`. (Change as necessary)
 
+Add to `~/.config/fish/config.fish`. (Change as necessary)
 ```
 easychangedirectory --init fish | source
 ```
@@ -71,8 +71,8 @@ Run `. ~/.config/fish/config.fish` as needed
 
 <details>
 <summary>Zsh unimplemented</summary>
-Add to `~/.zshrc`. (Change as necessary)
 
+Add to `~/.zshrc`. (Change as necessary)
 ```
 eval "$(easychangedirectory --init zsh)"
 ```
