@@ -3,7 +3,7 @@ name = "easychangedirectory"
 version = "0.1.0"
 authors = ["@shsyss"]
 edition = "2021"
-description = "cli tool to comfortably change directories"
+description = "Tools for easy cd"
 # build = "build.rs"
 
 [dependencies]
