@@ -37,15 +37,15 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 | Shell          | Windows       | Linux (Ubuntu) |
 | ---------------|:-------------:|:--------------:|
-| **Bash**       | **&#128504;** | **&#128504;**  |
-| **Fish**       | -             | **&#128504;**  |
-| **Powershell** | **&#128504;** | **&#128504;**  |
-| **Zsh**        | -             | **&#128504;**  |
+| **Bash**       | -             | **&#128504;**  |
+| **Fish**       | -             | -              |
+| **Powershell** | -             | -              |
+| **Zsh**        | -             | -              |
 
 ## Installation
 
 ### Install
-
+not yet
 
 #### Register ***easychangedirectory*** in shell
 
@@ -54,7 +54,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 Add to `~/.bashrc`
 
 ```
-eval "$(easychangedirectory --init bash)"
+eval "$(easychangedirectory --init bash
 ```
 Run `. ~/.bashrc` as needed
 </details>
@@ -62,6 +62,9 @@ Run `. ~/.bashrc` as needed
 ## After this
 
 - Complete the above
+- To be able to do the same with cd
 - Image Preview
 - Bug: Highlight shifted when moving left or right during search
+- Bug: Search suggestions are displayed from the index prior to the search
+- Bug: Skip move does not work properly
 - Bug: If the file content has a path, only the file name is displayed

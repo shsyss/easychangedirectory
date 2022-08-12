@@ -1,9 +1,0 @@
-# # easychangedirectory
-# eval "$(easychangedirectory --init bash)"
-
-function ed() \{
-  temp_path="{ temp_dir }.$$"
-  easychangedirectory "$\{temp_dir}"
-  path=`cat "$\{temp_dir}"`
-  cd "$\{path}"
-}

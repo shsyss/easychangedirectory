@@ -3,6 +3,7 @@ mod cli;
 pub mod connect;
 pub mod init;
 pub mod items;
+pub mod shell;
 mod ui;
 
 pub use app::{app, App};
