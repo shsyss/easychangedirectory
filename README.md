@@ -81,8 +81,6 @@ Run `. ~/.zshrc` as needed
 
 ## After this
 
-- Complete the above
-- To be able to do the same with cd
 - Image Preview
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions.
 - Bug: Highlight shifted when moving left or right during search
