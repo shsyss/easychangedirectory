@@ -19,6 +19,8 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Usage
 
+Command `ed`
+
 | Key                          | Description                           |
 | ---------------------------- | ------------------------------------- |
 | `k` `↑`                      | Move up                               |
