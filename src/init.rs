@@ -1,25 +1,22 @@
-use std::{env::temp_dir, path::PathBuf};
+use std::{collections::HashMap, env::temp_dir};
 
-use serde::Serialize;
-use tinytemplate::TinyTemplate;
+use handlebars::Handlebars;
+use serde_json::json;
 
-#[derive(Serialize)]
-struct Context {
-  temp_path: PathBuf,
-}
+use crate::shell;
 
 pub fn run(shell: &str) -> anyhow::Result<()> {
-  let mut temp = TinyTemplate::new();
-  let context = Context { temp_path: temp_dir().join("_easychangedirectory.txt") };
-  let shellscript = match shell {
-    "bash" => {
-      temp.add_template("init", include_str!("../templates/bash.txt"))?;
-      temp.render("init", &context)?
-    }
-    _ => todo!(), // Shell::Fish => {}
-                  // Shell::Powershell => {}
-                  // Shell::Zsh => {}
-  };
+  let init_map = HashMap::from([
+    ("bash", shell::BASH),
+    ("fish", shell::FISH),
+    ("powershell", shell::POWERSHELL),
+    ("zsh", shell::ZSH),
+  ]);
+
+  let shellscript = Handlebars::new().render_template(
+    init_map.get(shell).unwrap(),
+    &json!({ "temp_path": temp_dir().join("_easychangedirectory.txt") }),
+  )?;
 
   println!("{}", shellscript);
 

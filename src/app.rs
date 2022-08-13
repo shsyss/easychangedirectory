@@ -77,7 +77,7 @@ impl<T> StatefulList<T> {
   }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum State {
   File,
   Dir,
@@ -155,7 +155,7 @@ impl Item {
   }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
   Normal,
   Search,
@@ -426,7 +426,7 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
             KeyCode::Backspace => return Ok(current),
             KeyCode::Esc => return Ok(current),
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-            // TODO: change directory
+            // change directory
             KeyCode::Enter => return Ok(app.pwd),
 
             // home

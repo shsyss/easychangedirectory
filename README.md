@@ -13,6 +13,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 ## Features
 
 - Can change paths visually
+- The `cd` functionality can also be used as-is.
 
 ![demo](./assets/demo.gif)
 
@@ -37,31 +38,65 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 | Shell          | Windows       | Linux (Ubuntu) |
 | ---------------|:-------------:|:--------------:|
-| **Bash**       | **&#128504;** | **&#128504;**  |
+| **Bash**       | -             | **&#128504;**  |
 | **Fish**       | -             | **&#128504;**  |
-| **Powershell** | **&#128504;** | **&#128504;**  |
-| **Zsh**        | -             | **&#128504;**  |
+| **Powershell** | -             | **&#128504;**  |
+| **Zsh**        | -             | -              |
 
 ## Installation
 
 ### Install
+not yet
 
-
-#### Register ***easychangedirectory*** in shell
+### Register ***easychangedirectory*** in shell
 
 <details>
 <summary>Bash</summary>
-Add to `~/.bashrc`
 
+Add to `~/.bashrc` (Change as necessary)
 ```
 eval "$(easychangedirectory --init bash)"
 ```
 Run `. ~/.bashrc` as needed
 </details>
 
+<details>
+<summary>Fish</summary>
+
+Add to `~/.config/fish/config.fish` (Change as necessary)
+```
+easychangedirectory --init fish | source
+```
+Run `. ~/.config/fish/config.fish` as needed
+</details>
+
+<details>
+<summary>Powershell</summary>
+
+Add to the file found by `echo $profile`
+```
+Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
+```
+Run `. /path/to/profile.ps1` as needed
+
+</details>
+
+<!-- <details>
+<summary>Zsh</summary>
+
+Add to `~/.zshrc` (Change as necessary)
+```
+eval "$(easychangedirectory --init zsh)"
+```
+Run `. ~/.zshrc` as needed
+</details> -->
+
 ## After this
 
-- Complete the above
 - Image Preview
+- Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
+- Fish: I can't do regular expressions
 - Bug: Highlight shifted when moving left or right during search
+- Bug: Search suggestions are displayed from the index prior to the search
+- Bug: Skip move does not work properly
 - Bug: If the file content has a path, only the file name is displayed
