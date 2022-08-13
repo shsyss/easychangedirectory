@@ -74,8 +74,9 @@ Run `. ~/.config/fish/config.fish` as needed
 
 Add to the file found by `echo $profile`
 ```
-Invoke-Expression (& { (ed --init powershell) -join "`n" } )
+Invoke-Expression (& { (ed --init powershell | Out-String) } )
 ```
+Run `. /path/to/profile.ps1` as needed
 
 </details>
 
