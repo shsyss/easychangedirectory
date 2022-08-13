@@ -13,6 +13,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 ## Features
 
 - Can change paths visually
+- The `cd` functionality can also be used as-is.
 
 ![demo](./assets/demo.gif)
 
@@ -39,7 +40,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 | ---------------|:-------------:|:--------------:|
 | **Bash**       | -             | **&#128504;**  |
 | **Fish**       | -             | **&#128504;**  |
-| **Powershell** | -             | -              |
+| **Powershell** | -             | **&#128504;**  |
 | **Zsh**        | -             | -              |
 
 ## Installation
@@ -74,7 +75,7 @@ Run `. ~/.config/fish/config.fish` as needed
 
 Add to the file found by `echo $profile`
 ```
-Invoke-Expression (& { (ed --init powershell | Out-String) } )
+Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
 ```
 Run `. /path/to/profile.ps1` as needed
 
@@ -93,8 +94,8 @@ Run `. ~/.zshrc` as needed
 ## After this
 
 - Image Preview
-- Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions.
-- Bug: Fish receives arguments differently
+- Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
+- Fish: I can't do regular expressions
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
 - Bug: Skip move does not work properly
