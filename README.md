@@ -47,12 +47,12 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ### Install
 not yet
 
-#### Register ***easychangedirectory*** in shell
+### Register ***easychangedirectory*** in shell
 
 <details>
 <summary>Bash</summary>
 
-Add to `~/.bashrc`. (Change as necessary)
+Add to `~/.bashrc` (Change as necessary)
 ```
 eval "$(easychangedirectory --init bash)"
 ```
@@ -62,7 +62,7 @@ Run `. ~/.bashrc` as needed
 <details>
 <summary>Fish</summary>
 
-Add to `~/.config/fish/config.fish`. (Change as necessary)
+Add to `~/.config/fish/config.fish` (Change as necessary)
 ```
 easychangedirectory --init fish | source
 ```
@@ -70,19 +70,30 @@ Run `. ~/.config/fish/config.fish` as needed
 </details>
 
 <details>
-<summary>Zsh unimplemented</summary>
+<summary>Powershell</summary>
 
-Add to `~/.zshrc`. (Change as necessary)
+Add to the file found by `echo $profile`
+```
+Invoke-Expression (& { (ed --init powershell) -join "`n" } )
+```
+
+</details>
+
+<!-- <details>
+<summary>Zsh</summary>
+
+Add to `~/.zshrc` (Change as necessary)
 ```
 eval "$(easychangedirectory --init zsh)"
 ```
 Run `. ~/.zshrc` as needed
-</details>
+</details> -->
 
 ## After this
 
 - Image Preview
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions.
+- Bug: Fish receives arguments differently
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
 - Bug: Skip move does not work properly
