@@ -277,25 +277,37 @@ impl App {
     };
     Ok(())
   }
-  fn move_end(&mut self) {
-    self.items.select(self.items.items.len() - 1);
+  fn move_end(&mut self) -> anyhow::Result<()> {
+    let i = self.items.items.len() - 1;
+    self.items.select(i);
+    self.update_child_items(i)?;
+    Ok(())
   }
-  fn move_home(&mut self) {
-    self.items.select(0);
+  fn move_home(&mut self) -> anyhow::Result<()> {
+    let i = 0;
+    self.items.select(i);
+    self.update_child_items(i)?;
+    Ok(())
   }
   fn move_next(&mut self) -> anyhow::Result<()> {
     let i = self.items.next();
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_page_down(&mut self) {
-    let last = self.items.items.len() - 1;
-    let i = self.get_index(Family::Oneself);
-    self.items.select(if i > last - JUMP { last } else { i + JUMP });
+  fn move_page_down(&mut self) -> anyhow::Result<()> {
+    let last_i = self.items.items.len() - 1;
+    let old_i = self.get_index(Family::Oneself);
+    let i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
+    self.items.select(i);
+    self.update_child_items(i)?;
+    Ok(())
   }
-  fn move_page_up(&mut self) {
-    let i = self.get_index(Family::Oneself);
-    self.items.select(if i < JUMP { 0 } else { i - JUMP });
+  fn move_page_up(&mut self) -> anyhow::Result<()> {
+    let old_i = self.get_index(Family::Oneself);
+    let i = if old_i < JUMP { 0 } else { old_i - JUMP };
+    self.items.select(i);
+    self.update_child_items(i)?;
+    Ok(())
   }
   fn move_parent(&mut self) -> anyhow::Result<()> {
     let pwd = if let Some(pwd) = self.pwd.parent() {
@@ -431,16 +443,16 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
             KeyCode::Enter => return Ok(app.pwd),
 
             // home
-            KeyCode::Home => app.move_home(),
+            KeyCode::Home => app.move_home()?,
             // ? TODO: modifier + k move_home
             // end
-            KeyCode::End => app.move_end(),
+            KeyCode::End => app.move_end()?,
             // ? TODO: modifier + j move_end
             // pageUp
-            KeyCode::PageUp => app.move_page_up(),
+            KeyCode::PageUp => app.move_page_up()?,
             // ? TODO: modifier + k move_page_up
             // pageDown
-            KeyCode::PageDown => app.move_page_down(),
+            KeyCode::PageDown => app.move_page_down()?,
             // ? TODO: modifier + j move_page_down
             // next
             KeyCode::Char('j') => app.move_next()?,
@@ -475,10 +487,10 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
             }
 
             // move
-            KeyCode::Home => app.move_home(),
-            KeyCode::End => app.move_end(),
-            KeyCode::PageUp => app.move_page_up(),
-            KeyCode::PageDown => app.move_page_down(),
+            KeyCode::Home => app.move_home()?,
+            KeyCode::End => app.move_end()?,
+            KeyCode::PageUp => app.move_page_up()?,
+            KeyCode::PageDown => app.move_page_down()?,
             KeyCode::Down => app.move_next()?,
             KeyCode::Up => app.move_previous()?,
             KeyCode::Left => app.move_parent()?,

@@ -1,4 +1,4 @@
-# easychangedirectory (Installation is not yet available.)
+# easychangedirectory
 
 > **Tools for easy cd**
 
@@ -44,13 +44,18 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 | **Bash**       | **&#128504;** | **&#128504;**  | **&#63;** |
 | **Fish**       |   **&#63;**   | **&#128504;**  | **&#63;** |
 | **Powershell** | **&#128504;** | **&#128504;**  | **&#63;** |
-| **Zsh**        |   **&#63;**   |       -        | **&#63;** |
 
 ## Installation
 
 ### Install
 
-not yet
+#### If you can use Cargo
+
+```
+cargo install --locked easychangedirectory
+```
+
+We will add more as needed.
 
 ### Register **_easychangedirectory_** in shell
 
@@ -107,8 +112,8 @@ Run `. ~/.zshrc` as needed
 
 - Image Preview
 - Execute command
+- Add Support
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
-- Bug: Skip move does not work properly
 - Bug: If the file content has a path, only the file name is displayed
