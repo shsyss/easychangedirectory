@@ -455,9 +455,8 @@ fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<P
             KeyCode::Char('l') => app.move_child()?,
             KeyCode::Right => app.move_child()?,
 
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
             // ? TODO: mouse event
-            KeyCode::Char('s') => app.mode = Mode::Search,
-
             _ => {}
           }
         }

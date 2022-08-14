@@ -33,6 +33,7 @@ Command `ed`
 | `PageDown`                   | Skip a little and move down           |
 | `Enter`                      | Change directory to current directory |
 | `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory |
+| `Ctrl + s`                   | Search mode switch                    |
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
