@@ -111,11 +111,12 @@ impl ItemType {
 pub struct Item {
   pub item: ItemType,
   pub kind: Kind,
+  pub index: usize,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { item: ItemType::new_path(), kind: Kind::None }
+    Self { item: ItemType::new_path(), kind: Kind::None, index: 0 }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     if self.is_symlink() {
@@ -127,7 +128,10 @@ impl Item {
       App::make_items(&self.get_path().unwrap())?
     } else if self.is_file() {
       if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
-        s.lines().map(|s| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content }).collect()
+        s.lines()
+          .enumerate()
+          .map(|(i, s)| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: i })
+          .collect()
       } else {
         vec![Item::default()]
       }

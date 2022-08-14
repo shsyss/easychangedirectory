@@ -45,7 +45,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     top_chunks[0],
   );
 
-  let item = Item { item: ItemType::SearchText(app.search.clone()), kind: Kind::Search };
+  let item = Item { item: ItemType::SearchText(app.search.clone()), kind: Kind::Search, index: 0 };
   let search_items = vec![item];
   let search_items = set_items(&search_items);
   let search_text = List::new(search_items).highlight_symbol("> ");
