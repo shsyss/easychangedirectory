@@ -116,4 +116,3 @@ Run `. ~/.zshrc` as needed
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
-- Bug: If the file content has a path, only the file name is displayed

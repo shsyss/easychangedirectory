@@ -17,12 +17,12 @@ use tui::{
 use crate::{items, ui};
 
 #[derive(Debug)]
-pub struct StatefulList<T> {
+pub struct StatefulList {
   pub state: ListState,
-  pub items: Vec<T>,
+  pub items: Vec<Item>,
 }
 
-impl<T> StatefulList<T> {
+impl StatefulList {
   fn next(&mut self) -> usize {
     let i = match self.state.selected() {
       Some(i) => {
@@ -60,17 +60,17 @@ impl<T> StatefulList<T> {
   fn unselect(&mut self) {
     self.state.select(None);
   }
-  fn with_items(items: Vec<T>) -> StatefulList<T> {
+  fn with_items(items: Vec<Item>) -> StatefulList {
     let mut state = ListState::default();
     state.select(Some(0));
     StatefulList { state, items }
   }
-  fn with_items_option(items: Vec<T>, index: Option<usize>) -> StatefulList<T> {
+  fn with_items_option(items: Vec<Item>, index: Option<usize>) -> StatefulList {
     let mut state = ListState::default();
     state.select(index);
     StatefulList { state, items }
   }
-  fn with_items_select(items: Vec<T>, index: usize) -> StatefulList<T> {
+  fn with_items_select(items: Vec<Item>, index: usize) -> StatefulList {
     let mut state = ListState::default();
     state.select(Some(index));
     StatefulList { state, items }
@@ -105,9 +105,6 @@ impl TypeItem {
   fn new_path() -> Self {
     Self::Path(PathBuf::new())
   }
-  fn from_path(s: &str) -> Self {
-    Self::Path(PathBuf::from(s))
-  }
 }
 
 #[derive(Debug, Clone)]
@@ -128,8 +125,12 @@ impl Item {
     }
     Ok(if self.is_dir() {
       App::make_items(&self.get_path().unwrap())?
-    } else if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
-      s.lines().map(|s| Item { item: TypeItem::from_path(s), state: State::Content }).collect()
+    } else if self.is_file() {
+      if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
+        s.lines().map(|s| Item { item: TypeItem::Content(s.to_string()), state: State::Content }).collect()
+      } else {
+        vec![Item::default()]
+      }
     } else {
       vec![Item::default()]
     })
@@ -144,7 +145,11 @@ impl Item {
     matches!(self.state, State::File)
   }
   fn is_symlink(&self) -> bool {
-    self.get_path().unwrap().is_symlink()
+    if let Some(p) = self.get_path() {
+      p.is_symlink()
+    } else {
+      false
+    }
   }
   pub fn get_path(&self) -> Option<PathBuf> {
     if let TypeItem::Path(path) = &self.item {
@@ -164,10 +169,10 @@ pub enum Mode {
 #[derive(Debug)]
 pub struct App {
   pub mode: Mode,
-  pub child_items: StatefulList<Item>,
-  pub items: StatefulList<Item>,
-  pub parent_items: StatefulList<Item>,
-  pub grandparent_items: StatefulList<Item>,
+  pub child_items: StatefulList,
+  pub items: StatefulList,
+  pub parent_items: StatefulList,
+  pub grandparent_items: StatefulList,
   pwd: PathBuf,
   grandparent_path: PathBuf,
   pub search: String,
@@ -377,7 +382,13 @@ impl App {
       .items
       .iter()
       .filter_map(|item| -> Option<Item> {
-        if item.get_path()?.file_name()?.to_string_lossy().to_string().contains(&self.search) {
+        if let TypeItem::Content(s) = &item.item {
+          if s.contains(&self.search) {
+            Some(item.clone())
+          } else {
+            None
+          }
+        } else if item.get_path()?.file_name()?.to_string_lossy().to_string().contains(&self.search) {
           Some(item.clone())
         } else {
           None

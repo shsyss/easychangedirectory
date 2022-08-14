@@ -102,7 +102,14 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
         State::Dir => Style::default().fg(Color::Blue),
         State::Search => Style::default().fg(Color::Green),
       };
-      let text = if let TypeItem::SearchText(text) = &item.item { text.clone() } else { item.generate_filename()? };
+      // TODO: I want to consolidate `if let`
+      let text = if let TypeItem::SearchText(text) = &item.item {
+        text.clone()
+      } else if let TypeItem::Content(text) = &item.item {
+        text.clone()
+      } else {
+        item.generate_filename()?
+      };
       Some(ListItem::new(Span::styled(text, style)))
     })
     .collect()
