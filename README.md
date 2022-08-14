@@ -38,47 +38,56 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 ## Support
 
-| Shell          | Windows       | Linux (Ubuntu) |
-| ---------------|:-------------:|:--------------:|
-| **Bash**       | -             | **&#128504;**  |
-| **Fish**       | -             | **&#128504;**  |
-| **Powershell** | -             | **&#128504;**  |
-| **Zsh**        | -             | -              |
+| Shell          |    Windows    | Linux (Ubuntu) |    Mac    |
+| -------------- | :-----------: | :------------: | :-------: |
+| **Bash**       | **&#128504;** | **&#128504;**  | **&#63;** |
+| **Fish**       |   **&#63;**   | **&#128504;**  | **&#63;** |
+| **Powershell** | **&#128504;** | **&#128504;**  | **&#63;** |
+| **Zsh**        |   **&#63;**   |       -        | **&#63;** |
 
 ## Installation
 
 ### Install
+
 not yet
 
-### Register ***easychangedirectory*** in shell
+### Register **_easychangedirectory_** in shell
 
 <details>
 <summary>Bash</summary>
 
 Add to `~/.bashrc` (Change as necessary)
+
 ```
 eval "$(easychangedirectory --init bash)"
 ```
+
 Run `. ~/.bashrc` as needed
+
 </details>
 
 <details>
 <summary>Fish</summary>
 
 Add to `~/.config/fish/config.fish` (Change as necessary)
+
 ```
 easychangedirectory --init fish | source
 ```
+
 Run `. ~/.config/fish/config.fish` as needed
+
 </details>
 
 <details>
 <summary>Powershell</summary>
 
 Add to the file found by `echo $profile`
+
 ```
 Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
 ```
+
 Run `. /path/to/profile.ps1` as needed
 
 </details>
@@ -96,6 +105,7 @@ Run `. ~/.zshrc` as needed
 ## After this
 
 - Image Preview
+- Starting vscode
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
 - Fish: I can't do regular expressions
 - Bug: Highlight shifted when moving left or right during search
