@@ -78,7 +78,7 @@ impl StatefulList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum State {
+pub enum Kind {
   File,
   Dir,
   Content,
@@ -95,13 +95,13 @@ pub enum Family {
 }
 
 #[derive(Debug, Clone)]
-pub enum TypeItem {
+pub enum ItemType {
   Path(PathBuf),
   Content(String),
   SearchText(String),
 }
 
-impl TypeItem {
+impl ItemType {
   fn new_path() -> Self {
     Self::Path(PathBuf::new())
   }
@@ -109,17 +109,17 @@ impl TypeItem {
 
 #[derive(Debug, Clone)]
 pub struct Item {
-  pub item: TypeItem,
-  pub state: State,
+  pub item: ItemType,
+  pub kind: Kind,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { item: TypeItem::new_path(), state: State::None }
+    Self { item: ItemType::new_path(), kind: Kind::None }
   }
   fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     if self.is_symlink() {
-      if let TypeItem::Path(path) = &self.item {
+      if let ItemType::Path(path) = &self.item {
         return App::make_items(path.read_link()?);
       }
     }
@@ -127,7 +127,7 @@ impl Item {
       App::make_items(&self.get_path().unwrap())?
     } else if self.is_file() {
       if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
-        s.lines().map(|s| Item { item: TypeItem::Content(s.to_string()), state: State::Content }).collect()
+        s.lines().map(|s| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content }).collect()
       } else {
         vec![Item::default()]
       }
@@ -139,10 +139,10 @@ impl Item {
     Some(self.get_path()?.file_name()?.to_string_lossy().to_string())
   }
   pub fn is_dir(&self) -> bool {
-    matches!(self.state, State::Dir)
+    matches!(self.kind, Kind::Dir)
   }
   fn is_file(&self) -> bool {
-    matches!(self.state, State::File)
+    matches!(self.kind, Kind::File)
   }
   fn is_symlink(&self) -> bool {
     if let Some(p) = self.get_path() {
@@ -152,7 +152,7 @@ impl Item {
     }
   }
   pub fn get_path(&self) -> Option<PathBuf> {
-    if let TypeItem::Path(path) = &self.item {
+    if let ItemType::Path(path) = &self.item {
       Some(path.clone())
     } else {
       None
@@ -382,7 +382,7 @@ impl App {
       .items
       .iter()
       .filter_map(|item| -> Option<Item> {
-        if let TypeItem::Content(s) = &item.item {
+        if let ItemType::Content(s) = &item.item {
           if s.contains(&self.search) {
             Some(item.clone())
           } else {

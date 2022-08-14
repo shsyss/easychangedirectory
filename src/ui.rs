@@ -9,7 +9,7 @@ use tui::{
 };
 
 use crate::{
-  app::{Item, Mode, State, TypeItem},
+  app::{Item, ItemType, Kind, Mode},
   App,
 };
 
@@ -45,7 +45,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     top_chunks[0],
   );
 
-  let item = Item { item: TypeItem::SearchText(app.search.clone()), state: State::Search };
+  let item = Item { item: ItemType::SearchText(app.search.clone()), kind: Kind::Search };
   let search_items = vec![item];
   let search_items = set_items(&search_items);
   let search_text = List::new(search_items).highlight_symbol("> ");
@@ -97,15 +97,15 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
   items
     .iter()
     .filter_map(|item| {
-      let style = match item.state {
-        State::Content | State::None | State::File => Style::default().fg(Color::Gray),
-        State::Dir => Style::default().fg(Color::Blue),
-        State::Search => Style::default().fg(Color::Green),
+      let style = match item.kind {
+        Kind::Content | Kind::None | Kind::File => Style::default().fg(Color::Gray),
+        Kind::Dir => Style::default().fg(Color::Blue),
+        Kind::Search => Style::default().fg(Color::Green),
       };
       // TODO: I want to consolidate `if let`
-      let text = if let TypeItem::SearchText(text) = &item.item {
+      let text = if let ItemType::SearchText(text) = &item.item {
         text.clone()
-      } else if let TypeItem::Content(text) = &item.item {
+      } else if let ItemType::Content(text) = &item.item {
         text.clone()
       } else {
         item.generate_filename()?
