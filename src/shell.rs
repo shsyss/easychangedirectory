@@ -20,6 +20,7 @@ function ed() {
 }
 "#;
 
+// TODO: I can't do regular expressions in Fish.
 pub const FISH: &str = r#"
 # # easychangedirectory
 # easychangedirectory --init fish | source

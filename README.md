@@ -1,4 +1,4 @@
-# easychangedirectory (unfinished)
+# easychangedirectory (Installation is not yet available.)
 
 > **Tools for easy cd**
 
@@ -29,8 +29,8 @@ Command `ed`
 | `l` `→`                      | Move Child directory                  |
 | `Home`                       | Move to top                           |
 | `End`                        | Move to bottom                        |
-| `PageUp` `Alt + k`           | Skip a little and move up             |
-| `PageDown` `Alt + j`         | Skip a little and move down           |
+| `PageUp`                     | Skip a little and move up             |
+| `PageDown`                   | Skip a little and move down           |
 | `Enter`                      | Change directory to current directory |
 | `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory |
 
@@ -105,9 +105,8 @@ Run `. ~/.zshrc` as needed
 ## After this
 
 - Image Preview
-- Starting vscode
+- Execute command
 - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
-- Fish: I can't do regular expressions
 - Bug: Highlight shifted when moving left or right during search
 - Bug: Search suggestions are displayed from the index prior to the search
 - Bug: Skip move does not work properly
