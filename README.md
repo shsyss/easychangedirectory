@@ -33,7 +33,8 @@ Command `ed`
 | `PageDown`                   | Skip a little and move down           |
 | `Enter`                      | Change directory to current directory |
 | `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory |
-| `Ctrl + s`                   | Search mode switch                    |
+
+<!-- | `Ctrl + s`                   | Search mode switch                    | -->
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
@@ -108,11 +109,15 @@ eval "$(easychangedirectory --init zsh)"
 Run `. ~/.zshrc` as needed
 </details> -->
 
+## Environment variable
+
+- `_ED_SHOW_INDEX`
+  - If the value is `1`, the index is displayed on the left side of the list
+
 ## After this
 
+- Narrowing the list
 - Image Preview
 - Execute command
 - Add Support
-- Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
-- Bug: Highlight shifted when moving left or right during search
-- Bug: Search suggestions are displayed from the index prior to the search
+  - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions

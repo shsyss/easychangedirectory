@@ -1,3 +1,5 @@
+use std::env;
+
 use tui::{
   backend::Backend,
   layout::{Constraint, Direction, Layout},
@@ -102,14 +104,19 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
         Kind::Dir => Style::default().fg(Color::Blue),
         Kind::Search => Style::default().fg(Color::Green),
       };
-      // TODO: I want to consolidate `if let`
-      let text = if let ItemType::SearchText(text) = &item.item {
+
+      let mut text = if let ItemType::SearchText(text) = &item.item {
         text.clone()
       } else if let ItemType::Content(text) = &item.item {
         text.clone()
       } else {
         item.generate_filename()?
       };
+
+      if env::var("_ED_SHOW_INDEX").unwrap_or_else(|_| "0".to_string()) == "1" {
+        text = format!("{} {}", item.index + 1, text);
+      }
+
       Some(ListItem::new(Span::styled(text, style)))
     })
     .collect()
