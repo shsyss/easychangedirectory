@@ -1,10 +1,14 @@
 [package]
 name = "easychangedirectory"
 version = "0.1.0"
-authors = ["@shsyss"]
+authors = ["shsyss <shibata.syungo@gmail.com>"]
 edition = "2021"
 description = "Tools for easy cd"
-# build = "build.rs"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/shsyss/easychangedirectory"
+categories = ["command-line-utilities", "filesystem"]
+keywords = ["cli","terminal","cd"]
 
 [dependencies]
 anyhow = "1.0.60"
