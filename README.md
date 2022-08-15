@@ -8,7 +8,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Usage](#usage) / [Support](#support) / [Installation](#installation) / [After this](#after-this)
+[Features](#features) / [Usage](#usage) / [Support](#support) / [Installation](#installation) / [Environment variable](#environment-variable) / [After this](#after-this)
 
 ## Features
 
@@ -56,6 +56,10 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 cargo install --locked easychangedirectory
 ```
 
+#### Download from Release page
+
+Download the data appropriate for your environment and place it in a directory with a path.
+
 We will add more as needed.
 
 ### Register **_easychangedirectory_** in shell
@@ -95,7 +99,7 @@ Add to the file found by `echo $profile`
 Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
 ```
 
-Run `. /path/to/profile.ps1` as needed
+Run `. $profile` as needed
 
 </details>
 
