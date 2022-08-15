@@ -50,15 +50,15 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 
 ### Install
 
-#### If you can use Cargo
+- If you can use Cargo
 
 ```
 cargo install --locked easychangedirectory
 ```
 
-#### Download from Release page
+- Download from Release page
 
-Download the data appropriate for your environment and place it in a directory with a path.
+  - Download the data appropriate for your environment and place it in a directory with a path.
 
 We will add more as needed.
 
