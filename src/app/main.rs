@@ -1,6 +1,6 @@
 use anyhow::{bail, Context};
 use crossterm::{
-  event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
+  event::{DisableMouseCapture, EnableMouseCapture},
   execute,
   terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -8,13 +8,9 @@ use std::{
   env, fs, io,
   path::{Path, PathBuf},
 };
-use tui::{
-  backend::{Backend, CrosstermBackend},
-  widgets::ListState,
-  Terminal,
-};
+use tui::{backend::CrosstermBackend, widgets::ListState, Terminal};
 
-use crate::{items, ui};
+use crate::app;
 
 #[derive(Debug)]
 pub struct StatefulList {
@@ -177,7 +173,7 @@ pub struct App {
   pub items: StatefulList,
   pub parent_items: StatefulList,
   pub grandparent_items: StatefulList,
-  pwd: PathBuf,
+  pub pwd: PathBuf,
   grandparent_path: PathBuf,
   pub search: String,
 }
@@ -226,9 +222,9 @@ impl App {
     }
   }
   fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
-    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { items::read_dir(path)? })
+    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { app::read_items(path)? })
   }
-  fn move_child(&mut self) -> anyhow::Result<()> {
+  pub fn move_child(&mut self) -> anyhow::Result<()> {
     let i = self.items.state.selected().unwrap();
     let selected_item = self.items.items[i].clone();
     let pwd = if selected_item.is_dir() {
@@ -270,7 +266,7 @@ impl App {
     };
     Ok(())
   }
-  fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
+  pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
     let pi = self.get_index(Family::Oneself);
     let gi = self.get_index(Family::Parent);
 
@@ -286,24 +282,24 @@ impl App {
     };
     Ok(())
   }
-  fn move_end(&mut self) -> anyhow::Result<()> {
+  pub fn move_end(&mut self) -> anyhow::Result<()> {
     let i = self.items.items.len() - 1;
     self.items.select(i);
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_home(&mut self) -> anyhow::Result<()> {
+  pub fn move_home(&mut self) -> anyhow::Result<()> {
     let i = 0;
     self.items.select(i);
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_next(&mut self) -> anyhow::Result<()> {
+  pub fn move_next(&mut self) -> anyhow::Result<()> {
     let i = self.items.next();
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_page_down(&mut self) -> anyhow::Result<()> {
+  pub fn move_page_down(&mut self) -> anyhow::Result<()> {
     let last_i = self.items.items.len() - 1;
     let old_i = self.get_index(Family::Oneself);
     let i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
@@ -311,14 +307,14 @@ impl App {
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_page_up(&mut self) -> anyhow::Result<()> {
+  pub fn move_page_up(&mut self) -> anyhow::Result<()> {
     let old_i = self.get_index(Family::Oneself);
     let i = if old_i < JUMP { 0 } else { old_i - JUMP };
     self.items.select(i);
     self.update_child_items(i)?;
     Ok(())
   }
-  fn move_parent(&mut self) -> anyhow::Result<()> {
+  pub fn move_parent(&mut self) -> anyhow::Result<()> {
     let pwd = if let Some(pwd) = self.pwd.parent() {
       pwd.to_path_buf()
     } else {
@@ -346,14 +342,14 @@ impl App {
 
     Ok(())
   }
-  fn move_previous(&mut self) -> anyhow::Result<()> {
+  pub fn move_previous(&mut self) -> anyhow::Result<()> {
     let i = self.items.previous();
     self.update_child_items(i)?;
     Ok(())
   }
   fn new() -> anyhow::Result<App> {
     let pwd = env::current_dir()?;
-    let items = items::read_dir(&pwd)?;
+    let items = app::read_items(&pwd)?;
 
     // Initial selection is 0
     let child_path = if items[0].is_dir() { items[0].get_path().unwrap() } else { PathBuf::new() };
@@ -421,7 +417,7 @@ pub fn app() -> anyhow::Result<PathBuf> {
   let mut terminal = Terminal::new(backend)?;
 
   let app = App::new()?;
-  let path = match self::run(&mut terminal, app) {
+  let path = match app::run(&mut terminal, app) {
     Ok(path) => path,
     Err(e) => {
       // restore terminal
@@ -439,82 +435,4 @@ pub fn app() -> anyhow::Result<PathBuf> {
   terminal.show_cursor()?;
 
   Ok(path)
-}
-
-fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
-  let current = env::current_dir()?;
-  loop {
-    terminal.draw(|f| ui(f, &mut app))?;
-    if let Event::Key(key) = event::read()? {
-      match app.mode {
-        Mode::Normal => {
-          match key.code {
-            // finish
-            KeyCode::Backspace => return Ok(current),
-            KeyCode::Esc => return Ok(current),
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-
-            // change directory
-            KeyCode::Enter => return Ok(app.pwd),
-
-            // home
-            KeyCode::Home => app.move_home()?,
-            // ? TODO: modifier + k move_home
-            // end
-            KeyCode::End => app.move_end()?,
-            // ? TODO: modifier + j move_end
-            // pageUp
-            KeyCode::PageUp => app.move_page_up()?,
-            // ? TODO: modifier + k move_page_up
-            // pageDown
-            KeyCode::PageDown => app.move_page_down()?,
-            // ? TODO: modifier + j move_page_down
-            // next
-            KeyCode::Char('j') => app.move_next()?,
-            KeyCode::Down => app.move_next()?,
-            // previous
-            KeyCode::Char('k') => app.move_previous()?,
-            KeyCode::Up => app.move_previous()?,
-            // parent
-            KeyCode::Char('h') => app.move_parent()?,
-            KeyCode::Left => app.move_parent()?,
-            // right move
-            KeyCode::Char('l') => app.move_child()?,
-            KeyCode::Right => app.move_child()?,
-
-            // KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
-            // ? TODO: mouse event
-            _ => {}
-          }
-        }
-        Mode::Search => {
-          match key.code {
-            // finish
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-            KeyCode::Enter => return Ok(app.pwd),
-
-            KeyCode::Esc => app.mode = Mode::Normal,
-            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
-
-            KeyCode::Char(c) => app.search.push(c),
-            KeyCode::Backspace => {
-              app.search.pop();
-            }
-
-            // move
-            KeyCode::Home => app.move_home()?,
-            KeyCode::End => app.move_end()?,
-            KeyCode::PageUp => app.move_page_up()?,
-            KeyCode::PageDown => app.move_page_down()?,
-            KeyCode::Down => app.move_next()?,
-            KeyCode::Up => app.move_previous()?,
-            KeyCode::Left => app.move_parent()?,
-            KeyCode::Right => app.move_child()?,
-
-            _ => {}
-          }
-        }
-      }
-    }
-  }
 }

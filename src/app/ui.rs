@@ -10,10 +10,7 @@ use tui::{
   Frame,
 };
 
-use crate::{
-  app::{Item, ItemType, Kind, Mode},
-  App,
-};
+use crate::app::{App, Item, ItemType, Kind, Mode};
 
 struct Standard;
 

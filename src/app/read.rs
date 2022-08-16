@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::app::{Item, ItemType, Kind};
 
-pub fn read_dir<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
   let mut items = if let Ok(read_dir) = fs::read_dir(&path) {
     read_dir
       .filter_map(|entry| {
