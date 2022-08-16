@@ -9,70 +9,9 @@ use crossterm::{
   execute,
   terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use tui::{backend::CrosstermBackend, widgets::ListState, Terminal};
+use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{Item, ItemType};
-
-#[derive(Debug)]
-pub struct StatefulList {
-  pub state: ListState,
-  pub items: Vec<Item>,
-}
-
-impl StatefulList {
-  fn next(&mut self) -> usize {
-    let i = match self.state.selected() {
-      Some(i) => {
-        if i >= self.items.len() - 1 {
-          0
-        } else {
-          i + 1
-        }
-      }
-      None => 0,
-    };
-    self.state.select(Some(i));
-    i
-  }
-  fn previous(&mut self) -> usize {
-    let i = match self.state.selected() {
-      Some(i) => {
-        if i == 0 {
-          self.items.len() - 1
-        } else {
-          i - 1
-        }
-      }
-      None => 0,
-    };
-    self.state.select(Some(i));
-    i
-  }
-  fn select(&mut self, index: usize) {
-    self.state.select(Some(index));
-  }
-  fn selected(&self) -> usize {
-    self.state.selected().unwrap()
-  }
-  fn unselect(&mut self) {
-    self.state.select(None);
-  }
-  fn with_items(items: Vec<Item>) -> StatefulList {
-    let mut state = ListState::default();
-    state.select(Some(0));
-    StatefulList { state, items }
-  }
-  fn with_items_option(items: Vec<Item>, index: Option<usize>) -> StatefulList {
-    let mut state = ListState::default();
-    state.select(index);
-    StatefulList { state, items }
-  }
-  fn with_items_select(items: Vec<Item>, index: usize) -> StatefulList {
-    let mut state = ListState::default();
-    state.select(Some(index));
-    StatefulList { state, items }
-  }
-}
+use super::{Item, ItemType, Search, State, StatefulList};
 
 // for identification
 pub enum Family {
@@ -97,7 +36,7 @@ pub struct App {
   pub grandparent_items: StatefulList,
   pub pwd: PathBuf,
   grandparent_path: PathBuf,
-  pub search: String,
+  pub search: Search,
 }
 
 const JUMP: usize = 4;
@@ -184,7 +123,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: String::new(),
+      search: Search::new(),
     };
     Ok(())
   }
@@ -200,7 +139,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: String::new(),
+      search: Search::new(),
     };
     Ok(())
   }
@@ -259,7 +198,7 @@ impl App {
       grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
       pwd,
       grandparent_path,
-      search: String::new(),
+      search: Search::new(),
     };
 
     Ok(())
@@ -290,7 +229,7 @@ impl App {
       grandparent_items: StatefulList::with_items(grandparent_items),
       pwd,
       grandparent_path,
-      search: String::new(),
+      search: Search::new(),
     };
 
     app.parent_items.select(pi);
@@ -305,12 +244,12 @@ impl App {
       .iter()
       .filter_map(|item| -> Option<Item> {
         if let ItemType::Content(s) = &item.item {
-          if s.contains(&self.search) {
+          if s.contains(&self.search.text) {
             Some(item.clone())
           } else {
             None
           }
-        } else if item.get_path()?.file_name()?.to_string_lossy().to_string().contains(&self.search) {
+        } else if item.get_path()?.file_name()?.to_string_lossy().to_string().contains(&self.search.text) {
           Some(item.clone())
         } else {
           None
@@ -327,6 +266,9 @@ impl App {
     }
 
     Ok(())
+  }
+  pub fn update_search_list(&mut self) {
+    self.search.list = self.search_sort_to_vec();
   }
 }
 

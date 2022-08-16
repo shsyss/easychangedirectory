@@ -10,7 +10,7 @@ use tui::{
   Frame,
 };
 
-use crate::app::{App, Item, ItemType, Kind, Mode};
+use super::{App, Item, ItemType, Kind, Mode};
 
 struct Standard;
 
@@ -44,7 +44,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     top_chunks[0],
   );
 
-  let item = Item { item: ItemType::SearchText(app.search.clone()), kind: Kind::Search, index: 0 };
+  let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: 0 };
   let search_items = vec![item];
   let search_items = set_items(&search_items);
   let search_text = List::new(search_items).highlight_symbol("> ");
@@ -78,13 +78,17 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   f.render_stateful_widget(parent_items, bottom_chunks[1], &mut app.parent_items.state);
 
   // current
-  let searched_items = app.search_sort_to_vec();
-  let items: Vec<ListItem> = set_items(&searched_items);
+  // ! 絞り込んで空になった時にitemsに戻る
+  let (items, state) = if app.search.list.is_empty() {
+    (set_items(&app.items.items), &mut app.items.state)
+  } else {
+    (set_items(&app.search.list), &mut app.search.state)
+  };
   let items = List::new(items)
     .block(Standard::block())
     .highlight_style(Style::default().add_modifier(Modifier::BOLD).add_modifier(Modifier::UNDERLINED))
     .highlight_symbol("> ");
-  f.render_stateful_widget(items, bottom_chunks[2], &mut app.items.state);
+  f.render_stateful_widget(items, bottom_chunks[2], state);
 
   // child
   let child_items = set_items(&app.child_items.items);

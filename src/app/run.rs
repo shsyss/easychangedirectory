@@ -14,25 +14,21 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
         Mode::Normal => {
           match key.code {
             // finish
-            KeyCode::Backspace => return Ok(current),
-            KeyCode::Esc => return Ok(current),
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
+            KeyCode::Esc => return Ok(current),
+            KeyCode::Backspace => return Ok(current),
 
             // change directory
             KeyCode::Enter => return Ok(app.pwd),
 
             // home
             KeyCode::Home => app.move_home()?,
-            // ? TODO: modifier + k move_home
             // end
             KeyCode::End => app.move_end()?,
-            // ? TODO: modifier + j move_end
             // pageUp
             KeyCode::PageUp => app.move_page_up()?,
-            // ? TODO: modifier + k move_page_up
             // pageDown
             KeyCode::PageDown => app.move_page_down()?,
-            // ? TODO: modifier + j move_page_down
             // next
             KeyCode::Char('j') => app.move_next()?,
             KeyCode::Down => app.move_next()?,
@@ -47,7 +43,7 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Right => app.move_child()?,
 
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
-            // ? TODO: mouse event
+
             _ => {}
           }
         }
@@ -55,14 +51,21 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
           match key.code {
             // finish
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
+            KeyCode::Esc => return Ok(current),
+
+            // change directory
             KeyCode::Enter => return Ok(app.pwd),
 
-            KeyCode::Esc => app.mode = Mode::Normal,
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
 
-            KeyCode::Char(c) => app.search.push(c),
+            // input
+            KeyCode::Char(c) => {
+              app.search.text.push(c);
+              app.update_search_list();
+            }
             KeyCode::Backspace => {
-              app.search.pop();
+              app.search.text.pop();
+              app.update_search_list();
             }
 
             // move

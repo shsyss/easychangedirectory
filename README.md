@@ -22,21 +22,19 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 Command `ed`
 
-| Key                          | Description                           |
-| ---------------------------- | ------------------------------------- |
-| `k` `↑`                      | Move up                               |
-| `j` `↓`                      | Move down                             |
-| `h` `←`                      | Move parent directory                 |
-| `l` `→`                      | Move Child directory                  |
-| `Home`                       | Move to top                           |
-| `End`                        | Move to bottom                        |
-| `PageUp`                     | Skip a little and move up             |
-| `PageDown`                   | Skip a little and move down           |
-| `Enter`                      | Change directory to current directory |
-| `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory |
-
-<!-- | `Ctrl + s`                   | Search mode switch                    | -->
-
+| Key                          | Description                                 |
+| ---------------------------- | ------------------------------------------- |
+| `k` `↑`                      | Move up                                     |
+| `j` `↓`                      | Move down                                   |
+| `h` `←`                      | Move parent directory                       |
+| `l` `→`                      | Move Child directory                        |
+| `Home`                       | Move to top                                 |
+| `End`                        | Move to bottom                              |
+| `PageUp`                     | Skip a little and move up                   |
+| `PageDown`                   | Skip a little and move down                 |
+| `Enter`                      | Change directory to current directory       |
+| `Backspace` `Esc` `Ctrl + c` | Exit and return to original directory       |
+| `Ctrl + s`                   | Search mode switch (Char key will not work) |
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
 ## Support
@@ -122,6 +120,8 @@ Run `. ~/.zshrc` as needed
 ## After this
 
 - Narrowing the list
+- Add Key map
+  - ;(cd), q(finish)
 - Image Preview
 - Execute command
 - Add Support
