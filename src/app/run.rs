@@ -15,34 +15,39 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
           match key.code {
             // finish
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
+            KeyCode::Char('q') => return Ok(current),
             KeyCode::Esc => return Ok(current),
-            KeyCode::Backspace => return Ok(current),
 
             // change directory
+            KeyCode::Char('c') => return Ok(app.pwd),
+            KeyCode::Char(';') => return Ok(app.pwd),
             KeyCode::Enter => return Ok(app.pwd),
 
-            // home
+            // move
             KeyCode::Home => app.move_home()?,
-            // end
             KeyCode::End => app.move_end()?,
-            // pageUp
             KeyCode::PageUp => app.move_page_up()?,
-            // pageDown
             KeyCode::PageDown => app.move_page_down()?,
-            // next
             KeyCode::Char('j') => app.move_next()?,
             KeyCode::Down => app.move_next()?,
-            // previous
             KeyCode::Char('k') => app.move_previous()?,
             KeyCode::Up => app.move_previous()?,
-            // parent
             KeyCode::Char('h') => app.move_parent()?,
             KeyCode::Left => app.move_parent()?,
-            // right move
             KeyCode::Char('l') => app.move_child()?,
             KeyCode::Right => app.move_child()?,
 
+            // search
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
+            KeyCode::Insert => app.mode = Mode::Search,
+            KeyCode::Backspace => {
+              app.search.text.pop();
+              app.update_search_list();
+            }
+            KeyCode::Delete => {
+              app.search.text.clear();
+              app.update_search_list();
+            }
 
             _ => {}
           }
@@ -56,7 +61,9 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             // change directory
             KeyCode::Enter => return Ok(app.pwd),
 
+            // search
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
+            KeyCode::Insert => app.mode = Mode::Normal,
 
             // input
             KeyCode::Char(c) => {
@@ -65,6 +72,10 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             }
             KeyCode::Backspace => {
               app.search.text.pop();
+              app.update_search_list();
+            }
+            KeyCode::Delete => {
+              app.search.text.clear();
               app.update_search_list();
             }
 
