@@ -3,13 +3,15 @@ use std::{env, path::PathBuf};
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
 
-pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: super::App) -> anyhow::Result<PathBuf> {
+use super::{App, Mode};
+
+pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
   let current = env::current_dir()?;
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
       match app.mode {
-        super::Mode::Normal => {
+        Mode::Normal => {
           match key.code {
             // finish
             KeyCode::Backspace => return Ok(current),
@@ -44,19 +46,19 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: super::App) -> anyho
             KeyCode::Char('l') => app.move_child()?,
             KeyCode::Right => app.move_child()?,
 
-            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = super::Mode::Search,
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
             // ? TODO: mouse event
             _ => {}
           }
         }
-        super::Mode::Search => {
+        Mode::Search => {
           match key.code {
             // finish
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
             KeyCode::Enter => return Ok(app.pwd),
 
-            KeyCode::Esc => app.mode = super::Mode::Normal,
-            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = super::Mode::Normal,
+            KeyCode::Esc => app.mode = Mode::Normal,
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
 
             KeyCode::Char(c) => app.search.push(c),
             KeyCode::Backspace => {

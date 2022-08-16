@@ -1,11 +1,11 @@
 mod init;
+mod item;
 mod main;
-mod read;
 mod run;
 mod ui;
 
 pub use init::init;
-pub use main::{app, App, Item, ItemType, Kind, Mode};
-pub use read::read_items;
+pub use item::{read_items, Item, ItemType, Kind};
+pub use main::{app, App, Mode};
 pub use run::run;
 pub use ui::ui;

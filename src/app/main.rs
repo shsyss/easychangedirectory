@@ -1,16 +1,17 @@
-use anyhow::{bail, Context};
+use std::{
+  env, io,
+  path::{Path, PathBuf},
+};
+
+use anyhow::bail;
 use crossterm::{
   event::{DisableMouseCapture, EnableMouseCapture},
   execute,
   terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{
-  env, fs, io,
-  path::{Path, PathBuf},
-};
 use tui::{backend::CrosstermBackend, widgets::ListState, Terminal};
 
-use crate::app;
+use super::{Item, ItemType};
 
 #[derive(Debug)]
 pub struct StatefulList {
@@ -73,91 +74,12 @@ impl StatefulList {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Kind {
-  File,
-  Dir,
-  Content,
-  Search,
-  None,
-}
-
 // for identification
 pub enum Family {
   Grandparent,
   Parent,
   Oneself,
   Child,
-}
-
-#[derive(Debug, Clone)]
-pub enum ItemType {
-  Path(PathBuf),
-  Content(String),
-  SearchText(String),
-}
-
-impl ItemType {
-  fn new_path() -> Self {
-    Self::Path(PathBuf::new())
-  }
-}
-
-#[derive(Debug, Clone)]
-pub struct Item {
-  pub item: ItemType,
-  pub kind: Kind,
-  pub index: usize,
-}
-
-impl Item {
-  pub fn default() -> Self {
-    Self { item: ItemType::new_path(), kind: Kind::None, index: 0 }
-  }
-  fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
-    if self.is_symlink() {
-      if let ItemType::Path(path) = &self.item {
-        return App::make_items(path.read_link()?);
-      }
-    }
-    Ok(if self.is_dir() {
-      App::make_items(&self.get_path().unwrap())?
-    } else if self.is_file() {
-      if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
-        s.lines()
-          .enumerate()
-          .map(|(i, s)| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: i })
-          .collect()
-      } else {
-        vec![Item::default()]
-      }
-    } else {
-      vec![Item::default()]
-    })
-  }
-  pub fn generate_filename(&self) -> Option<String> {
-    Some(self.get_path()?.file_name()?.to_string_lossy().to_string())
-  }
-  pub fn is_dir(&self) -> bool {
-    matches!(self.kind, Kind::Dir)
-  }
-  fn is_file(&self) -> bool {
-    matches!(self.kind, Kind::File)
-  }
-  fn is_symlink(&self) -> bool {
-    if let Some(p) = self.get_path() {
-      p.is_symlink()
-    } else {
-      false
-    }
-  }
-  pub fn get_path(&self) -> Option<PathBuf> {
-    if let ItemType::Path(path) = &self.item {
-      Some(path.clone())
-    } else {
-      None
-    }
-  }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -180,6 +102,14 @@ pub struct App {
 
 const JUMP: usize = 4;
 impl App {
+  fn generate_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
+    let generate_item = items.iter().enumerate().find(|(_, item)| item.get_path().unwrap() == path.as_ref());
+    if let Some((i, _)) = generate_item {
+      i
+    } else {
+      0
+    }
+  }
   fn generate_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
     path.as_ref().parent().unwrap_or_else(|| Path::new("")).to_path_buf()
   }
@@ -213,16 +143,8 @@ impl App {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
   }
-  fn generate_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
-    let generate_item = items.iter().enumerate().find(|(_, item)| item.get_path().unwrap() == path.as_ref());
-    if let Some((i, _)) = generate_item {
-      i
-    } else {
-      0
-    }
-  }
-  fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
-    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { app::read_items(path)? })
+  pub fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { super::read_items(path)? })
   }
   pub fn move_child(&mut self) -> anyhow::Result<()> {
     let i = self.items.state.selected().unwrap();
@@ -349,7 +271,7 @@ impl App {
   }
   fn new() -> anyhow::Result<App> {
     let pwd = env::current_dir()?;
-    let items = app::read_items(&pwd)?;
+    let items = super::read_items(&pwd)?;
 
     // Initial selection is 0
     let child_path = if items[0].is_dir() { items[0].get_path().unwrap() } else { PathBuf::new() };
@@ -417,7 +339,7 @@ pub fn app() -> anyhow::Result<PathBuf> {
   let mut terminal = Terminal::new(backend)?;
 
   let app = App::new()?;
-  let path = match app::run(&mut terminal, app) {
+  let path = match super::run(&mut terminal, app) {
     Ok(path) => path,
     Err(e) => {
       // restore terminal
