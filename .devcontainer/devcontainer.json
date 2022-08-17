@@ -27,6 +27,7 @@
         "path": "pwsh",
         "icon": "terminal-powershell"
       }
-    }
+    },
+    "terminal.integrated.defaultProfile.linux": "fish"
   }
 }
