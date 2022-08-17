@@ -78,11 +78,9 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   f.render_stateful_widget(parent_items, bottom_chunks[1], &mut app.parent_items.state);
 
   // current
-  // ! 絞り込んで空になった時にitemsに戻る
-  let (items, state) = if app.search.list.is_empty() {
-    (set_items(&app.items.items), &mut app.items.state)
-  } else {
-    (set_items(&app.search.list), &mut app.search.state)
+  let (items, state) = match app.judge_mode() {
+    Mode::Normal => (set_items(&app.items.items), &mut app.items.state),
+    Mode::Search => (set_items(&app.search.list), &mut app.search.state),
   };
   let items = List::new(items)
     .block(Standard::block())

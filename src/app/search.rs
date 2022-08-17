@@ -11,7 +11,9 @@ pub struct Search {
 
 impl Search {
   pub fn new() -> Self {
-    Search { text: String::new(), list: vec![], state: ListState::default() }
+    let mut state = ListState::default();
+    state.select(Some(0));
+    Search { text: String::new(), list: vec![], state }
   }
 }
 

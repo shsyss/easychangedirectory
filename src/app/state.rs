@@ -3,8 +3,6 @@ use tui::widgets::ListState;
 use super::Item;
 
 pub trait State {
-  // TODO: appのmethodで分岐させて使う
-  // ! 足りない
   fn next(&mut self) -> usize;
   fn previous(&mut self) -> usize;
 }

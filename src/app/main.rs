@@ -13,14 +13,6 @@ use tui::{backend::CrosstermBackend, Terminal};
 
 use super::{Item, ItemType, Search, State, StatefulList};
 
-// for identification
-pub enum Family {
-  Grandparent,
-  Parent,
-  Oneself,
-  Child,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
   Normal,
@@ -61,15 +53,17 @@ impl App {
   pub fn get_grandparent_items(&self) -> Vec<Item> {
     self.grandparent_items.items.clone()
   }
-  fn get_index(&self, family: Family) -> usize {
-    let items = match family {
-      Family::Grandparent => &self.grandparent_items,
-      Family::Parent => &self.parent_items,
-      Family::Oneself => &self.items,
-      Family::Child => &self.child_items,
-    };
-
-    items.state.selected().unwrap_or(0)
+  fn get_grandparent_index(&self) -> usize {
+    self.grandparent_items.state.selected().unwrap_or(0)
+  }
+  fn get_parent_index(&self) -> usize {
+    self.parent_items.state.selected().unwrap_or(0)
+  }
+  fn get_current_index(&self) -> usize {
+    self.items.state.selected().unwrap_or(0)
+  }
+  fn get_child_index(&self) -> usize {
+    self.child_items.state.selected().unwrap_or(0)
   }
   pub fn get_items(&self) -> Vec<Item> {
     self.items.items.clone()
@@ -81,6 +75,13 @@ impl App {
   fn is_contents_in_working_block(&self) -> bool {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
+  }
+  pub fn judge_mode(&self) -> Mode {
+    if self.search.text.is_empty() {
+      Mode::Normal
+    } else {
+      Mode::Search
+    }
   }
   pub fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
     Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { super::read_items(path)? })
@@ -102,19 +103,18 @@ impl App {
       return Ok(());
     }
 
-    let selected_ci = self.get_index(Family::Child);
+    let selected_ci = self.get_child_index();
 
     // The index of `items` is set to the index of `child_items` if it is selected. If not, it is set to `0`.
     let (child_items, i) = if let Some(items) = self.get_child_items().get(selected_ci) {
-      (items.generate_child_items()?, self.get_index(Family::Child))
+      (items.generate_child_items()?, self.get_child_index())
     } else {
       (self.get_child_items()[0].generate_child_items()?, 0)
     };
 
     let ci = None;
-    let pi = self.get_index(Family::Oneself);
-    let gi = self.get_index(Family::Parent);
-
+    let pi = self.get_current_index();
+    let gi = self.get_parent_index();
     *self = Self {
       mode: self.mode,
       child_items: StatefulList::with_items_option(child_items, ci),
@@ -128,8 +128,8 @@ impl App {
     Ok(())
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
-    let pi = self.get_index(Family::Oneself);
-    let gi = self.get_index(Family::Parent);
+    let pi = self.get_current_index();
+    let gi = self.get_parent_index();
 
     *self = Self {
       mode: self.mode,
@@ -162,14 +162,14 @@ impl App {
   }
   pub fn move_page_down(&mut self) -> anyhow::Result<()> {
     let last_i = self.items.items.len() - 1;
-    let old_i = self.get_index(Family::Oneself);
+    let old_i = self.get_current_index();
     let i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
     self.items.select(i);
     self.update_child_items(i)?;
     Ok(())
   }
   pub fn move_page_up(&mut self) -> anyhow::Result<()> {
-    let old_i = self.get_index(Family::Oneself);
+    let old_i = self.get_current_index();
     let i = if old_i < JUMP { 0 } else { old_i - JUMP };
     self.items.select(i);
     self.update_child_items(i)?;
@@ -185,9 +185,9 @@ impl App {
     let grandparent_path = Self::generate_parent_path(&self.grandparent_path);
     let grandparent_items = Self::make_items(&grandparent_path)?;
 
-    let ci = if self.is_contents_in_working_block() { None } else { Some(self.get_index(Family::Oneself)) };
-    let i = self.get_index(Family::Parent);
-    let pi = self.get_index(Family::Grandparent);
+    let ci = if self.is_contents_in_working_block() { None } else { Some(self.get_current_index()) };
+    let i = self.get_parent_index();
+    let pi = self.get_grandparent_index();
     let gi = Self::generate_index(&grandparent_items, &self.grandparent_path);
 
     *self = Self {
@@ -237,6 +237,7 @@ impl App {
 
     Ok(app)
   }
+  fn search_list_auto_select(&mut self) {}
   pub fn search_sort_to_vec(&self) -> Vec<Item> {
     self
       .items
