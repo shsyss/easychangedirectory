@@ -52,4 +52,7 @@ impl State for Search {
     self.state.select(Some(i));
     i
   }
+  fn select(&mut self, index: usize) {
+    self.state.select(Some(index));
+  }
 }

@@ -5,6 +5,7 @@ use super::Item;
 pub trait State {
   fn next(&mut self) -> usize;
   fn previous(&mut self) -> usize;
+  fn select(&mut self, index: usize);
 }
 
 #[derive(Debug)]
@@ -14,14 +15,14 @@ pub struct StatefulList {
 }
 
 impl StatefulList {
-  pub fn select(&mut self, index: usize) {
-    self.state.select(Some(index));
-  }
   pub fn selected(&self) -> usize {
     self.state.selected().unwrap()
   }
   pub fn unselect(&mut self) {
     self.state.select(None);
+  }
+  pub fn get_selected_item(&self) -> Item {
+    self.items[self.selected()].clone()
   }
   pub fn with_items(items: Vec<Item>) -> StatefulList {
     let mut state = ListState::default();
@@ -68,5 +69,8 @@ impl State for StatefulList {
     };
     self.state.select(Some(i));
     i
+  }
+  fn select(&mut self, index: usize) {
+    self.state.select(Some(index));
   }
 }

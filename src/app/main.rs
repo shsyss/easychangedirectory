@@ -71,6 +71,9 @@ impl App {
   pub fn get_parent_items(&self) -> Vec<Item> {
     self.parent_items.items.clone()
   }
+  fn get_search_index(&self) -> usize {
+    self.search.state.selected().unwrap_or(0)
+  }
   /// If the working block is "content" `true`
   fn is_contents_in_working_block(&self) -> bool {
     let i = self.parent_items.selected();
@@ -144,35 +147,58 @@ impl App {
     Ok(())
   }
   pub fn move_end(&mut self) -> anyhow::Result<()> {
-    let i = self.items.items.len() - 1;
-    self.items.select(i);
-    self.update_child_items(i)?;
+    let last_i = match self.judge_mode() {
+      Mode::Normal => self.items.items.len() - 1,
+      Mode::Search => self.search.list.len() - 1,
+    };
+    match self.judge_mode() {
+      Mode::Normal => self.items.select(last_i),
+      Mode::Search => self.search.select(last_i),
+    };
+    self.update_child_items(last_i)?;
     Ok(())
   }
   pub fn move_home(&mut self) -> anyhow::Result<()> {
-    let i = 0;
-    self.items.select(i);
-    self.update_child_items(i)?;
+    let top_i = 0;
+    match self.judge_mode() {
+      Mode::Normal => self.items.select(top_i),
+      Mode::Search => self.search.select(top_i),
+    }
+    self.update_child_items(top_i)?;
     Ok(())
   }
   pub fn move_next(&mut self) -> anyhow::Result<()> {
-    let i = self.items.next();
-    self.update_child_items(i)?;
+    let new_i = match self.judge_mode() {
+      Mode::Normal => self.items.next(),
+      Mode::Search => self.search.next(),
+    };
+    self.update_child_items(new_i)?;
     Ok(())
   }
   pub fn move_page_down(&mut self) -> anyhow::Result<()> {
-    let last_i = self.items.items.len() - 1;
-    let old_i = self.get_current_index();
-    let i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
-    self.items.select(i);
-    self.update_child_items(i)?;
+    let (last_i, old_i) = match self.judge_mode() {
+      Mode::Normal => (self.items.items.len() - 1, self.get_current_index()),
+      Mode::Search => (self.search.list.len() - 1, self.get_search_index()),
+    };
+    let new_i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
+    match self.judge_mode() {
+      Mode::Normal => self.items.select(new_i),
+      Mode::Search => self.search.select(new_i),
+    }
+    self.update_child_items(new_i)?;
     Ok(())
   }
   pub fn move_page_up(&mut self) -> anyhow::Result<()> {
-    let old_i = self.get_current_index();
-    let i = if old_i < JUMP { 0 } else { old_i - JUMP };
-    self.items.select(i);
-    self.update_child_items(i)?;
+    let old_i = match self.judge_mode() {
+      Mode::Normal => self.get_current_index(),
+      Mode::Search => self.get_search_index(),
+    };
+    let new_i = if old_i < JUMP { 0 } else { old_i - JUMP };
+    match self.judge_mode() {
+      Mode::Normal => self.items.select(new_i),
+      Mode::Search => self.search.select(new_i),
+    };
+    self.update_child_items(new_i)?;
     Ok(())
   }
   pub fn move_parent(&mut self) -> anyhow::Result<()> {
@@ -204,7 +230,10 @@ impl App {
     Ok(())
   }
   pub fn move_previous(&mut self) -> anyhow::Result<()> {
-    let i = self.items.previous();
+    let i = match self.judge_mode() {
+      Mode::Normal => self.items.previous(),
+      Mode::Search => self.search.previous(),
+    };
     self.update_child_items(i)?;
     Ok(())
   }
