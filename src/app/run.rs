@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf};
+use std::path::PathBuf;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
@@ -6,7 +6,7 @@ use tui::{backend::Backend, Terminal};
 use super::{App, Mode};
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
-  let current = env::current_dir()?;
+  let current = PathBuf::from(".");
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
@@ -42,11 +42,11 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Insert => app.mode = Mode::Search,
             KeyCode::Backspace => {
               app.search.text.pop();
-              app.update_search_list();
+              app.update_search_effect()?;
             }
             KeyCode::Delete => {
               app.search.text.clear();
-              app.update_search_list();
+              app.update_search_effect()?;
             }
 
             _ => {}
@@ -68,15 +68,15 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             // input
             KeyCode::Char(c) => {
               app.search.text.push(c);
-              app.update_search_list();
+              app.update_search_effect()?;
             }
             KeyCode::Backspace => {
               app.search.text.pop();
-              app.update_search_list();
+              app.update_search_effect()?;
             }
             KeyCode::Delete => {
               app.search.text.clear();
-              app.update_search_list();
+              app.update_search_effect()?;
             }
 
             // move

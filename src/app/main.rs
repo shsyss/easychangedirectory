@@ -1,6 +1,7 @@
 use std::{
   env, io,
   path::{Path, PathBuf},
+  vec,
 };
 
 use anyhow::bail;
@@ -73,6 +74,9 @@ impl App {
   }
   fn get_search_index(&self) -> usize {
     self.search.state.selected().unwrap_or(0)
+  }
+  fn get_search_list(&self) -> Vec<Item> {
+    self.search.list.clone()
   }
   /// If the working block is "content" `true`
   fn is_contents_in_working_block(&self) -> bool {
@@ -266,7 +270,6 @@ impl App {
 
     Ok(app)
   }
-  fn search_list_auto_select(&mut self) {}
   pub fn search_sort_to_vec(&self) -> Vec<Item> {
     self
       .items
@@ -290,15 +293,30 @@ impl App {
   fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
     let ci = self.child_items.state.selected();
 
-    self.child_items = StatefulList::with_items_option(self.get_items()[index].generate_child_items()?, ci);
+    let items = match self.judge_mode() {
+      Mode::Normal => self.get_items(),
+      Mode::Search => self.get_search_list(),
+    };
+
+    // ! 境界外
+    self.child_items = StatefulList::with_items_option(items[index].generate_child_items()?, ci);
     if self.get_items()[index].is_file() {
       self.child_items.unselect();
     }
 
     Ok(())
   }
-  pub fn update_search_list(&mut self) {
+  pub fn update_search_effect(&mut self) -> anyhow::Result<()> {
     self.search.list = self.search_sort_to_vec();
+
+    let now_i = match self.judge_mode() {
+      Mode::Normal => self.get_current_index(),
+      Mode::Search => self.get_search_index(),
+    };
+
+    self.update_child_items(now_i)?;
+
+    Ok(())
   }
 }
 
