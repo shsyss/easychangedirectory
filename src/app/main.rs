@@ -94,9 +94,9 @@ impl App {
     Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { super::read_items(path)? })
   }
   pub fn move_child(&mut self) -> anyhow::Result<()> {
-    let i = self.items.state.selected().unwrap();
-    let selected_item = self.items.items[i].clone();
-    let pwd = if selected_item.is_dir() {
+    let old_i = self.items.state.selected().unwrap();
+    let selected_item = self.items.items[old_i].clone();
+    let new_pwd = if selected_item.is_dir() {
       selected_item.get_path().unwrap()
     } else if selected_item.is_file() {
       self.move_content(selected_item)?;
@@ -107,43 +107,44 @@ impl App {
 
     let old_child_items = self.get_child_items();
     if old_child_items.is_empty() {
+      // TODO: 空白でも通るように
       return Ok(());
     }
 
     let selected_ci = self.get_child_index();
 
     // The index of `items` is set to the index of `child_items` if it is selected. If not, it is set to `0`.
-    let (child_items, i) = if let Some(items) = self.get_child_items().get(selected_ci) {
+    let (new_child_items, new_i) = if let Some(items) = self.get_child_items().get(selected_ci) {
       (items.generate_child_items()?, self.get_child_index())
     } else {
       (self.get_child_items()[0].generate_child_items()?, 0)
     };
 
-    let ci = None;
-    let pi = self.get_current_index();
-    let gi = self.get_parent_index();
+    let new_ci = None;
+    let new_pi = self.get_current_index();
+    let new_gi = self.get_parent_index();
     *self = Self {
       mode: self.mode,
-      child_items: StatefulList::with_items_option(child_items, ci),
-      items: StatefulList::with_items_select(old_child_items, i),
-      parent_items: StatefulList::with_items_select(self.get_items(), pi),
-      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
-      pwd,
+      child_items: StatefulList::with_items_option(new_child_items, new_ci),
+      items: StatefulList::with_items_select(old_child_items, new_i),
+      parent_items: StatefulList::with_items_select(self.get_items(), new_pi),
+      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
+      pwd: new_pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
       search: Search::new(),
     };
     Ok(())
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
-    let pi = self.get_current_index();
-    let gi = self.get_parent_index();
+    let new_pi = self.get_current_index();
+    let new_gi = self.get_parent_index();
 
     *self = Self {
       mode: self.mode,
       child_items: StatefulList::with_items(vec![Item::default()]),
       items: StatefulList::with_items(self.get_child_items()),
-      parent_items: StatefulList::with_items_select(self.get_items(), pi),
-      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), gi),
+      parent_items: StatefulList::with_items_select(self.get_items(), new_pi),
+      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
       search: Search::new(),
@@ -206,39 +207,39 @@ impl App {
     Ok(())
   }
   pub fn move_parent(&mut self) -> anyhow::Result<()> {
-    let pwd = if let Some(pwd) = self.pwd.parent() {
+    let new_pwd = if let Some(pwd) = self.pwd.parent() {
       pwd.to_path_buf()
     } else {
       return Ok(());
     };
 
-    let grandparent_path = Self::generate_parent_path(&self.grandparent_path);
-    let grandparent_items = Self::make_items(&grandparent_path)?;
+    let new_grandparent_path = Self::generate_parent_path(&self.grandparent_path);
+    let new_grandparent_items = Self::make_items(&new_grandparent_path)?;
 
-    let ci = if self.is_contents_in_working_block() { None } else { Some(self.get_current_index()) };
-    let i = self.get_parent_index();
-    let pi = self.get_grandparent_index();
-    let gi = Self::generate_index(&grandparent_items, &self.grandparent_path);
+    let new_ci = if self.is_contents_in_working_block() { None } else { Some(self.get_current_index()) };
+    let new_i = self.get_parent_index();
+    let new_pi = self.get_grandparent_index();
+    let new_gi = Self::generate_index(&new_grandparent_items, &self.grandparent_path);
 
     *self = Self {
       mode: self.mode,
-      child_items: StatefulList::with_items_option(self.get_items(), ci),
-      items: StatefulList::with_items_select(self.get_parent_items(), i),
-      parent_items: StatefulList::with_items_select(self.get_grandparent_items(), pi),
-      grandparent_items: StatefulList::with_items_select(grandparent_items, gi),
-      pwd,
-      grandparent_path,
+      child_items: StatefulList::with_items_option(self.get_items(), new_ci),
+      items: StatefulList::with_items_select(self.get_parent_items(), new_i),
+      parent_items: StatefulList::with_items_select(self.get_grandparent_items(), new_pi),
+      grandparent_items: StatefulList::with_items_select(new_grandparent_items, new_gi),
+      pwd: new_pwd,
+      grandparent_path: new_grandparent_path,
       search: Search::new(),
     };
 
     Ok(())
   }
   pub fn move_previous(&mut self) -> anyhow::Result<()> {
-    let i = match self.judge_mode() {
+    let new_i = match self.judge_mode() {
       Mode::Normal => self.items.previous(),
       Mode::Search => self.search.previous(),
     };
-    self.update_child_items(i)?;
+    self.update_child_items(new_i)?;
     Ok(())
   }
   fn new() -> anyhow::Result<App> {
@@ -298,8 +299,8 @@ impl App {
       Mode::Search => self.get_search_list(),
     };
 
-    // ! 境界外
-    self.child_items = StatefulList::with_items_option(items[index].generate_child_items()?, ci);
+    self.child_items =
+      StatefulList::with_items_option(items.get(index).unwrap_or(&Item::default()).generate_child_items()?, ci);
     if self.get_items()[index].is_file() {
       self.child_items.unselect();
     }
