@@ -106,8 +106,8 @@ impl App {
     };
 
     let old_child_items = self.get_child_items();
+    // TODO
     if old_child_items.is_empty() {
-      // TODO: 空白でも通るように
       return Ok(());
     }
 
@@ -121,7 +121,10 @@ impl App {
     };
 
     let new_ci = None;
-    let new_pi = self.get_current_index();
+    let new_pi = match self.judge_mode() {
+      Mode::Normal => self.get_current_index(),
+      Mode::Search => self.get_search_list()[self.get_search_index()].index,
+    };
     let new_gi = self.get_parent_index();
     *self = Self {
       mode: self.mode,
@@ -136,7 +139,10 @@ impl App {
     Ok(())
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
-    let new_pi = self.get_current_index();
+    let new_pi = match self.judge_mode() {
+      Mode::Normal => self.get_current_index(),
+      Mode::Search => self.get_search_list()[self.get_search_index()].index,
+    };
     let new_gi = self.get_parent_index();
 
     *self = Self {
@@ -216,7 +222,14 @@ impl App {
     let new_grandparent_path = Self::generate_parent_path(&self.grandparent_path);
     let new_grandparent_items = Self::make_items(&new_grandparent_path)?;
 
-    let new_ci = if self.is_contents_in_working_block() { None } else { Some(self.get_current_index()) };
+    let new_ci = if self.is_contents_in_working_block() {
+      None
+    } else {
+      match self.judge_mode() {
+        Mode::Normal => Some(self.get_current_index()),
+        Mode::Search => Some(self.get_search_list()[self.get_search_index()].index),
+      }
+    };
     let new_i = self.get_parent_index();
     let new_pi = self.get_grandparent_index();
     let new_gi = Self::generate_index(&new_grandparent_items, &self.grandparent_path);
