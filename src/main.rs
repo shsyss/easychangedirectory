@@ -1,14 +1,14 @@
-use easychangedirectory::{app, build_cli, connect, init};
+use easychangedirectory::{app, build_cli, connect};
 
 fn main() -> anyhow::Result<()> {
   let matches = build_cli().get_matches();
 
   if let Some(shell) = matches.get_one::<String>("init") {
-    init::run(shell)?;
+    app::init(shell)?;
     return Ok(());
   }
 
-  let cd_path = match app() {
+  let cd_path = match app::app() {
     Ok(path) => path,
     Err(e) => {
       eprintln!("\x1b[31mError:\x1b[m  {}", e);

@@ -3,18 +3,40 @@ name = "easychangedirectory"
 version = "0.1.0"
 authors = ["shsyss <shsyss00@gmail.com>"]
 edition = "2021"
-description = "Tools for easy cd"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/shsyss/easychangedirectory"
 categories = ["command-line-utilities", "filesystem"]
 keywords = ["cli","terminal","cd"]
+description = """
+Tools for easy cd
+
+ -------------------------------------------------------------
+|   Key         |    Description                              |
+|---------------|---------------------------------------------|
+| ↑ k           | Move up                                     |
+| ↓ j           | Move down                                   |
+| ← h           | Move parent directory                       |
+| → l           | Move Child directory                        |
+| Home	        | Move to top                                 |
+| End           | Move to bottom                              |
+| PageUp        | Skip a little and move up                   |
+| PageDown      | Skip a little and move down                 |
+| Enter c ;     | Change directory to current directory       |
+| Esc Ctrl+c q	| Exit and return to original directory       |
+| Insert Ctrl+s	| Search mode switch (Char key will not work) |
+| Backspace     | Delete one character from the search string |
+| Delete        | Delete all search strings                   |
+ -------------------------------------------------------------
+"""
 
 [dependencies]
 anyhow = "1.0.60"
 clap = { version = "3.2.16", features = ["cargo"] }
 crossterm = "0.24.0"
+envy = "0.4.2"
 handlebars = "4.3.3"
+serde = { version = "1.0.144", features = ["derive"] }
 serde_json = "1.0.83"
 tui = "0.18.0"
 

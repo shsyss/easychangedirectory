@@ -5,7 +5,7 @@ use serde_json::json;
 
 use crate::shell;
 
-pub fn run(shell: &str) -> anyhow::Result<()> {
+pub fn init(shell: &str) -> anyhow::Result<()> {
   let init_map = HashMap::from([
     ("bash", shell::BASH),
     ("fish", shell::FISH),
