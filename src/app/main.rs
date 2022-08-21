@@ -104,8 +104,10 @@ impl App {
       return Ok(());
     }
 
-    let old_i = self.items.state.selected().unwrap();
-    let selected_item = self.items.items[old_i].clone();
+    let selected_item = match self.judge_mode() {
+      Mode::Normal => self.items.items[self.items.selected()].clone(),
+      Mode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
+    };
     let new_pwd = if selected_item.is_dir() {
       selected_item.get_path().unwrap()
     } else if selected_item.is_file() {
