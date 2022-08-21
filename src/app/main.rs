@@ -321,7 +321,13 @@ impl App {
     Ok(())
   }
   pub fn update_search_effect(&mut self) -> anyhow::Result<()> {
-    self.search.list = self.search_sort_to_vec();
+    let new_search_list = self.search_sort_to_vec();
+
+    if !new_search_list.is_empty() {
+      self.search.list = new_search_list;
+    } else {
+      self.search.text.pop();
+    }
 
     let now_i = match self.judge_mode() {
       Mode::Normal => self.get_current_index(),
