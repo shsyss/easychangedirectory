@@ -103,6 +103,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let old_i = self.items.state.selected().unwrap();
     let selected_item = self.items.items[old_i].clone();
     let new_pwd = if selected_item.is_dir() {
@@ -164,6 +165,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let last_i = match self.judge_mode() {
       Mode::Normal => self.items.items.len() - 1,
       Mode::Search => self.search.list.len() - 1,
@@ -179,6 +181,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let top_i = 0;
     match self.judge_mode() {
       Mode::Normal => self.items.select(top_i),
@@ -191,6 +194,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let new_i = match self.judge_mode() {
       Mode::Normal => self.items.next(),
       Mode::Search => self.search.next(),
@@ -202,6 +206,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let (last_i, old_i) = match self.judge_mode() {
       Mode::Normal => (self.items.items.len() - 1, self.get_current_index()),
       Mode::Search => (self.search.list.len() - 1, self.get_search_index()),
@@ -218,6 +223,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let old_i = match self.judge_mode() {
       Mode::Normal => self.get_current_index(),
       Mode::Search => self.get_search_index(),
@@ -275,6 +281,7 @@ impl App {
     if self.is_empty_in_working_block() {
       return Ok(());
     }
+
     let new_i = match self.judge_mode() {
       Mode::Normal => self.items.previous(),
       Mode::Search => self.search.previous(),
@@ -332,6 +339,11 @@ impl App {
       .collect()
   }
   fn update_child_items(&mut self, index: usize) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      self.child_items = StatefulList::with_items_option(vec![], None);
+      return Ok(());
+    }
+
     let ci = self.child_items.state.selected();
 
     let items = match self.judge_mode() {
@@ -341,7 +353,7 @@ impl App {
 
     self.child_items =
       StatefulList::with_items_option(items.get(index).unwrap_or(&Item::default()).generate_child_items()?, ci);
-    if self.get_items()[index].is_file() {
+    if items[index].is_file() {
       self.child_items.unselect();
     }
 
