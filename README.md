@@ -38,8 +38,6 @@ Command `ed`
 | `Backspace`                  | Delete one character from the search string |
 | `Delete`                     | Delete all search strings                   |
 
-- Cannot enter a string with no matching file name in a narrowed search
-
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
 ## Support

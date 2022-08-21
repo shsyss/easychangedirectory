@@ -48,26 +48,26 @@ impl App {
   pub fn generate_pwd_str(&self) -> String {
     self.pwd.to_string_lossy().to_string()
   }
+  fn get_child_index(&self) -> usize {
+    self.child_items.state.selected().unwrap_or(0)
+  }
   pub fn get_child_items(&self) -> Vec<Item> {
     self.child_items.items.clone()
-  }
-  pub fn get_grandparent_items(&self) -> Vec<Item> {
-    self.grandparent_items.items.clone()
-  }
-  fn get_grandparent_index(&self) -> usize {
-    self.grandparent_items.state.selected().unwrap_or(0)
-  }
-  fn get_parent_index(&self) -> usize {
-    self.parent_items.state.selected().unwrap_or(0)
   }
   fn get_current_index(&self) -> usize {
     self.items.state.selected().unwrap_or(0)
   }
-  fn get_child_index(&self) -> usize {
-    self.child_items.state.selected().unwrap_or(0)
+  fn get_grandparent_index(&self) -> usize {
+    self.grandparent_items.state.selected().unwrap_or(0)
+  }
+  pub fn get_grandparent_items(&self) -> Vec<Item> {
+    self.grandparent_items.items.clone()
   }
   pub fn get_items(&self) -> Vec<Item> {
     self.items.items.clone()
+  }
+  fn get_parent_index(&self) -> usize {
+    self.parent_items.state.selected().unwrap_or(0)
   }
   pub fn get_parent_items(&self) -> Vec<Item> {
     self.parent_items.items.clone()
@@ -83,6 +83,12 @@ impl App {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
   }
+  fn is_empty_in_working_block(&self) -> bool {
+    match self.judge_mode() {
+      Mode::Normal => self.items.items.is_empty(),
+      Mode::Search => self.search.list.is_empty(),
+    }
+  }
   pub fn judge_mode(&self) -> Mode {
     if self.search.text.is_empty() {
       Mode::Normal
@@ -94,6 +100,9 @@ impl App {
     Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { super::read_items(path)? })
   }
   pub fn move_child(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let old_i = self.items.state.selected().unwrap();
     let selected_item = self.items.items[old_i].clone();
     let new_pwd = if selected_item.is_dir() {
@@ -105,19 +114,13 @@ impl App {
       return Ok(());
     };
 
-    let old_child_items = self.get_child_items();
-    // TODO
-    if old_child_items.is_empty() {
-      return Ok(());
-    }
-
     let selected_ci = self.get_child_index();
 
     // The index of `items` is set to the index of `child_items` if it is selected. If not, it is set to `0`.
     let (new_child_items, new_i) = if let Some(items) = self.get_child_items().get(selected_ci) {
       (items.generate_child_items()?, self.get_child_index())
     } else {
-      (self.get_child_items()[0].generate_child_items()?, 0)
+      (self.get_child_items().get(0).unwrap_or(&Item::default()).generate_child_items()?, 0)
     };
 
     let new_ci = None;
@@ -129,7 +132,7 @@ impl App {
     *self = Self {
       mode: self.mode,
       child_items: StatefulList::with_items_option(new_child_items, new_ci),
-      items: StatefulList::with_items_select(old_child_items, new_i),
+      items: StatefulList::with_items_select(self.get_child_items(), new_i),
       parent_items: StatefulList::with_items_select(self.get_items(), new_pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
       pwd: new_pwd,
@@ -158,6 +161,9 @@ impl App {
     Ok(())
   }
   pub fn move_end(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let last_i = match self.judge_mode() {
       Mode::Normal => self.items.items.len() - 1,
       Mode::Search => self.search.list.len() - 1,
@@ -170,6 +176,9 @@ impl App {
     Ok(())
   }
   pub fn move_home(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let top_i = 0;
     match self.judge_mode() {
       Mode::Normal => self.items.select(top_i),
@@ -179,6 +188,9 @@ impl App {
     Ok(())
   }
   pub fn move_next(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let new_i = match self.judge_mode() {
       Mode::Normal => self.items.next(),
       Mode::Search => self.search.next(),
@@ -187,6 +199,9 @@ impl App {
     Ok(())
   }
   pub fn move_page_down(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let (last_i, old_i) = match self.judge_mode() {
       Mode::Normal => (self.items.items.len() - 1, self.get_current_index()),
       Mode::Search => (self.search.list.len() - 1, self.get_search_index()),
@@ -200,6 +215,9 @@ impl App {
     Ok(())
   }
   pub fn move_page_up(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let old_i = match self.judge_mode() {
       Mode::Normal => self.get_current_index(),
       Mode::Search => self.get_search_index(),
@@ -227,7 +245,13 @@ impl App {
     } else {
       match self.judge_mode() {
         Mode::Normal => Some(self.get_current_index()),
-        Mode::Search => Some(self.get_search_list()[self.get_search_index()].index),
+        Mode::Search => {
+          if let Some(item) = self.get_search_list().get(self.get_search_index()) {
+            Some(item.index)
+          } else {
+            Some(self.get_current_index())
+          }
+        }
       }
     };
     let new_i = self.get_parent_index();
@@ -248,6 +272,9 @@ impl App {
     Ok(())
   }
   pub fn move_previous(&mut self) -> anyhow::Result<()> {
+    if self.is_empty_in_working_block() {
+      return Ok(());
+    }
     let new_i = match self.judge_mode() {
       Mode::Normal => self.items.previous(),
       Mode::Search => self.search.previous(),
@@ -321,13 +348,7 @@ impl App {
     Ok(())
   }
   pub fn update_search_effect(&mut self) -> anyhow::Result<()> {
-    let new_search_list = self.search_sort_to_vec();
-
-    if !new_search_list.is_empty() {
-      self.search.list = new_search_list;
-    } else {
-      self.search.text.pop();
-    }
+    self.search.list = self.search_sort_to_vec();
 
     let now_i = match self.judge_mode() {
       Mode::Normal => self.get_current_index(),

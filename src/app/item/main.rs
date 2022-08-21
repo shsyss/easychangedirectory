@@ -30,6 +30,7 @@ pub enum Kind {
 pub struct Item {
   pub item: ItemType,
   pub kind: Kind,
+  // TODO: to Option<usize>
   pub index: usize,
 }
 
