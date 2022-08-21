@@ -12,7 +12,7 @@ use crossterm::{
 };
 use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{Item, ItemType, Search, State, StatefulList};
+use super::{Config, Item, ItemType, Search, State, StatefulList};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
@@ -30,6 +30,7 @@ pub struct App {
   pub pwd: PathBuf,
   grandparent_path: PathBuf,
   pub search: Search,
+  pub config: Config,
 }
 
 const JUMP: usize = 4;
@@ -141,6 +142,7 @@ impl App {
       pwd: new_pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
       search: Search::new(),
+      config: self.config,
     };
     Ok(())
   }
@@ -160,6 +162,7 @@ impl App {
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
       search: Search::new(),
+      config: self.config,
     };
     Ok(())
   }
@@ -275,6 +278,7 @@ impl App {
       pwd: new_pwd,
       grandparent_path: new_grandparent_path,
       search: Search::new(),
+      config: self.config,
     };
 
     Ok(())
@@ -313,6 +317,7 @@ impl App {
       pwd,
       grandparent_path,
       search: Search::new(),
+      config: Config::new()?,
     };
 
     app.parent_items.select(pi);

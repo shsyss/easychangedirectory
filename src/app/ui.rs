@@ -1,5 +1,3 @@
-use std::env;
-
 use tui::{
   backend::Backend,
   layout::{Constraint, Direction, Layout},
@@ -10,7 +8,7 @@ use tui::{
   Frame,
 };
 
-use super::{App, Item, ItemType, Kind, Mode};
+use super::{App, Config, Item, ItemType, Kind, Mode};
 
 struct Standard;
 
@@ -46,7 +44,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
   let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: 0 };
   let search_items = vec![item];
-  let search_items = set_items(&search_items);
+  let search_items = set_items(&search_items, app.config);
   let search_text = List::new(search_items).highlight_symbol("> ");
   let mut state = ListState::default();
   if app.mode == Mode::Normal {
@@ -67,20 +65,20 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     .split(chunks[1]);
 
   // grandparent
-  let grandparent_items = set_items(&app.grandparent_items.items);
+  let grandparent_items = set_items(&app.grandparent_items.items, app.config);
   let grandparent_items =
     List::new(grandparent_items).block(Standard::block()).highlight_style(Standard::highlight_style());
   f.render_stateful_widget(grandparent_items, bottom_chunks[0], &mut app.grandparent_items.state);
 
   // parent
-  let parent_items = set_items(&app.parent_items.items);
+  let parent_items = set_items(&app.parent_items.items, app.config);
   let parent_items = List::new(parent_items).block(Standard::block()).highlight_style(Standard::highlight_style());
   f.render_stateful_widget(parent_items, bottom_chunks[1], &mut app.parent_items.state);
 
   // current
   let (items, state) = match app.judge_mode() {
-    Mode::Normal => (set_items(&app.items.items), &mut app.items.state),
-    Mode::Search => (set_items(&app.search.list), &mut app.search.state),
+    Mode::Normal => (set_items(&app.items.items, app.config), &mut app.items.state),
+    Mode::Search => (set_items(&app.search.list, app.config), &mut app.search.state),
   };
   let items = List::new(items)
     .block(Standard::block())
@@ -89,12 +87,14 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   f.render_stateful_widget(items, bottom_chunks[2], state);
 
   // child
-  let child_items = set_items(&app.child_items.items);
+  let child_items = set_items(&app.child_items.items, app.config);
   let child_items = List::new(child_items).highlight_style(Standard::highlight_style());
   f.render_stateful_widget(child_items, bottom_chunks[3], &mut app.child_items.state);
 }
 
-fn set_items(items: &[Item]) -> Vec<ListItem> {
+fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
+  let is_show_index = config._ed_show_index == Some(1) && !items.is_empty() && !items[0].kind.eq(&Kind::Search);
+
   items
     .iter()
     .filter_map(|item| {
@@ -112,7 +112,7 @@ fn set_items(items: &[Item]) -> Vec<ListItem> {
         item.generate_filename()?
       };
 
-      if env::var("_ED_SHOW_INDEX").unwrap_or_else(|_| "0".to_string()) == "1" {
+      if is_show_index {
         text = format!("{} {}", item.index + 1, text);
       }
 
