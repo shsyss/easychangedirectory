@@ -119,6 +119,9 @@ Run `. ~/.zshrc` as needed
 
 - `_ED_SHOW_INDEX`
   - If the value is `1`, the index is displayed on the left side of the list
+- `_ED_VIEW_FILE_CONTENTS`
+  - If the value is `1`, the file contents can be viewed
+  - Preview is possible without setting
 
 ## After this
 

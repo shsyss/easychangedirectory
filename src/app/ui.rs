@@ -93,7 +93,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 }
 
 fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
-  let is_show_index = config._ed_show_index == Some(1) && !items.is_empty() && !items[0].kind.eq(&Kind::Search);
+  let is_show_index = config._ed_show_index.eq(&Some(1)) && !items.is_empty() && !items[0].kind.eq(&Kind::Search);
 
   items
     .iter()
