@@ -33,8 +33,8 @@ Command `ed`
 | `PageUp`                     | Skip a little and move up                   |
 | `PageDown`                   | Skip a little and move down                 |
 | `Enter` `c` `;`              | Change directory to current directory       |
-| `Esc` `Ctrl + c` `q`         | Exit and return to original directory       |
-| `Insert` `Ctrl + s`          | Search mode switch (Char key will not work) |
+| `Esc` `Ctrl+c` `q`           | Exit and return to original directory       |
+| `Insert` `Ctrl+s`            | Search mode switch (Char key will not work) |
 | `Backspace`                  | Delete one character from the search string |
 | `Delete`                     | Delete all search strings                   |
 
