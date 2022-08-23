@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, process::Command};
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
@@ -49,6 +49,10 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
               app.update_search_effect()?;
             }
 
+            // Execute command
+            KeyCode::Char('V') => {
+              Command::new("code").arg(&app.pwd).output()?;
+            }
             _ => {}
           }
         }
