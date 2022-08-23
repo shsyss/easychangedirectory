@@ -37,6 +37,7 @@ Command `ed`
 | `Insert` `Ctrl+s`  | Search mode switch (Char key will not work) |
 | `Backspace`        | Delete one character from the search string |
 | `Delete`           | Delete all search strings                   |
+| `V`                | Open vscode                                 |
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
