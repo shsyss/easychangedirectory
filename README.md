@@ -3,7 +3,7 @@
 > **Tools for easy cd**
 
 [![Latest version](https://img.shields.io/crates/v/easychangedirectory)](https://crates.io/crates/easychangedirectory)
-[![downloads](https://img.shields.io/crates/d/easychangedirectory?label=crates.io%20downloads&style=flat-square)](https://crates.io/crates/easychangedirectory)
+[![downloads](https://img.shields.io/crates/d/easychangedirectory?label=downloads&style=flat-square)](https://crates.io/crates/easychangedirectory)
 [![Apache](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
 [![MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
 [![Build Status](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml/badge.svg)](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml)
@@ -136,7 +136,4 @@ Run `. ~/.zshrc` as needed
 
 ## After this
 
-- Image Preview
-- Execute command
 - Add Support
-  - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
