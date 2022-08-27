@@ -129,7 +129,7 @@ impl App {
 
     let new_ci = None;
     let new_pi = match self.judge_mode() {
-      Mode::Normal => self.get_current_index(),
+      Mode::Normal => Some(self.get_current_index()),
       Mode::Search => self.get_search_list()[self.get_search_index()].index,
     };
     let new_gi = self.get_parent_index();
@@ -137,7 +137,7 @@ impl App {
       mode: self.mode,
       child_items: StatefulList::with_items_option(new_child_items, new_ci),
       items: StatefulList::with_items_select(self.get_child_items(), new_i),
-      parent_items: StatefulList::with_items_select(self.get_items(), new_pi),
+      parent_items: StatefulList::with_items_option(self.get_items(), new_pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
       pwd: new_pwd,
       grandparent_path: Self::generate_parent_path(&self.pwd),
@@ -148,7 +148,7 @@ impl App {
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
     let new_pi = match self.judge_mode() {
-      Mode::Normal => self.get_current_index(),
+      Mode::Normal => Some(self.get_current_index()),
       Mode::Search => self.get_search_list()[self.get_search_index()].index,
     };
     let new_gi = self.get_parent_index();
@@ -157,7 +157,7 @@ impl App {
       mode: self.mode,
       child_items: StatefulList::with_items(vec![Item::default()]),
       items: StatefulList::with_items(self.get_child_items()),
-      parent_items: StatefulList::with_items_select(self.get_items(), new_pi),
+      parent_items: StatefulList::with_items_option(self.get_items(), new_pi),
       grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
       pwd: selected_item.get_path().unwrap(),
       grandparent_path: Self::generate_parent_path(&self.pwd),
@@ -258,7 +258,7 @@ impl App {
         Mode::Normal => Some(self.get_current_index()),
         Mode::Search => {
           if let Some(item) = self.get_search_list().get(self.get_search_index()) {
-            Some(item.index)
+            item.index
           } else {
             Some(self.get_current_index())
           }

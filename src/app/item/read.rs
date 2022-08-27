@@ -10,7 +10,7 @@ pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
         let entry = entry.ok()?;
         let filepath = entry.path();
         let kind = if filepath.is_dir() { Kind::Dir } else { Kind::File };
-        Some(Item { item: ItemType::Path(filepath), kind, index: 0 })
+        Some(Item { item: ItemType::Path(filepath), kind, index: Some(0) })
       })
       .collect::<Vec<Item>>()
   } else {
@@ -23,7 +23,7 @@ pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
       .iter_mut()
       .enumerate()
       .map(|(i, item)| {
-        item.index = i;
+        item.index = Some(i);
         item.clone()
       })
       .collect(),

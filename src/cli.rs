@@ -23,6 +23,7 @@ pub fn build_cli() -> Command<'static> {
 | Insert Ctrl+s	| Search mode switch (Char key will not work) |
 | Backspace     | Delete one character from the search string |
 | Delete        | Delete all search strings                   |
+| V             | Open vscode                                 |
  -------------------------------------------------------------",
     )
 }

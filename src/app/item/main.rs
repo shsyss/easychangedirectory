@@ -30,13 +30,12 @@ pub enum Kind {
 pub struct Item {
   pub item: ItemType,
   pub kind: Kind,
-  // TODO: to Option<usize>
-  pub index: usize,
+  pub index: Option<usize>,
 }
 
 impl Item {
   pub fn default() -> Self {
-    Self { item: ItemType::new_path(), kind: Kind::None, index: 0 }
+    Self { item: ItemType::new_path(), kind: Kind::None, index: None }
   }
   pub fn generate_child_items(&self) -> anyhow::Result<Vec<Item>> {
     if self.is_symlink() {
@@ -50,7 +49,7 @@ impl Item {
       if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
         s.lines()
           .enumerate()
-          .map(|(i, s)| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: i })
+          .map(|(i, s)| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: Some(i) })
           .collect()
       } else {
         vec![Item::default()]

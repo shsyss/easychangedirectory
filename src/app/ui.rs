@@ -42,7 +42,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     top_chunks[0],
   );
 
-  let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: 0 };
+  let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: Some(0) };
   let search_items = vec![item];
   let search_items = set_items(&search_items, app.config);
   let search_text = List::new(search_items).highlight_symbol("> ");
@@ -113,7 +113,7 @@ fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
       };
 
       if is_show_index {
-        text = format!("{} {}", item.index + 1, text);
+        text = format!("{} {}", item.index.unwrap_or(0) + 1, text);
       }
 
       Some(ListItem::new(Span::styled(text, style)))

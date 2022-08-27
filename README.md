@@ -2,9 +2,11 @@
 
 > **Tools for easy cd**
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
-[![Rust](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml/badge.svg)](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml)
+[![Latest version](https://img.shields.io/crates/v/easychangedirectory)](https://crates.io/crates/easychangedirectory)
+[![downloads](https://img.shields.io/crates/d/easychangedirectory?label=downloads&style=flat-square)](https://crates.io/crates/easychangedirectory)
+[![Apache](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
+[![MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
+[![Build Status](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml/badge.svg)](https://github.com/shsyss/easychangedirectory/actions/workflows/rust.yml)
 [![release](https://github.com/shsyss/easychangedirectory/actions/workflows/release.yml/badge.svg)](https://github.com/shsyss/easychangedirectory/actions/workflows/release.yml)
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
@@ -22,31 +24,38 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 Command `ed`
 
-| Key                          | Description                                 |
-| ---------------------------- | ------------------------------------------- |
-| `↑` `k`                      | Move up                                     |
-| `↓` `j`                      | Move down                                   |
-| `←` `h`                      | Move parent directory                       |
-| `→` `l`                      | Move Child directory                        |
-| `Home`                       | Move to top                                 |
-| `End`                        | Move to bottom                              |
-| `PageUp`                     | Skip a little and move up                   |
-| `PageDown`                   | Skip a little and move down                 |
-| `Enter` `c` `;`              | Change directory to current directory       |
-| `Esc` `Ctrl+c` `q`           | Exit and return to original directory       |
-| `Insert` `Ctrl+s`            | Search mode switch (Char key will not work) |
-| `Backspace`                  | Delete one character from the search string |
-| `Delete`                     | Delete all search strings                   |
+| Key                | Description                                 |
+| ------------------ | ------------------------------------------- |
+| `↑` `k`            | Move up                                     |
+| `↓` `j`            | Move down                                   |
+| `←` `h`            | Move parent directory                       |
+| `→` `l`            | Move Child directory                        |
+| `Home`             | Move to top                                 |
+| `End`              | Move to bottom                              |
+| `PageUp`           | Skip a little and move up                   |
+| `PageDown`         | Skip a little and move down                 |
+| `Enter` `c` `;`    | Change directory to current directory       |
+| `Esc` `Ctrl+c` `q` | Exit and return to original directory       |
+| `Insert` `Ctrl+s`  | Search mode switch (Char key will not work) |
+| `Backspace`        | Delete one character from the search string |
+| `Delete`           | Delete all search strings                   |
+| `V`                | Open vscode                                 |
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
 ## Support
 
-| Shell          |    Windows    | Linux (Ubuntu) |    Mac    |
-| -------------- | :-----------: | :------------: | :-------: |
-| **Bash**       | **&#128504;** | **&#128504;**  | **&#63;** |
-| **Fish**       |   **&#63;**   | **&#128504;**  | **&#63;** |
-| **Powershell** | **&#128504;** | **&#128504;**  | **&#63;** |
+### Shell
+- Bash
+- Fish
+- Powershell
+
+### Operating system
+- Windows <!-- 11 -->
+- Ubuntu <!-- 22.04 -->
+- Debian <!-- 11.4 -->
+
+May be available for more operating systems than those listed
 
 ## Installation
 
@@ -57,6 +66,8 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ```
 cargo install --locked easychangedirectory
 ```
+
+<!--　winget brew apt ... -->
 
 - Download from Release page
 
@@ -125,7 +136,4 @@ Run `. ~/.zshrc` as needed
 
 ## After this
 
-- Image Preview
-- Execute command
 - Add Support
-  - Zsh: Error `__vsc_command_output_start:3` is displayed at the second and subsequent `ed` executions
