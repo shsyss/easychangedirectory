@@ -1,7 +1,7 @@
-mod main;
+mod item;
 mod read;
 
-pub use main::{Item, ItemType, Kind};
+pub use item::{Item, ItemType, Kind};
 pub use read::read_items;
 
 pub use super::App;

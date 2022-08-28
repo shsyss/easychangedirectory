@@ -10,10 +10,10 @@ use tui::{
 
 use super::{App, Config, Item, ItemType, Kind, Mode};
 
-struct Standard;
+struct MyStyle;
 
-impl Standard {
-  fn block<'a>() -> Block<'a> {
+impl MyStyle {
+  fn right_border<'a>() -> Block<'a> {
     Block::default().borders(Borders::RIGHT).border_style(Style::default().fg(Color::Gray))
   }
 
@@ -24,7 +24,7 @@ impl Standard {
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   // Overall style
-  f.render_widget(Block::default().style(Style::default().bg(Color::Rgb(0, 0, 40))), f.size());
+  f.render_widget(Block::default().style(Style::default().bg(Color::Rgb(10, 10, 10))), f.size());
 
   // layout
   let chunks = Layout::default()
@@ -32,16 +32,19 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     .constraints([Constraint::Percentage(10), Constraint::Max(100)])
     .split(f.size());
 
+  // top----------------------------------------------------------
   let top_chunks = Layout::default()
     .direction(Direction::Horizontal)
     .constraints([Constraint::Percentage(80), Constraint::Length(1)])
     .split(chunks[0]);
 
+  // show pwd
   f.render_widget(
     Block::default().title(Span::styled(app.generate_pwd_str(), Style::default().fg(Color::Yellow))),
     top_chunks[0],
   );
 
+  // search
   let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: Some(0) };
   let search_items = vec![item];
   let search_items = set_items(&search_items, app.config);
@@ -54,6 +57,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   }
   f.render_stateful_widget(search_text, top_chunks[1], &mut state);
 
+  // bottom------------------------------------------------------
   let bottom_chunks = Layout::default()
     .direction(Direction::Horizontal)
     .constraints([
@@ -67,12 +71,12 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   // grandparent
   let grandparent_items = set_items(&app.grandparent_items.items, app.config);
   let grandparent_items =
-    List::new(grandparent_items).block(Standard::block()).highlight_style(Standard::highlight_style());
+    List::new(grandparent_items).block(MyStyle::right_border()).highlight_style(MyStyle::highlight_style());
   f.render_stateful_widget(grandparent_items, bottom_chunks[0], &mut app.grandparent_items.state);
 
   // parent
   let parent_items = set_items(&app.parent_items.items, app.config);
-  let parent_items = List::new(parent_items).block(Standard::block()).highlight_style(Standard::highlight_style());
+  let parent_items = List::new(parent_items).block(MyStyle::right_border()).highlight_style(MyStyle::highlight_style());
   f.render_stateful_widget(parent_items, bottom_chunks[1], &mut app.parent_items.state);
 
   // current
@@ -81,14 +85,14 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     Mode::Search => (set_items(&app.search.list, app.config), &mut app.search.state),
   };
   let items = List::new(items)
-    .block(Standard::block())
+    .block(MyStyle::right_border())
     .highlight_style(Style::default().add_modifier(Modifier::BOLD).add_modifier(Modifier::UNDERLINED))
     .highlight_symbol("> ");
   f.render_stateful_widget(items, bottom_chunks[2], state);
 
   // child
   let child_items = set_items(&app.child_items.items, app.config);
-  let child_items = List::new(child_items).highlight_style(Standard::highlight_style());
+  let child_items = List::new(child_items).highlight_style(MyStyle::highlight_style());
   f.render_stateful_widget(child_items, bottom_chunks[3], &mut app.child_items.state);
 }
 
