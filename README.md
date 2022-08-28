@@ -46,11 +46,13 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 ## Support
 
 ### Shell
+
 - Bash
 - Fish
 - Powershell
 
 ### Operating system
+
 - Windows <!-- 11 -->
 - Ubuntu <!-- 22.04 -->
 - Debian <!-- 11.4 -->
@@ -133,6 +135,8 @@ Run `. ~/.zshrc` as needed
 - `_ED_VIEW_FILE_CONTENTS`
   - If the value is `1`, the file contents can be viewed
   - Preview is possible without setting
+- `_ED_SET_BG`
+  - If the value is `1`, set black background
 
 ## After this
 
