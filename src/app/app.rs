@@ -111,7 +111,7 @@ impl App {
     };
     let new_pwd = if selected_item.is_dir() {
       selected_item.get_path().unwrap()
-    } else if selected_item.is_file() && self.config._ed_view_file_contents.eq(&Some(1)) {
+    } else if selected_item.is_file() && self.config.is_view_file_contents() {
       self.move_content(selected_item)?;
       return Ok(());
     } else {

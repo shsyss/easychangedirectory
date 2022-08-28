@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+use super::{Item, Kind};
+
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {
   pub _ed_show_index: Option<usize>,
@@ -9,5 +11,12 @@ pub struct Config {
 impl Config {
   pub fn new() -> anyhow::Result<Self> {
     Ok(envy::from_env::<Self>()?)
+  }
+
+  pub fn is_show_index(&self, items: &[Item]) -> bool {
+    self._ed_show_index.eq(&Some(1)) && !items.is_empty() && !items[0].kind.eq(&Kind::Search)
+  }
+  pub fn is_view_file_contents(&self) -> bool {
+    self._ed_view_file_contents.eq(&Some(1))
   }
 }

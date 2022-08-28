@@ -97,8 +97,6 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 }
 
 fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
-  let is_show_index = config._ed_show_index.eq(&Some(1)) && !items.is_empty() && !items[0].kind.eq(&Kind::Search);
-
   items
     .iter()
     .filter_map(|item| {
@@ -116,7 +114,7 @@ fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
         item.generate_filename()?
       };
 
-      if is_show_index {
+      if config.is_show_index(items) {
         text = format!("{} {}", item.index.unwrap_or(0) + 1, text);
       }
 
