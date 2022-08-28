@@ -16,7 +16,6 @@ impl MyStyle {
   fn right_border<'a>() -> Block<'a> {
     Block::default().borders(Borders::RIGHT).border_style(Style::default().fg(Color::Gray))
   }
-
   fn highlight_style() -> Style {
     Style::default().fg(Color::Magenta)
   }
@@ -24,7 +23,9 @@ impl MyStyle {
 
 pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   // Overall style
-  f.render_widget(Block::default().style(Style::default().bg(Color::Rgb(10, 10, 10))), f.size());
+  if app.config.is_set_bg() {
+    f.render_widget(Block::default().style(Style::default().bg(Color::Rgb(10, 10, 10))), f.size());
+  }
 
   // layout
   let chunks = Layout::default()

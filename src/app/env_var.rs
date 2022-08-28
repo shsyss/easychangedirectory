@@ -4,8 +4,9 @@ use super::{Item, Kind};
 
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {
-  pub _ed_show_index: Option<usize>,
-  pub _ed_view_file_contents: Option<usize>,
+  pub _ed_show_index: Option<u8>,
+  pub _ed_view_file_contents: Option<u8>,
+  pub _ed_set_bg: Option<u8>,
 }
 
 impl Config {
@@ -18,5 +19,8 @@ impl Config {
   }
   pub fn is_view_file_contents(&self) -> bool {
     self._ed_view_file_contents.eq(&Some(1))
+  }
+  pub fn is_set_bg(&self) -> bool {
+    self._ed_set_bg.eq(&Some(1))
   }
 }
