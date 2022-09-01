@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::{Item, Kind};
+use crate::app::{Item, Kind};
 
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {

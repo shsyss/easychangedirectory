@@ -1,5 +1,4 @@
 mod app;
-mod env_var;
 mod init;
 mod item;
 mod run;
@@ -8,7 +7,6 @@ mod state;
 mod ui;
 
 pub use app::{app, App, Mode};
-pub use env_var::Config;
 pub use init::init;
 pub use item::{read_items, Item, ItemType, Kind};
 pub use run::run;

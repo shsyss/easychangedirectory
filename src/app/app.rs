@@ -12,7 +12,8 @@ use crossterm::{
 };
 use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{Config, Item, ItemType, Search, State, StatefulList};
+use super::{Item, ItemType, Search, State, StatefulList};
+use crate::Config;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
