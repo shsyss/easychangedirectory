@@ -20,8 +20,8 @@ fn main() -> anyhow::Result<()> {
   };
 
   if let Some(temp_path) = matches.get_one::<String>("temp_path") {
-    if let Err(e) = ed::connect::pipe_shell(cd_path, temp_path) {
-      eprintln!("\x1b[31mError:\x1b[m  {}", e);
+    if let Err(e) = ed::pipe_shell(cd_path, temp_path) {
+      eprintln!("\x1b[31mError:\x1b[m {}", e);
     }
   }
 
