@@ -21,9 +21,6 @@ impl StatefulList {
   pub fn unselect(&mut self) {
     self.state.select(None);
   }
-  pub fn get_selected_item(&self) -> Item {
-    self.items[self.selected()].clone()
-  }
   pub fn with_items(items: Vec<Item>) -> StatefulList {
     let mut state = ListState::default();
     state.select(Some(0));

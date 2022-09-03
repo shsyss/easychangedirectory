@@ -8,7 +8,8 @@ use tui::{
   Frame,
 };
 
-use super::{App, Config, Item, ItemType, Kind, Mode};
+use super::{App, Item, ItemType, Kind, Mode};
+use crate::Config;
 
 struct MyStyle;
 

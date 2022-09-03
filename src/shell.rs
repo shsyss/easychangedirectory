@@ -32,7 +32,7 @@ function ed
     easychangedirectory "$temp_path"
     set path (cat "$temp_path")
     cd "$path"
-  else if test "$arg_cnt" -eq 1 -a \( "x$argv[1]" = 'x-h' -o "x$argv[1]" = 'x--help' -o "x$argv[1]" = 'x-V' -o "x$argv[1]" = 'x--version' \)
+  else if test "$arg_cnt" -eq 1 -a \( "x$argv[1]" = 'x-h' -o "x$argv[1]" = 'x--help' -o "x$argv[1]" = 'x-V' -o "x$argv[1]" = 'x--version' -o "x$argv[1]" = 'x--env' \)
     easychangedirectory "$argv[1]"
   else if test "$arg_cnt" -eq 1
     cd "$argv[1]"

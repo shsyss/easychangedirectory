@@ -1,6 +1,12 @@
-pub mod app;
+mod app;
 mod cli;
-pub mod connect;
-pub mod shell;
+mod connect;
+mod env;
+mod init;
+mod shell;
 
+pub use app::app;
 pub use cli::build_cli;
+pub use connect::pipe_shell;
+pub use env::Config;
+pub use init::init;
