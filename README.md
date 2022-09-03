@@ -22,7 +22,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Usage
 
-Command `ed`
+##### Command `ed`
 
 | Key                | Description                                 |
 | ------------------ | ------------------------------------------- |
@@ -130,13 +130,15 @@ Run `. ~/.zshrc` as needed
 
 ## Environment variable
 
+##### You can check all environment variable values with `ed --env`
+
+- `_ED_SET_BG`
+  - If the value is `1`, set black background
 - `_ED_SHOW_INDEX`
   - If the value is `1`, the index is displayed on the left side of the list
 - `_ED_VIEW_FILE_CONTENTS`
   - If the value is `1`, the file contents can be viewed
   - Preview is possible without setting
-- `_ED_SET_BG`
-  - If the value is `1`, set black background
 
 ## After this
 
