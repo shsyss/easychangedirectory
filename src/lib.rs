@@ -1,3 +1,5 @@
+//! This crate is a command line tool, not a library
+
 mod app;
 mod cli;
 mod connect;
