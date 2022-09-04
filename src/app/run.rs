@@ -19,9 +19,9 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Esc => return Ok(current),
 
             // change directory
-            KeyCode::Char('c') => return Ok(app.pwd),
-            KeyCode::Char(';') => return Ok(app.pwd),
-            KeyCode::Enter => return Ok(app.pwd),
+            KeyCode::Char('c') => return Ok(app.wd),
+            KeyCode::Char(';') => return Ok(app.wd),
+            KeyCode::Enter => return Ok(app.wd),
 
             // move
             KeyCode::Home => app.move_home()?,
@@ -51,7 +51,7 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
 
             // Execute command
             KeyCode::Char('V') => {
-              Command::new("code").arg(&app.pwd).output()?;
+              Command::new("code").arg(&app.wd).output()?;
             }
             _ => {}
           }
@@ -63,7 +63,7 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Esc => return Ok(current),
 
             // change directory
-            KeyCode::Enter => return Ok(app.pwd),
+            KeyCode::Enter => return Ok(app.wd),
 
             // search
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,

@@ -40,9 +40,9 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     .constraints([Constraint::Percentage(80), Constraint::Length(1)])
     .split(chunks[0]);
 
-  // show pwd
+  // show wd
   f.render_widget(
-    Block::default().title(Span::styled(app.generate_pwd_str(), Style::default().fg(Color::Yellow))),
+    Block::default().title(Span::styled(app.generate_wd_str(), Style::default().fg(Color::Yellow))),
     top_chunks[0],
   );
 
