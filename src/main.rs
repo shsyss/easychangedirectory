@@ -1,21 +1,26 @@
 use easychangedirectory as ed;
 
-fn main() -> anyhow::Result<()> {
+fn main() {
   let matches = ed::build_cli().get_matches();
 
   if let Some(shell) = matches.get_one::<String>("init") {
-    ed::init(shell)?;
-    return Ok(());
+    if let Err(e) = ed::init(shell) {
+      eprintln!("\x1b[31mError:\x1b[m {}", e);
+    }
+    return;
   } else if matches.contains_id("env") {
-    ed::Config::new()?.show_all();
-    return Ok(());
+    match ed::Config::new() {
+      Ok(c) => c.show_all(),
+      Err(e) => eprintln!("\x1b[31mError:\x1b[m {}", e),
+    };
+    return;
   }
 
   let cd_path = match ed::app() {
     Ok(path) => path,
     Err(e) => {
       eprintln!("\x1b[31mError:\x1b[m {}", e);
-      return Ok(());
+      return;
     }
   };
 
@@ -24,6 +29,4 @@ fn main() -> anyhow::Result<()> {
       eprintln!("\x1b[31mError:\x1b[m {}", e);
     }
   }
-
-  Ok(())
 }
