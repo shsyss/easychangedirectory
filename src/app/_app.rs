@@ -1,5 +1,5 @@
 use std::{
-  env, io,
+  env, io, mem,
   path::{Path, PathBuf},
   vec,
 };
@@ -59,17 +59,8 @@ impl App {
   fn get_current_index(&self) -> usize {
     self.items.state.selected().unwrap_or(0)
   }
-  fn get_grandparent_index(&self) -> usize {
-    self.grandparent_items.state.selected().unwrap_or(0)
-  }
-  pub fn get_grandparent_items(&self) -> Vec<Item> {
-    self.grandparent_items.items.clone()
-  }
   pub fn get_items(&self) -> Vec<Item> {
     self.items.items.clone()
-  }
-  fn get_parent_index(&self) -> usize {
-    self.parent_items.state.selected().unwrap_or(0)
   }
   pub fn get_parent_items(&self) -> Vec<Item> {
     self.parent_items.items.clone()
@@ -128,23 +119,26 @@ impl App {
       (self.get_child_items().get(0).unwrap_or(&Item::default()).generate_child_items()?, 0)
     };
 
-    let new_ci = None;
     let new_pi = match self.judge_mode() {
       Mode::Normal => Some(self.get_current_index()),
       Mode::Search => self.get_search_list()[self.get_search_index()].index,
     };
-    let new_gi = self.get_parent_index();
-    *self = Self {
-      mode: self.mode,
-      child_items: StatefulList::with_items_option(new_child_items, new_ci),
-      items: StatefulList::with_items_select(self.get_child_items(), new_i),
-      parent_items: StatefulList::with_items_option(self.get_items(), new_pi),
-      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
-      pwd: new_pwd,
-      grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: Search::new(),
-      config: self.config,
-    };
+
+    let new_grandparent_path = Self::generate_parent_path(&self.pwd);
+
+    self.pwd = new_pwd;
+    self.grandparent_path = new_grandparent_path;
+    self.search = Search::new();
+    self.grandparent_items = mem::replace(
+      &mut self.parent_items,
+      mem::replace(
+        &mut self.items,
+        mem::replace(&mut self.child_items, StatefulList::with_items_option(new_child_items, None)),
+      ),
+    );
+    self.items.state.select(Some(new_i));
+    self.parent_items.state.select(new_pi);
+
     Ok(())
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
@@ -152,19 +146,21 @@ impl App {
       Mode::Normal => Some(self.get_current_index()),
       Mode::Search => self.get_search_list()[self.get_search_index()].index,
     };
-    let new_gi = self.get_parent_index();
+    let new_grandparent_path = Self::generate_parent_path(&self.pwd);
 
-    *self = Self {
-      mode: self.mode,
-      child_items: StatefulList::with_items(vec![Item::default()]),
-      items: StatefulList::with_items(self.get_child_items()),
-      parent_items: StatefulList::with_items_option(self.get_items(), new_pi),
-      grandparent_items: StatefulList::with_items_select(self.get_parent_items(), new_gi),
-      pwd: selected_item.get_path().unwrap(),
-      grandparent_path: Self::generate_parent_path(&self.pwd),
-      search: Search::new(),
-      config: self.config,
-    };
+    self.pwd = selected_item.get_path().unwrap();
+    self.grandparent_path = new_grandparent_path;
+    self.search = Search::new();
+    self.grandparent_items = mem::replace(
+      &mut self.parent_items,
+      mem::replace(
+        &mut self.items,
+        mem::replace(&mut self.child_items, StatefulList::with_items(vec![Item::default()])),
+      ),
+    );
+    self.items.state.select(Some(0));
+    self.parent_items.state.select(new_pi);
+
     Ok(())
   }
   pub fn move_end(&mut self) -> anyhow::Result<()> {
@@ -266,21 +262,19 @@ impl App {
         }
       }
     };
-    let new_i = self.get_parent_index();
-    let new_pi = self.get_grandparent_index();
     let new_gi = Self::generate_index(&new_grandparent_items, &self.grandparent_path);
 
-    *self = Self {
-      mode: self.mode,
-      child_items: StatefulList::with_items_option(self.get_items(), new_ci),
-      items: StatefulList::with_items_select(self.get_parent_items(), new_i),
-      parent_items: StatefulList::with_items_select(self.get_grandparent_items(), new_pi),
-      grandparent_items: StatefulList::with_items_select(new_grandparent_items, new_gi),
-      pwd: new_pwd,
-      grandparent_path: new_grandparent_path,
-      search: Search::new(),
-      config: self.config,
-    };
+    self.pwd = new_pwd;
+    self.grandparent_path = new_grandparent_path;
+    self.search = Search::new();
+    self.child_items = mem::replace(
+      &mut self.items,
+      mem::replace(
+        &mut self.parent_items,
+        mem::replace(&mut self.grandparent_items, StatefulList::with_items_select(new_grandparent_items, new_gi)),
+      ),
+    );
+    self.child_items.state.select(new_ci);
 
     Ok(())
   }
