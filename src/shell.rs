@@ -31,7 +31,7 @@ function ed
     easychangedirectory "$temp_path"
     set path (cat "$temp_path")
     cd "$path"
-  else if string match -r 'x[\-|\-\-]+[a-zA-Z]+' "x$argv[1]" &> /dev/null
+  else if string match -r '^x[\-|\-\-]+[a-zA-Z]+$' "x$argv[1]" &> /dev/null
     easychangedirectory "$argv[1]"
   else if test "$arg_cnt" -eq 1
     cd "$argv[1]"
