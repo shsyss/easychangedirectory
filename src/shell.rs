@@ -73,9 +73,9 @@ function ed() {
     easychangedirectory "${temp_path}"
     path=`cat "${temp_path}"`
     cd "${path}" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" = - ]]; then
+  elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
     cd "$1" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+[a-zA-Z]+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
     cd "$1" || return
