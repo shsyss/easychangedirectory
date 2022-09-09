@@ -133,6 +133,8 @@ Run `. ~/.zshrc` as needed
 
 You can check all environment variable values with `ed --env`.
 
+- `_ED_PWD`
+  - If the value is `1`, print current directory after execution
 - `_ED_SET_BG`
   - If the value is `1`, set black background
 - `_ED_SHOW_INDEX`
