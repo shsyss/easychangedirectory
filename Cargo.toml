@@ -1,7 +1,7 @@
 [package]
 name = "easychangedirectory"
 description = "Tools for easy cd"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["shsyss <shsyss00@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
