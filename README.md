@@ -16,7 +16,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 ## Features
 
 - Can change paths visually
-- The `cd` functionality can also be used as-is.
+- The `cd` functionality can also be used as-is
 
 ![demo](./assets/demo.gif)
 
@@ -58,9 +58,11 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Ubuntu <!-- 22.04 -->
 - Debian <!-- 11.4 -->
 
-May be available for more operating systems than those listed
+May be available for more operating systems than those listed.
 
 ## Installation
+
+[Install](#install) and [Register in the shell](#register-easychangedirectory-in-shell)
 
 ### Install
 
@@ -70,11 +72,9 @@ May be available for more operating systems than those listed
 cargo install --locked easychangedirectory
 ```
 
-<!--　winget brew apt ... -->
-
 - Download from Release page
 
-  - Download the data appropriate for your environment and place it in a directory with a path.
+  - Download the data appropriate for your environment and place it in a directory with a path
 
 We will add more as needed.
 
@@ -131,7 +131,7 @@ Run `. ~/.zshrc` as needed
 
 ## Environment variable
 
-You can check all environment variable values with `ed --env`
+You can check all environment variable values with `ed --env`.
 
 - `_ED_SET_BG`
   - If the value is `1`, set black background
