@@ -10,7 +10,7 @@ function ed() {
     cd "${path}" || return
   elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
     cd "$1" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+[a-zA-Z]+ ]]; then
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
     cd "$1" || return
@@ -31,7 +31,7 @@ function ed
     easychangedirectory "$temp_path"
     set path (cat "$temp_path")
     cd "$path"
-  else if string match -r '^x\-+[a-zA-Z]+' "x$argv[1]" &> /dev/null
+  else if string match -r '^x\-+' "x$argv[1]" &> /dev/null
     easychangedirectory "$argv[1]"
   else if test "$arg_cnt" -eq 1
     cd "$argv[1]"
@@ -75,12 +75,16 @@ function ed() {
     cd "${path}" || return
   elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
     cd "$1" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+[a-zA-Z]+ ]]; then
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
     cd "$1" || return
   else
     echo 'Too many arguments'
   fi
+}
+
+function test() {
+  easychangedirectory
 }
 "#;
