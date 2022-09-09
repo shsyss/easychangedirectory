@@ -50,6 +50,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Bash
 - Fish
 - Powershell
+- Zsh
 
 ### Operating system
 
@@ -118,7 +119,7 @@ Run `. $profile` as needed
 
 </details>
 
-<!-- <details>
+<details>
 <summary>Zsh</summary>
 
 Add to `~/.zshrc` (Change as necessary)
@@ -126,7 +127,7 @@ Add to `~/.zshrc` (Change as necessary)
 eval "$(easychangedirectory --init zsh)"
 ```
 Run `. ~/.zshrc` as needed
-</details> -->
+</details>
 
 ## Environment variable
 
