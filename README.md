@@ -22,7 +22,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Usage
 
-##### Command `ed`
+Command `ed`
 
 | Key                | Description                                 |
 | ------------------ | ------------------------------------------- |
@@ -131,7 +131,7 @@ Run `. ~/.zshrc` as needed
 
 ## Environment variable
 
-##### You can check all environment variable values with `ed --env`
+You can check all environment variable values with `ed --env`
 
 - `_ED_SET_BG`
   - If the value is `1`, set black background
