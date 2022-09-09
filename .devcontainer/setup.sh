@@ -20,3 +20,4 @@ export PATH=/root/.cargo/bin:$PATH
 
 # cargo install cargo-expand
 # cargo install cargo-edit
+cargo install --locked easychangedirectory

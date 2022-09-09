@@ -6,11 +6,9 @@ function ed() {
   if [[ "$#" -eq 0 ]]; then
     temp_path="{{ temp_path }}.$$"
     easychangedirectory "${temp_path}"
-    path=`cat "${temp_path}"`
-    cd "${path}" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
-    cd "$1" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
+    cd_path=`cat "${temp_path}"`
+    cd "${cd_path}" || return
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+[a-zA-Z]+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
     cd "$1" || return
@@ -20,7 +18,6 @@ function ed() {
 }
 "#;
 
-// TODO: I can't do regular expressions in Fish.
 pub const FISH: &str = r#"
 # # easychangedirectory
 # easychangedirectory --init fish | source
@@ -30,9 +27,9 @@ function ed
   if test "$arg_cnt" -eq 0
     set temp_path "{{ temp_path }}.$fish_pid"
     easychangedirectory "$temp_path"
-    set path (cat "$temp_path")
-    cd "$path"
-  else if test "$arg_cnt" -eq 1 -a \( "x$argv[1]" = 'x-h' -o "x$argv[1]" = 'x--help' -o "x$argv[1]" = 'x-V' -o "x$argv[1]" = 'x--version' -o "x$argv[1]" = 'x--env' \)
+    set cd_path (cat "$temp_path")
+    cd "$cd_path"
+  else if string match -r '^x\-+[a-zA-Z]+' "x$argv[1]" &> /dev/null
     easychangedirectory "$argv[1]"
   else if test "$arg_cnt" -eq 1
     cd "$argv[1]"
@@ -50,11 +47,9 @@ function ed {
   if ($args.Length -eq 0) {
     $temp_path = "{{ temp_path }}.$pid"
     easychangedirectory $temp_path
-    $path = (cat $temp_path)
-    cd $path
-  } elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
-    cd $args[0]
-  } elseif ($args.Length -eq 1 -and $args[0][0] -eq '-') {
+    $cd_path = (cat $temp_path)
+    cd $cd_path
+  } elseif ($args.Length -eq 1 -and $args[0] -match '^-+[a-zA-Z]+') {
     easychangedirectory $args[0]
   } elseif ($args.Length -eq 1) {
     cd $args[0]
@@ -72,11 +67,9 @@ function ed() {
   if [[ "$#" -eq 0 ]]; then
     temp_path="{{ temp_path }}.$$"
     easychangedirectory "${temp_path}"
-    path=`cat "${temp_path}"`
-    cd "${path}" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" = - ]]; then
-    cd "$1" || return
-  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+ ]]; then
+    cd_path=`cat ${temp_path}`
+    cd "${cd_path}" || return
+  elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^-+[a-zA-Z]+ ]]; then
     easychangedirectory "$1"
   elif [[ "$#" -eq 1 ]]; then
     cd "$1" || return

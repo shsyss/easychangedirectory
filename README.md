@@ -22,7 +22,7 @@ Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
 ## Usage
 
-##### Command `ed`
+Command `ed`
 
 | Key                | Description                                 |
 | ------------------ | ------------------------------------------- |
@@ -50,6 +50,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Bash
 - Fish
 - Powershell
+- Zsh
 
 ### Operating system
 
@@ -118,7 +119,7 @@ Run `. $profile` as needed
 
 </details>
 
-<!-- <details>
+<details>
 <summary>Zsh</summary>
 
 Add to `~/.zshrc` (Change as necessary)
@@ -126,11 +127,11 @@ Add to `~/.zshrc` (Change as necessary)
 eval "$(easychangedirectory --init zsh)"
 ```
 Run `. ~/.zshrc` as needed
-</details> -->
+</details>
 
 ## Environment variable
 
-##### You can check all environment variable values with `ed --env`
+You can check all environment variable values with `ed --env`
 
 - `_ED_SET_BG`
   - If the value is `1`, set black background
