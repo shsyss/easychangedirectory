@@ -85,7 +85,7 @@ We will add more as needed.
 
 Add to `~/.bashrc` (Change as necessary)
 
-```
+```bash
 eval "$(easychangedirectory --init bash)"
 ```
 
@@ -98,7 +98,7 @@ Run `. ~/.bashrc` as needed
 
 Add to `~/.config/fish/config.fish` (Change as necessary)
 
-```
+```fish
 easychangedirectory --init fish | source
 ```
 
@@ -111,7 +111,7 @@ Run `. ~/.config/fish/config.fish` as needed
 
 Add to the file found by `echo $profile`
 
-```
+```powershell
 Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
 ```
 
@@ -123,7 +123,7 @@ Run `. $profile` as needed
 <summary>Zsh</summary>
 
 Add to `~/.zshrc` (Change as necessary)
-```
+```zsh
 eval "$(easychangedirectory --init zsh)"
 ```
 Run `. ~/.zshrc` as needed
