@@ -58,7 +58,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Ubuntu <!-- 22.04 -->
 - Debian <!-- 11.4 -->
 
-May be available for more operating systems than those listed.
+Operating systems that are not currently listed are not available, I just can't confirm them because I am not able to prepare them, and there is a great possibility that they can be used.
 
 ## Installation
 
