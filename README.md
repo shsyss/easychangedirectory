@@ -58,7 +58,7 @@ Please let us know if you have any key map requests. If it is traditional, we wi
 - Ubuntu <!-- 22.04 -->
 - Debian <!-- 11.4 -->
 
-May be available for more operating systems than those listed.
+Operating systems that are not currently listed are not available, I just can't confirm them because I am not able to prepare them, and there is a great possibility that they can be used.
 
 ## Installation
 
@@ -85,7 +85,7 @@ We will add more as needed.
 
 Add to `~/.bashrc` (Change as necessary)
 
-```
+```bash
 eval "$(easychangedirectory --init bash)"
 ```
 
@@ -98,7 +98,7 @@ Run `. ~/.bashrc` as needed
 
 Add to `~/.config/fish/config.fish` (Change as necessary)
 
-```
+```fish
 easychangedirectory --init fish | source
 ```
 
@@ -111,7 +111,7 @@ Run `. ~/.config/fish/config.fish` as needed
 
 Add to the file found by `echo $profile`
 
-```
+```powershell
 Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )
 ```
 
@@ -123,7 +123,7 @@ Run `. $profile` as needed
 <summary>Zsh</summary>
 
 Add to `~/.zshrc` (Change as necessary)
-```
+```zsh
 eval "$(easychangedirectory --init zsh)"
 ```
 Run `. ~/.zshrc` as needed
@@ -133,6 +133,8 @@ Run `. ~/.zshrc` as needed
 
 You can check all environment variable values with `ed --env`.
 
+- `_ED_PWD`
+  - If the value is `1`, print current directory after execution
 - `_ED_SET_BG`
   - If the value is `1`, set black background
 - `_ED_SHOW_INDEX`

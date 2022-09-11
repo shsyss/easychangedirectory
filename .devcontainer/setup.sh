@@ -21,3 +21,7 @@ export PATH=/root/.cargo/bin:$PATH
 # cargo install cargo-expand
 # cargo install cargo-edit
 cargo install --locked easychangedirectory
+echo 'eval "$(easychangedirectory --init bash)"' >> ~/.bashrc
+# echo 'Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )' >> ~/.config/powershell/Microsoft.PowerShell_profile.ps1
+# echo 'easychangedirectory --init fish | source' >> ~/.config/fish/config.fish
+echo 'eval "$(easychangedirectory --init zsh)"' >> ~/.zshrc
