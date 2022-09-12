@@ -42,7 +42,8 @@ Command `ed`
 | `Backspace`        | Delete one character from the search string |
 | `Delete`           | Delete all search strings                   |
 | `V`                | Open VSCode in the current directory        |
-| `L`                | Open Lapce in the current directory         |
+
+<!-- | `L`                | Open Lapce in the current directory         | -->
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
