@@ -41,7 +41,8 @@ Command `ed`
 | `Insert` `Ctrl+s`  | Search mode switch (Char key will not work) |
 | `Backspace`        | Delete one character from the search string |
 | `Delete`           | Delete all search strings                   |
-| `V`                | Open vscode in the current directory        |
+| `V`                | Open VSCode in the current directory        |
+| `L`                | Open Lapce in the current directory         |
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
@@ -125,10 +126,13 @@ Run `. $profile` as needed
 <summary>Zsh</summary>
 
 Add to `~/.zshrc` (Change as necessary)
+
 ```zsh
 eval "$(easychangedirectory --init zsh)"
 ```
+
 Run `. ~/.zshrc` as needed
+
 </details>
 
 ## Environment variable

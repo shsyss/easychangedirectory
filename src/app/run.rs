@@ -53,6 +53,9 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Char('V') => {
               Command::new("code").arg(&app.wd).output()?;
             }
+            KeyCode::Char('L') => {
+              Command::new("lapce").arg(&app.wd).output()?;
+            }
             _ => {}
           }
         }
