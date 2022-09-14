@@ -13,7 +13,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Usage](#usage) / [Support](#support) / [Installation](#installation) / [Environment variable](#environment-variable) / [After this](#after-this)
+[Features](#features) / [Usage](#usage) / [Support shell](#support-shell) / [Installation](#installation) / [Environment variable](#environment-variable) / [After this](#after-this)
 
 ## Features
 
@@ -47,22 +47,12 @@ Command `ed`
 
 Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
 
-## Support
-
-### Shell
+## Support shell
 
 - Bash
 - Fish
 - Powershell
 - Zsh
-
-### Operating system
-
-- Windows <!-- 11 -->
-- Ubuntu <!-- 22.04 -->
-- Debian <!-- 11.4 -->
-
-Operating systems that are not currently listed are not available, I just can't confirm them because I am not able to prepare them, and there is a great possibility that they can be used.
 
 ## Installation
 
