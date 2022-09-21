@@ -143,3 +143,4 @@ You can check all environment variable values with `ed --env`.
 ## After this
 
 - Add Support
+- Add tests
