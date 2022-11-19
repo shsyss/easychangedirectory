@@ -2,10 +2,10 @@
 name = "easychangedirectory"
 description = "Tools for easy cd"
 version = "0.5.0"
-authors = ["shsyss <shsyss00@gmail.com>"]
+authors = ["dijdzv <dijdzv@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-repository = "https://github.com/shsyss/easychangedirectory"
+repository = "https://github.com/dijdzv/easychangedirectory"
 edition = "2021"
 categories = ["command-line-utilities", "filesystem"]
 keywords = ["cli","terminal","cd"]
