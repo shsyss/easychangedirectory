@@ -13,7 +13,7 @@
 
 Dual-licensed under [Apache 2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT).
 
-[Features](#features) / [Usage](#usage) / [Support shell](#support-shell) / [Installation](#installation) / [Environment variable](#environment-variable) / [After this](#after-this)
+[Features](#features) / [Usage](#usage) / [Support shell](#support-shell) / [Installation](#installation) / [Environment variable](#environment-variable)
 
 ## Features
 
@@ -139,8 +139,3 @@ You can check all environment variable values with `ed --env`.
 - `_ED_VIEW_FILE_CONTENTS`
   - If the value is `1`, the file contents can be viewed
   - Preview is possible without setting
-
-## After this
-
-- Add Support
-- Add tests
