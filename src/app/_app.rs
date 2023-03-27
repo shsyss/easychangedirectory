@@ -295,7 +295,16 @@ impl App {
     let items = super::read_items(&wd)?;
 
     // Initial selection is 0
-    let child_path = if items[0].is_dir() { items[0].get_path().unwrap() } else { PathBuf::new() };
+    let child_path = match items.get(0) {
+      Some(item) => {
+        if item.is_dir() {
+          item.get_path().unwrap()
+        } else {
+          PathBuf::new()
+        }
+      }
+      None => PathBuf::new(),
+    };
     let parent_path = Self::generate_parent_path(&wd);
     let grandparent_path = Self::generate_parent_path(&parent_path);
     let parent_items = Self::make_items(&parent_path)?;
