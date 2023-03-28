@@ -4,10 +4,11 @@ use crate::app::{Item, Kind};
 
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {
-  pub _ed_wd: Option<u8>,
-  pub _ed_set_bg: Option<u8>,
-  pub _ed_show_index: Option<u8>,
-  pub _ed_view_file_contents: Option<u8>,
+  _ed_wd: Option<u8>,
+  _ed_set_bg: Option<u8>,
+  _ed_show_index: Option<u8>,
+  _ed_view_file_contents: Option<u8>,
+  _ed_log: Option<u8>,
 }
 
 impl Config {
@@ -27,6 +28,9 @@ impl Config {
   pub fn is_set_bg(&self) -> bool {
     self._ed_set_bg.eq(&Some(1))
   }
+  pub fn is_log(&self) -> bool {
+    self._ed_log.eq(&Some(1))
+  }
 
   pub fn show_all(&self) {
     println!("_ED_PWD = {}", self._ed_wd.map(|u| u.to_string()).unwrap_or_else(|| "".to_string()));
@@ -36,5 +40,6 @@ impl Config {
       "_ED_VIEW_FILE_CONTENTS = {}",
       self._ed_view_file_contents.map(|u| u.to_string()).unwrap_or_else(|| "".to_string())
     );
+    println!("_ED_LOG = {}", self._ed_log.map(|u| u.to_string()).unwrap_or_else(|| "".to_string()));
   }
 }
