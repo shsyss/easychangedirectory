@@ -4,6 +4,7 @@ mod app;
 mod cli;
 mod connect;
 mod env;
+pub mod error;
 mod init;
 mod shell;
 
