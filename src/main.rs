@@ -35,7 +35,10 @@ fn main() {
 
   if let Ok(config) = ed::Config::new() {
     if config.is_wd() {
-      println!("{}", cd_path.display());
+      println!("Now: {}", cd_path.display());
+    }
+    if config.is_log() {
+      println!("Log output location: {}", ed::log::LogOutput::path().display());
     }
   }
 }
