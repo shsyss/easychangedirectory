@@ -3,13 +3,19 @@ use std::{path::PathBuf, process::Command};
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
 
+use crate::log;
+
 use super::{App, Mode};
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
   let current = PathBuf::from(".");
+  if app.config.is_log() {
+    log::init();
+  }
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
+      log::write(&app, &key);
       match app.mode {
         Mode::Normal => {
           match key.code {

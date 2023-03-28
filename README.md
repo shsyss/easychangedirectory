@@ -139,3 +139,5 @@ You can check all environment variable values with `ed --env`.
 - `_ED_VIEW_FILE_CONTENTS`
   - If the value is `1`, the file contents can be viewed
   - Preview is possible without setting
+- `_ED_LOG`
+  - If the value is `1`, output log to `ed.log`

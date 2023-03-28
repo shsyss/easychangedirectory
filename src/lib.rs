@@ -6,6 +6,7 @@ mod connect;
 mod env;
 pub mod error;
 mod init;
+pub mod log;
 mod shell;
 
 pub use app::app;
