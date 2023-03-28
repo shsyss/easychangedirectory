@@ -34,7 +34,7 @@ fn main() {
   }
 
   if let Ok(config) = ed::Config::new() {
-    if config.is_pwd() {
+    if config.is_wd() {
       println!("{}", cd_path.display());
     }
   }
