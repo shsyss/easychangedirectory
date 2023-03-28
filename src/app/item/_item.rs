@@ -44,9 +44,9 @@ impl Item {
       }
     }
     Ok(if self.is_dir() {
-      App::make_items(&self.get_path().unwrap())?
+      App::make_items(self.get_path().unwrap())?
     } else if self.is_file() {
-      if let Ok(s) = fs::read_to_string(&self.get_path().context("Non-string files are being read.")?) {
+      if let Ok(s) = fs::read_to_string(self.get_path().context("Non-string files are being read.")?) {
         s.lines()
           .enumerate()
           .map(|(i, s)| Item { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: Some(i) })
