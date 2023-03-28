@@ -4,7 +4,7 @@ use crate::app::{Item, Kind};
 
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {
-  _ed_pwd: Option<u8>,
+  _ed_wd: Option<u8>,
   _ed_set_bg: Option<u8>,
   _ed_show_index: Option<u8>,
   _ed_view_file_contents: Option<u8>,
