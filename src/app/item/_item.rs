@@ -45,7 +45,7 @@ impl Item {
     }
     Ok(if self.is_dir() {
       App::make_items(self.get_path().unwrap())?
-    } else if self.is_file() {
+    } else if self.is_file() && self.can_read() {
       if let Ok(s) = fs::read_to_string(self.get_path().context("Non-string files are being read.")?) {
         s.lines()
           .enumerate()
@@ -60,6 +60,13 @@ impl Item {
   }
   pub fn generate_filename(&self) -> Option<String> {
     Some(self.get_path()?.file_name()?.to_string_lossy().to_string())
+  }
+  pub fn can_read(&self) -> bool {
+    if let ItemType::Path(path) = &self.item {
+      path.is_file()
+    } else {
+      false
+    }
   }
   pub fn is_dir(&self) -> bool {
     matches!(self.kind, Kind::Dir)
