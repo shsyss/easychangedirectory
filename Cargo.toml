@@ -15,7 +15,7 @@ anyhow = "1.0.71"
 clap = { version = "3.2.25", features = ["cargo"] }
 crossterm = "0.26.1"
 envy = "0.4.2"
-handlebars = "4.3.3"
+handlebars = "4.3.7"
 home = "0.5.5"
 log = "0.4.17"
 serde = { version = "1.0.144", features = ["derive"] }
