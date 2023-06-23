@@ -4,7 +4,8 @@ use ed::error::PrintError;
 
 fn main() {
   let matches = ed::build_cli().get_matches();
-
+  dbg!(&matches);
+  // ! FIXME: コマンドライン引数が正常にマッチしていない
   if let Some(shell) = matches.get_one::<String>("init") {
     if let Err(e) = ed::init(shell) {
       e.eprintln();
