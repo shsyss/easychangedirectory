@@ -10,7 +10,9 @@
     {
       "matchUpdateTypes": [
         "minor",
-        "pin"
+        "patch",
+        "pin",
+        "digest"
       ],
       "automerge": true
     }
