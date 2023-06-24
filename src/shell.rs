@@ -1,3 +1,24 @@
+use clap::ValueEnum;
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+pub enum Shell {
+  Bash,
+  Fish,
+  Powershell,
+  Zsh,
+}
+
+impl Shell {
+  pub fn get_template(&self) -> &str {
+    match self {
+      Shell::Bash => BASH,
+      Shell::Fish => FISH,
+      Shell::Powershell => POWERSHELL,
+      Shell::Zsh => ZSH,
+    }
+  }
+}
+
 pub const BASH: &str = r#"
 # # easychangedirectory
 # eval "$(easychangedirectory --init bash)"
