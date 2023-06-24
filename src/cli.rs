@@ -25,7 +25,7 @@ use crate::shell::Shell;
 | V             | Open vscode                                 |
  -------------------------------------------------------------")]
 pub struct Cli {
-  #[arg(hide(true))]
+  #[arg(short, hide(true))]
   temp_path: Option<String>,
   #[arg(long, value_enum, value_name = "SHELL", help = "Configure shell")]
   init: Option<Shell>,
