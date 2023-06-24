@@ -45,7 +45,7 @@ Command `ed`
 
 <!-- | `L`                | Open Lapce in the current directory         | -->
 
-Please let us know if you have any key map requests. If it is traditional, we will add it immediately.
+If it does not work, try restarting the shell.
 
 ## Support shell
 
