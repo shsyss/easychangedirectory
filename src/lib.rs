@@ -9,7 +9,7 @@ mod init;
 pub mod log;
 mod shell;
 
-pub use app::app;
+pub use app::{app, Action};
 pub use cli::cli;
 pub use connect::pipe_shell;
 pub use env::Config;

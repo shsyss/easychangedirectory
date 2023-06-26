@@ -12,7 +12,7 @@ use crossterm::{
 };
 use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{Item, ItemType, Search, State, StatefulList};
+use super::{run::Action, Item, ItemType, Search, State, StatefulList};
 use crate::Config;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -387,7 +387,7 @@ impl App {
   }
 }
 
-pub fn app() -> anyhow::Result<PathBuf> {
+pub fn app() -> anyhow::Result<Action> {
   // setup terminal
   enable_raw_mode()?;
   let mut stdout = io::stdout();
@@ -396,8 +396,8 @@ pub fn app() -> anyhow::Result<PathBuf> {
   let mut terminal = Terminal::new(backend)?;
 
   let app = App::new()?;
-  let path = match super::run(&mut terminal, app) {
-    Ok(path) => path,
+  let action = match super::run(&mut terminal, app) {
+    Ok(action) => action,
     Err(e) => {
       // restore terminal
       disable_raw_mode()?;
@@ -413,5 +413,5 @@ pub fn app() -> anyhow::Result<PathBuf> {
   execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
   terminal.show_cursor()?;
 
-  Ok(path)
+  Ok(action)
 }

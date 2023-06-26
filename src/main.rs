@@ -7,19 +7,24 @@ fn main() {
 
   cli.match_options();
 
-  let cd_path = match ed::app() {
-    Ok(path) => path,
+  let action = match ed::app() {
+    Ok(action) => action,
     Err(e) => {
       e.eprintln();
       return;
     }
   };
 
-  cli.match_temp_path(&cd_path);
+  let action_path = match action {
+    ed::Action::Change(path) => path,
+    ed::Action::Keep(path) => path,
+  };
+
+  cli.match_temp_path(&action_path);
 
   if let Ok(config) = ed::Config::new() {
     if config.is_pwd() {
-      println!("Now: {}", cd_path.display());
+      println!("Now: {}", action_path.display());
     }
     if config.is_log() {
       println!("Log output location: {}", ed::log::LogOutput::path().display());

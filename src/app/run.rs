@@ -7,7 +7,12 @@ use crate::log;
 
 use super::{App, AppMode};
 
-pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
+pub enum Action {
+  Change(PathBuf),
+  Keep(PathBuf),
+}
+
+pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<Action> {
   let current = PathBuf::from(".");
   if app.config.is_log() {
     log::init();
@@ -20,14 +25,14 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
         AppMode::Normal => {
           match key.code {
             // finish
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-            KeyCode::Char('q') => return Ok(current),
-            KeyCode::Esc => return Ok(current),
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep(current)),
+            KeyCode::Char('q') => return Ok(Action::Keep(current)),
+            KeyCode::Esc => return Ok(Action::Keep(current)),
 
             // change directory
-            KeyCode::Char('c') => return Ok(app.wd),
-            KeyCode::Char(';') => return Ok(app.wd),
-            KeyCode::Enter => return Ok(app.wd),
+            KeyCode::Char('c') => return Ok(Action::Change(app.wd)),
+            KeyCode::Char(';') => return Ok(Action::Change(app.wd)),
+            KeyCode::Enter => return Ok(Action::Change(app.wd)),
 
             // move
             KeyCode::Home => app.move_home()?,
@@ -68,11 +73,11 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
         AppMode::Search => {
           match key.code {
             // finish
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
-            KeyCode::Esc => return Ok(current),
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep(current)),
+            KeyCode::Esc => return Ok(Action::Keep(current)),
 
             // change directory
-            KeyCode::Enter => return Ok(app.wd),
+            KeyCode::Enter => return Ok(Action::Change(app.wd)),
 
             // search
             KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = AppMode::Normal,
