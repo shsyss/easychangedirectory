@@ -71,6 +71,12 @@ impl App {
   fn get_search_list(&self) -> Vec<Item> {
     self.search.list.clone()
   }
+  fn get_selected_item(&self) -> Item {
+    match self.judge_mode() {
+      AppMode::Normal => self.items.items[self.items.selected()].clone(),
+      AppMode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
+    }
+  }
   /// If the working block is "content" `true`
   fn is_contents_in_working_block(&self) -> bool {
     let i = self.parent_items.selected();
@@ -97,10 +103,7 @@ impl App {
       return Ok(());
     }
 
-    let selected_item = match self.judge_mode() {
-      AppMode::Normal => self.items.items[self.items.selected()].clone(),
-      AppMode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
-    };
+    let selected_item = self.get_selected_item();
     let new_wd = if selected_item.is_dir() {
       selected_item.get_path().unwrap()
     } else if selected_item.is_file() && self.config.is_view_file_contents() {
