@@ -16,14 +16,14 @@ use super::{Item, ItemType, Search, State, StatefulList};
 use crate::Config;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Mode {
+pub enum AppMode {
   Normal,
   Search,
 }
 
 #[derive(Debug)]
 pub struct App {
-  pub mode: Mode,
+  pub mode: AppMode,
   pub child_items: StatefulList,
   pub items: StatefulList,
   pub parent_items: StatefulList,
@@ -78,15 +78,15 @@ impl App {
   }
   fn is_empty_in_working_block(&self) -> bool {
     match self.judge_mode() {
-      Mode::Normal => self.items.items.is_empty(),
-      Mode::Search => self.search.list.is_empty(),
+      AppMode::Normal => self.items.items.is_empty(),
+      AppMode::Search => self.search.list.is_empty(),
     }
   }
-  pub fn judge_mode(&self) -> Mode {
+  pub fn judge_mode(&self) -> AppMode {
     if self.search.text.is_empty() {
-      Mode::Normal
+      AppMode::Normal
     } else {
-      Mode::Search
+      AppMode::Search
     }
   }
   pub fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
@@ -98,8 +98,8 @@ impl App {
     }
 
     let selected_item = match self.judge_mode() {
-      Mode::Normal => self.items.items[self.items.selected()].clone(),
-      Mode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
+      AppMode::Normal => self.items.items[self.items.selected()].clone(),
+      AppMode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
     };
     let new_wd = if selected_item.is_dir() {
       selected_item.get_path().unwrap()
@@ -120,8 +120,8 @@ impl App {
     };
 
     let new_pi = match self.judge_mode() {
-      Mode::Normal => Some(self.get_current_index()),
-      Mode::Search => self.get_search_list()[self.get_search_index()].index,
+      AppMode::Normal => Some(self.get_current_index()),
+      AppMode::Search => self.get_search_list()[self.get_search_index()].index,
     };
 
     let new_grandparent_path = Self::generate_parent_path(&self.wd);
@@ -143,8 +143,8 @@ impl App {
   }
   pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
     let new_pi = match self.judge_mode() {
-      Mode::Normal => Some(self.get_current_index()),
-      Mode::Search => self.get_search_list()[self.get_search_index()].index,
+      AppMode::Normal => Some(self.get_current_index()),
+      AppMode::Search => self.get_search_list()[self.get_search_index()].index,
     };
     let new_grandparent_path = Self::generate_parent_path(&self.wd);
 
@@ -169,12 +169,12 @@ impl App {
     }
 
     let last_i = match self.judge_mode() {
-      Mode::Normal => self.items.items.len() - 1,
-      Mode::Search => self.search.list.len() - 1,
+      AppMode::Normal => self.items.items.len() - 1,
+      AppMode::Search => self.search.list.len() - 1,
     };
     match self.judge_mode() {
-      Mode::Normal => self.items.select(last_i),
-      Mode::Search => self.search.select(last_i),
+      AppMode::Normal => self.items.select(last_i),
+      AppMode::Search => self.search.select(last_i),
     };
     self.update_child_items(last_i)?;
     Ok(())
@@ -186,8 +186,8 @@ impl App {
 
     let top_i = 0;
     match self.judge_mode() {
-      Mode::Normal => self.items.select(top_i),
-      Mode::Search => self.search.select(top_i),
+      AppMode::Normal => self.items.select(top_i),
+      AppMode::Search => self.search.select(top_i),
     }
     self.update_child_items(top_i)?;
     Ok(())
@@ -198,8 +198,8 @@ impl App {
     }
 
     let new_i = match self.judge_mode() {
-      Mode::Normal => self.items.next(),
-      Mode::Search => self.search.next(),
+      AppMode::Normal => self.items.next(),
+      AppMode::Search => self.search.next(),
     };
     self.update_child_items(new_i)?;
     Ok(())
@@ -210,13 +210,13 @@ impl App {
     }
 
     let (last_i, old_i) = match self.judge_mode() {
-      Mode::Normal => (self.items.items.len() - 1, self.get_current_index()),
-      Mode::Search => (self.search.list.len() - 1, self.get_search_index()),
+      AppMode::Normal => (self.items.items.len() - 1, self.get_current_index()),
+      AppMode::Search => (self.search.list.len() - 1, self.get_search_index()),
     };
     let new_i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
     match self.judge_mode() {
-      Mode::Normal => self.items.select(new_i),
-      Mode::Search => self.search.select(new_i),
+      AppMode::Normal => self.items.select(new_i),
+      AppMode::Search => self.search.select(new_i),
     }
     self.update_child_items(new_i)?;
     Ok(())
@@ -227,13 +227,13 @@ impl App {
     }
 
     let old_i = match self.judge_mode() {
-      Mode::Normal => self.get_current_index(),
-      Mode::Search => self.get_search_index(),
+      AppMode::Normal => self.get_current_index(),
+      AppMode::Search => self.get_search_index(),
     };
     let new_i = if old_i < JUMP { 0 } else { old_i - JUMP };
     match self.judge_mode() {
-      Mode::Normal => self.items.select(new_i),
-      Mode::Search => self.search.select(new_i),
+      AppMode::Normal => self.items.select(new_i),
+      AppMode::Search => self.search.select(new_i),
     };
     self.update_child_items(new_i)?;
     Ok(())
@@ -252,8 +252,8 @@ impl App {
       None
     } else {
       match self.judge_mode() {
-        Mode::Normal => Some(self.get_current_index()),
-        Mode::Search => {
+        AppMode::Normal => Some(self.get_current_index()),
+        AppMode::Search => {
           if let Some(item) = self.get_search_list().get(self.get_search_index()) {
             item.index
           } else {
@@ -284,8 +284,8 @@ impl App {
     }
 
     let new_i = match self.judge_mode() {
-      Mode::Normal => self.items.previous(),
-      Mode::Search => self.search.previous(),
+      AppMode::Normal => self.items.previous(),
+      AppMode::Search => self.search.previous(),
     };
     self.update_child_items(new_i)?;
     Ok(())
@@ -313,7 +313,7 @@ impl App {
     let gi = Self::generate_index(&grandparent_items, &parent_path);
 
     let mut app = App {
-      mode: Mode::Normal,
+      mode: AppMode::Normal,
       child_items: StatefulList::with_items_option(Self::make_items(child_path)?, None),
       items: StatefulList::with_items(items),
       parent_items: StatefulList::with_items(parent_items),
@@ -358,8 +358,8 @@ impl App {
     let ci = self.child_items.state.selected();
 
     let items = match self.judge_mode() {
-      Mode::Normal => self.get_items(),
-      Mode::Search => self.get_search_list(),
+      AppMode::Normal => self.get_items(),
+      AppMode::Search => self.get_search_list(),
     };
 
     self.child_items =
@@ -374,8 +374,8 @@ impl App {
     self.search.list = self.search_sort_to_vec();
 
     let now_i = match self.judge_mode() {
-      Mode::Normal => self.get_current_index(),
-      Mode::Search => self.get_search_index(),
+      AppMode::Normal => self.get_current_index(),
+      AppMode::Search => self.get_search_index(),
     };
 
     self.update_child_items(now_i)?;

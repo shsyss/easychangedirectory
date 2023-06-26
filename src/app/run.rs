@@ -5,7 +5,7 @@ use tui::{backend::Backend, Terminal};
 
 use crate::log;
 
-use super::{App, Mode};
+use super::{App, AppMode};
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<PathBuf> {
   let current = PathBuf::from(".");
@@ -17,7 +17,7 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
     if let Event::Key(key) = event::read()? {
       log::write(&app, &key);
       match app.mode {
-        Mode::Normal => {
+        AppMode::Normal => {
           match key.code {
             // finish
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
@@ -44,8 +44,8 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Right => app.move_child()?,
 
             // search
-            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Search,
-            KeyCode::Insert => app.mode = Mode::Search,
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = AppMode::Search,
+            KeyCode::Insert => app.mode = AppMode::Search,
             KeyCode::Backspace => {
               app.search.text.pop();
               app.update_search_effect()?;
@@ -65,7 +65,7 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             _ => {}
           }
         }
-        Mode::Search => {
+        AppMode::Search => {
           match key.code {
             // finish
             KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(current),
@@ -75,8 +75,8 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             KeyCode::Enter => return Ok(app.wd),
 
             // search
-            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = Mode::Normal,
-            KeyCode::Insert => app.mode = Mode::Normal,
+            KeyCode::Char('s') if key.modifiers == KeyModifiers::CONTROL => app.mode = AppMode::Normal,
+            KeyCode::Insert => app.mode = AppMode::Normal,
 
             // input
             KeyCode::Char(c) => {

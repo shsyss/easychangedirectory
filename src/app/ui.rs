@@ -8,7 +8,7 @@ use tui::{
   Frame,
 };
 
-use super::{App, Item, ItemType, Kind, Mode};
+use super::{App, AppMode, Item, ItemType, Kind};
 use crate::Config;
 
 struct MyStyle;
@@ -52,9 +52,9 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   let search_items = set_items(&search_items, app.config);
   let search_text = List::new(search_items).highlight_symbol("> ");
   let mut state = ListState::default();
-  if app.mode == Mode::Normal {
+  if app.mode == AppMode::Normal {
     state.select(None);
-  } else if app.mode == Mode::Search {
+  } else if app.mode == AppMode::Search {
     state.select(Some(0));
   }
   f.render_stateful_widget(search_text, top_chunks[1], &mut state);
@@ -83,8 +83,8 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
   // current
   let (items, state) = match app.judge_mode() {
-    Mode::Normal => (set_items(&app.items.items, app.config), &mut app.items.state),
-    Mode::Search => (set_items(&app.search.list, app.config), &mut app.search.state),
+    AppMode::Normal => (set_items(&app.items.items, app.config), &mut app.items.state),
+    AppMode::Search => (set_items(&app.search.list, app.config), &mut app.search.state),
   };
   let items = List::new(items)
     .block(MyStyle::right_border())
