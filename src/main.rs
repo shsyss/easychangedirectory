@@ -18,7 +18,7 @@ fn main() {
   cli.match_temp_path(&cd_path);
 
   if let Ok(config) = ed::Config::new() {
-    if config.is_wd() {
+    if config.is_pwd() {
       println!("Now: {}", cd_path.display());
     }
     if config.is_log() {
