@@ -9,12 +9,11 @@ use super::{App, AppMode};
 
 pub enum Action {
   Change(PathBuf),
-  Keep(PathBuf),
+  Keep,
   Print(PathBuf),
 }
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<Action> {
-  let current = PathBuf::from(".");
   if app.config.is_log() {
     log::init();
   }
@@ -28,9 +27,9 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
         AppMode::Normal => {
           match key.code {
             // finish
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep(current)),
-            KeyCode::Char('q') => return Ok(Action::Keep(current)),
-            KeyCode::Esc => return Ok(Action::Keep(current)),
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep),
+            KeyCode::Char('q') => return Ok(Action::Keep),
+            KeyCode::Esc => return Ok(Action::Keep),
 
             // change directory
             KeyCode::Char('c') => return Ok(Action::Change(app.wd)),
@@ -80,8 +79,8 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
         AppMode::Search => {
           match key.code {
             // finish
-            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep(current)),
-            KeyCode::Esc => return Ok(Action::Keep(current)),
+            KeyCode::Char('c') if key.modifiers == KeyModifiers::CONTROL => return Ok(Action::Keep),
+            KeyCode::Esc => return Ok(Action::Keep),
 
             // change directory
             KeyCode::Enter => return Ok(Action::Change(app.wd)),

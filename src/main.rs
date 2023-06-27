@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use easychangedirectory as ed;
 
 use ed::error::PrintError;
@@ -15,17 +17,17 @@ fn main() {
     }
   };
 
+  let current = PathBuf::from(".");
   let action_path = match action {
-    ed::Action::Change(cd_path) => {
-      cli.match_temp_path(&cd_path);
-      cd_path
-    }
-    ed::Action::Keep(current) => current,
+    ed::Action::Change(cd_path) => cd_path,
+    ed::Action::Keep => current,
     ed::Action::Print(print_path) => {
       println!("{}", print_path.display());
-      print_path
+      current
     }
   };
+
+  cli.match_temp_path(&action_path);
 
   if let Ok(config) = ed::Config::new() {
     if config.is_pwd() {
