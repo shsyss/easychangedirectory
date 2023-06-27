@@ -21,7 +21,9 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
-      log::write(&app, &key);
+      if app.config.is_log() {
+        log::write(&app, &key);
+      }
       match app.mode {
         AppMode::Normal => {
           match key.code {
