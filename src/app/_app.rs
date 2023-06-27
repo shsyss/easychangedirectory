@@ -12,8 +12,8 @@ use crossterm::{
 };
 use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{run::Action, Item, ItemType, Search, State, StatefulList};
-use crate::Config;
+use super::{Item, ItemType, Search, State, StatefulList};
+use crate::{action::Action, Config};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppMode {

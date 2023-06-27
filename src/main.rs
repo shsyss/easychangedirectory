@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use easychangedirectory as ed;
 
 use ed::error::PrintError;
@@ -17,15 +15,7 @@ fn main() {
     }
   };
 
-  let current = PathBuf::from(".");
-  let action_path = match action {
-    ed::Action::Change(cd_path) => cd_path,
-    ed::Action::Keep => current,
-    ed::Action::Print(print_path) => {
-      println!("{}", print_path.display());
-      current
-    }
-  };
+  let action_path = action.execute();
 
   cli.prepare_cd(&action_path);
 

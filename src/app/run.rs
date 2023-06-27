@@ -1,17 +1,11 @@
-use std::{path::PathBuf, process::Command};
+use std::process::Command;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
 
-use crate::log;
+use crate::{action::Action, log};
 
 use super::{App, AppMode};
-
-pub enum Action {
-  Change(PathBuf),
-  Keep,
-  Print(PathBuf),
-}
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<Action> {
   if app.config.is_log() {
