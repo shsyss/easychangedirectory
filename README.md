@@ -42,6 +42,7 @@ Command `ed`
 | `Backspace`        | Delete one character from the search string |
 | `Delete`           | Delete all search strings                   |
 | `V`                | Open VSCode in the current directory        |
+| `p`                | Print the selected filepath                 |
 
 <!-- | `L`                | Open Lapce in the current directory         | -->
 

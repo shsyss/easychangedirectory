@@ -23,6 +23,7 @@ use crate::shell::Shell;
 | Backspace     | Delete one character from the search string |
 | Delete        | Delete all search strings                   |
 | V             | Open vscode                                 |
+| p             | Print the selected filepath                 |
  -------------------------------------------------------------")]
 pub struct Cli {
   #[arg(short, hide(true))]
