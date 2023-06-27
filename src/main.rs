@@ -16,11 +16,16 @@ fn main() {
   };
 
   let action_path = match action {
-    ed::Action::Change(path) => path,
-    ed::Action::Keep(path) => path,
+    ed::Action::Change(cd_path) => {
+      cli.match_temp_path(&cd_path);
+      cd_path
+    }
+    ed::Action::Keep(current) => current,
+    ed::Action::Print(print_path) => {
+      println!("{}", print_path.display());
+      print_path
+    }
   };
-
-  cli.match_temp_path(&action_path);
 
   if let Ok(config) = ed::Config::new() {
     if config.is_pwd() {

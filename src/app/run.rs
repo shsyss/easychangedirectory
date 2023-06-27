@@ -10,6 +10,7 @@ use super::{App, AppMode};
 pub enum Action {
   Change(PathBuf),
   Keep(PathBuf),
+  Print(PathBuf),
 }
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<Action> {
@@ -67,6 +68,10 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
             // KeyCode::Char('L') => {
             //   Command::new("lapce").arg(&app.wd).output()?;
             // }
+
+            // print selected filepath
+            KeyCode::Char('p') => return Ok(Action::Print(app.get_selected_filepath())),
+
             _ => {}
           }
         }

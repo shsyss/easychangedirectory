@@ -77,6 +77,9 @@ impl App {
       AppMode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
     }
   }
+  pub fn get_selected_filepath(&self) -> PathBuf {
+    self.get_selected_item().get_path().unwrap()
+  }
   /// If the working block is "content" `true`
   fn is_contents_in_working_block(&self) -> bool {
     let i = self.parent_items.selected();
