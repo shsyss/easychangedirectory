@@ -45,10 +45,10 @@ impl App {
     }
   }
   fn generate_parent_path<P: AsRef<Path>>(path: P) -> PathBuf {
-    path.as_ref().parent().unwrap_or_else(|| Path::new("")).to_path_buf()
+    path.as_ref().parent().unwrap_or_else(|| Path::new("")).into()
   }
   pub fn generate_wd_str(&self) -> String {
-    self.wd.to_string_lossy().to_string()
+    self.wd.to_string_lossy().into()
   }
   fn get_child_index(&self) -> usize {
     self.child_items.state.selected().unwrap_or(0)
@@ -246,7 +246,7 @@ impl App {
   }
   pub fn move_parent(&mut self) -> anyhow::Result<()> {
     let new_wd = if let Some(wd) = self.wd.parent() {
-      wd.to_path_buf()
+      wd.into()
     } else {
       return Ok(());
     };

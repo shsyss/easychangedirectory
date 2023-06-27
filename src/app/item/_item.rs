@@ -59,7 +59,7 @@ impl Item {
     })
   }
   pub fn generate_filename(&self) -> Option<String> {
-    Some(self.get_path()?.file_name()?.to_string_lossy().to_string())
+    Some(self.get_path()?.file_name()?.to_string_lossy().into())
   }
   pub fn can_read(&self) -> bool {
     if let ItemType::Path(path) = &self.item {
@@ -83,7 +83,7 @@ impl Item {
   }
   pub fn get_path(&self) -> Option<PathBuf> {
     if let ItemType::Path(path) = &self.item {
-      Some(path.clone())
+      Some(path.into())
     } else {
       None
     }

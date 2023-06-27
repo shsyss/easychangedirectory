@@ -109,9 +109,9 @@ fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
       };
 
       let mut text = if let ItemType::SearchText(text) = &item.item {
-        text.clone()
+        text.into()
       } else if let ItemType::Content(text) = &item.item {
-        text.clone()
+        text.into()
       } else {
         item.generate_filename()?
       };
