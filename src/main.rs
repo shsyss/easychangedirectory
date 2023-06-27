@@ -27,7 +27,7 @@ fn main() {
     }
   };
 
-  cli.match_temp_path(&action_path);
+  cli.prepare_cd(&action_path);
 
   if let Ok(config) = ed::Config::new() {
     if config.is_pwd() {

@@ -58,7 +58,7 @@ impl Cli {
     }
   }
 
-  pub fn match_temp_path(&self, cd_path: &std::path::Path) {
+  pub fn prepare_cd(&self, cd_path: &std::path::Path) {
     if let Some(temp_path) = self.temp_path.as_ref() {
       if let Err(e) = crate::pipe_shell(cd_path, temp_path) {
         e.eprintln();
