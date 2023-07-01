@@ -5,6 +5,7 @@
 [![Latest version](https://img.shields.io/crates/v/easychangedirectory)](https://crates.io/crates/easychangedirectory)
 [![crates.io downloads](https://img.shields.io/crates/d/easychangedirectory?label=downloads&style=flat-square)](https://crates.io/crates/easychangedirectory)
 [![Github All Releases](https://img.shields.io/github/downloads/dijdzv/easychangedirectory/total.svg)](https://github.com/dijdzv/easychangedirectory/releases)
+[![codecov](https://codecov.io/gh/dijdzv/easychangedirectory/branch/main/graph/badge.svg?token=V568GOT5XP)](https://codecov.io/gh/dijdzv/easychangedirectory)
 
 [![Apache](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](LICENSE-APACHE)
 [![MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE-MIT)
