@@ -32,7 +32,7 @@ mod tests {
     assert_eq!(action.execute(), cd_path);
     let action = Action::Keep;
     assert_eq!(action.execute(), current);
-    let action = Action::Print(cd_path.clone());
+    let action = Action::Print(cd_path);
     assert_eq!(action.execute(), current);
   }
 }

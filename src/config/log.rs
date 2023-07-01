@@ -32,3 +32,13 @@ impl Log {
     info!("search: {:?}", app.search.text);
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_output_path() {
+    assert_eq!(Log::output_path(), home::home_dir().unwrap().join(".easychangedirectory").join("ed.log"));
+  }
+}

@@ -43,3 +43,24 @@ impl Config {
     println!("_ED_LOG = {}", self._ed_log.map(|u| u.to_string()).unwrap_or_else(|| "".to_string()));
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn verify_config() {
+    let config = Config {
+      _ed_pwd: Some(1),
+      _ed_set_bg: Some(1),
+      _ed_show_index: Some(1),
+      _ed_view_file_contents: Some(1),
+      _ed_log: Some(1),
+    };
+    assert!(config.is_pwd());
+    assert!(config.is_show_index(&[Item::default()]));
+    assert!(config.is_view_file_contents());
+    assert!(config.is_set_bg());
+    assert!(config.is_log());
+  }
+}
