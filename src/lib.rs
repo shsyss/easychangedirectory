@@ -3,16 +3,15 @@
 mod action;
 mod app;
 mod cli;
+mod config;
 mod connect;
-mod env;
 pub mod error;
 mod init;
-mod log;
 mod shell;
 
 pub use crate::app::app;
 pub use crate::cli::cli;
+pub use crate::config::Config;
+pub use crate::config::Log;
 pub use crate::connect::pipe_shell;
-pub use crate::env::Config;
 pub use crate::init::init;
-pub use crate::log::Log;
