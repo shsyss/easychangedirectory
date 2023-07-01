@@ -19,3 +19,20 @@ impl Action {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_action_execute() {
+    let current = PathBuf::from(".");
+    let cd_path = PathBuf::from("/tmp");
+    let action = Action::Change(cd_path.clone());
+    assert_eq!(action.execute(), cd_path);
+    let action = Action::Keep;
+    assert_eq!(action.execute(), current);
+    let action = Action::Print(cd_path.clone());
+    assert_eq!(action.execute(), current);
+  }
+}
