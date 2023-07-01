@@ -24,7 +24,7 @@ fn main() {
       println!("Now: {}", action_path.display());
     }
     if config.is_log() {
-      println!("Log output location: {}", ed::log::LogOutput::path().display());
+      println!("Log output location: {}", ed::Log::output_path().display());
     }
   }
 }

@@ -3,19 +3,19 @@ use std::process::Command;
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use tui::{backend::Backend, Terminal};
 
-use crate::{action::Action, log};
+use crate::{action::Action, Log};
 
 use super::{App, AppMode};
 
 pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Result<Action> {
   if app.config.is_log() {
-    log::init();
+    Log::init();
   }
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
     if let Event::Key(key) = event::read()? {
       if app.config.is_log() {
-        log::write(&app, &key);
+        Log::write(&app, &key);
       }
       match app.mode {
         AppMode::Normal => {
