@@ -74,7 +74,7 @@ pub fn cli() -> Cli {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
   use super::*;
 
   #[test]
