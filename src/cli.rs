@@ -72,3 +72,14 @@ impl Cli {
 pub fn cli() -> Cli {
   Cli::parse()
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+
+  #[test]
+  fn verify_cli() {
+    use clap::CommandFactory;
+    Cli::command().debug_assert();
+  }
+}
