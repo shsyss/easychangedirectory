@@ -5,9 +5,9 @@ mod search;
 mod state;
 mod ui;
 
-pub use _app::{app, App, AppMode};
-pub use item::{read_items, Item, ItemType, Kind};
-pub use run::run;
-pub use search::Search;
-pub use state::{State, StatefulList};
-pub use ui::ui;
+pub use self::_app::{app, App, AppMode};
+pub use self::item::{read_items, Item, ItemType, Kind};
+pub use self::run::run;
+pub use self::search::Search;
+pub use self::state::{State, StatefulList};
+pub use self::ui::ui;
