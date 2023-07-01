@@ -99,3 +99,16 @@ function ed() {
   fi
 }
 "#;
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_shell_get_template() {
+    assert_eq!(BASH, Shell::Bash.get_template());
+    assert_eq!(FISH, Shell::Fish.get_template());
+    assert_eq!(POWERSHELL, Shell::Powershell.get_template());
+    assert_eq!(ZSH, Shell::Zsh.get_template());
+  }
+}
