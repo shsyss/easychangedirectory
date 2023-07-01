@@ -142,6 +142,6 @@ You can check all environment variable values with `ed --env`.
   - If the value is `1`, the file contents can be viewed
   - Preview is possible without setting
 - `_ED_LOG`
-  - If the value is `1`, output log to `HOME/ed.log`
+  - If the value is `1`, output log to `HOME/.easychangedirectory/ed.log`
   - If an environment variable appropriate for `HOME` is not found, panic ensues.
   - Log output location will be printed upon completion
