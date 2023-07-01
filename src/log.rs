@@ -17,7 +17,7 @@ impl Log {
     let path = Self::output_path();
     let parent = path.parent().unwrap();
     if !parent.exists() {
-      std::fs::create_dir_all(parent).unwrap();
+      std::fs::create_dir(parent).unwrap();
     }
     CombinedLogger::init(vec![WriteLogger::new(LevelFilter::Info, Config::default(), File::create(path).unwrap())])
       .unwrap();
