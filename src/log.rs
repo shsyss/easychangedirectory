@@ -10,11 +10,16 @@ pub struct LogOutput;
 
 impl LogOutput {
   pub fn path() -> PathBuf {
-    home::home_dir().unwrap().join("ed.log")
+    home::home_dir().unwrap().join(format!(".{}", env!("CARGO_PKG_NAME"))).join("ed.log")
   }
 }
 
 pub fn init() {
+  let path = LogOutput::path();
+  let parent = path.parent().unwrap();
+  if !parent.exists() {
+    std::fs::create_dir_all(parent).unwrap();
+  }
   CombinedLogger::init(vec![WriteLogger::new(
     LevelFilter::Info,
     Config::default(),
