@@ -89,3 +89,19 @@ impl Item {
     }
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_item() {
+    let item = Item { item: ItemType::Path(PathBuf::from("test")), kind: Kind::Dir, index: None };
+    assert_eq!(item.is_dir(), true);
+    assert_eq!(item.is_file(), false);
+    assert_eq!(item.is_symlink(), false);
+    assert_eq!(item.can_read(), false);
+    assert_eq!(item.get_path(), Some(PathBuf::from("test")));
+    assert_eq!(item.generate_filename(), Some("test".to_string()));
+  }
+}
