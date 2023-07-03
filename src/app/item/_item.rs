@@ -102,6 +102,10 @@ mod tests {
     assert_eq!(item.is_symlink(), false);
     assert_eq!(item.can_read(), false);
     assert_eq!(item.get_path(), Some(PathBuf::from("test")));
-    assert_eq!(item.generate_filename(), Some("test".to_string()));
+    assert_eq!(item.generate_filename(), Some("test".into()));
+    let item = Item { item: ItemType::Content("test".into()), kind: Kind::Content, index: None };
+    assert_eq!(item.can_read(), false);
+    assert_eq!(item.is_symlink(), false);
+    assert_eq!(item.get_path(), None);
   }
 }
