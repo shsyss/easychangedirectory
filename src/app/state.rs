@@ -85,7 +85,8 @@ mod tests {
 
   #[test]
   fn test_with_items_option() {
-    let state = StatefulList::with_items_option(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], Some(1));
+    let state =
+      StatefulList::with_items_option(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], Some(1));
     assert_eq!(state.selected(), 1);
   }
 
