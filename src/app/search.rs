@@ -69,6 +69,8 @@ mod tests {
     assert_eq!(search.next(), 1);
     assert_eq!(search.next(), 2);
     assert_eq!(search.next(), 0);
+    search.state.select(None);
+    assert_eq!(search.next(), 0);
   }
 
   #[test]
@@ -77,6 +79,8 @@ mod tests {
     search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
     assert_eq!(search.previous(), 2);
     assert_eq!(search.previous(), 1);
+    assert_eq!(search.previous(), 0);
+    search.state.select(None);
     assert_eq!(search.previous(), 0);
   }
 
