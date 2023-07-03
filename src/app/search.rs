@@ -17,12 +17,6 @@ impl Search {
   }
 }
 
-impl Default for Search {
-  fn default() -> Self {
-    Self::new()
-  }
-}
-
 impl State for Search {
   fn next(&mut self) -> usize {
     let i = match self.state.selected() {
