@@ -71,3 +71,36 @@ impl State for StatefulList {
     self.state.select(Some(index));
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::app::{ItemType, Kind};
+
+  impl Item {
+    fn new_in_state_tests(s: &str) -> Self {
+      Self { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: None }
+    }
+  }
+
+  #[test]
+  fn test_next() {
+    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    assert_eq!(state.next(), 1);
+    assert_eq!(state.next(), 0);
+  }
+
+  #[test]
+  fn test_previous() {
+    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    assert_eq!(state.previous(), 1);
+    assert_eq!(state.previous(), 0);
+  }
+
+  #[test]
+  fn test_select() {
+    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    state.select(1);
+    assert_eq!(state.selected(), 1);
+  }
+}

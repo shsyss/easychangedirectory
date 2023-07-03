@@ -56,3 +56,41 @@ impl State for Search {
     self.state.select(Some(index));
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::app::{ItemType, Kind};
+
+  impl Item {
+    fn new_in_search_tests(s: &str) -> Self {
+      Self { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: None }
+    }
+  }
+
+  #[test]
+  fn test_next() {
+    let mut search = Search::new();
+    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    assert_eq!(search.next(), 1);
+    assert_eq!(search.next(), 2);
+    assert_eq!(search.next(), 0);
+  }
+
+  #[test]
+  fn test_previous() {
+    let mut search = Search::new();
+    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    assert_eq!(search.previous(), 2);
+    assert_eq!(search.previous(), 1);
+    assert_eq!(search.previous(), 0);
+  }
+
+  #[test]
+  fn test_select() {
+    let mut search = Search::new();
+    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    search.select(1);
+    assert_eq!(search.state.selected(), Some(1));
+  }
+}
