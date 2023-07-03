@@ -84,9 +84,23 @@ mod tests {
   }
 
   #[test]
+  fn test_with_items_option() {
+    let state = StatefulList::with_items_option(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], Some(1));
+    assert_eq!(state.selected(), 1);
+  }
+
+  #[test]
+  fn test_with_items_select() {
+    let state = StatefulList::with_items_select(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], 1);
+    assert_eq!(state.selected(), 1);
+  }
+
+  #[test]
   fn test_next() {
     let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
     assert_eq!(state.next(), 1);
+    assert_eq!(state.next(), 0);
+    state.unselect();
     assert_eq!(state.next(), 0);
   }
 
@@ -94,6 +108,8 @@ mod tests {
   fn test_previous() {
     let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
     assert_eq!(state.previous(), 1);
+    assert_eq!(state.previous(), 0);
+    state.unselect();
     assert_eq!(state.previous(), 0);
   }
 
