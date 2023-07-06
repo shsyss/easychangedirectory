@@ -9,6 +9,7 @@ pub struct Search {
   pub state: ListState,
 }
 
+#[allow(clippy::new_without_default)]
 impl Search {
   pub fn new() -> Self {
     let mut state = ListState::default();
