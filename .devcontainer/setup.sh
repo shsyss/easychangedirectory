@@ -25,3 +25,5 @@ echo 'eval "$(easychangedirectory --init bash)"' >> ~/.bashrc
 # echo 'Invoke-Expression (& { (easychangedirectory --init powershell | Out-String) } )' >> ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 # echo 'easychangedirectory --init fish | source' >> ~/.config/fish/config.fish
 echo 'eval "$(easychangedirectory --init zsh)"' >> ~/.zshrc
+
+cargo install rust-script

@@ -1,0 +1,73 @@
+#!/usr/bin/env rust-script
+//! ```cargo
+//! [dependencies]
+//! home = "0.5.5"
+//! ```
+
+use std::{
+  fs,
+  process::{Command, Stdio},
+};
+
+fn main() {
+  let os = judge_os();
+  println!("os: {os:?}");
+  let shell = judge_shell();
+  println!("shell: {shell:?}");
+
+  match Command::new("cargo").arg("b").status() {
+    Ok(_) => println!("cargo build success"),
+    Err(e) => {
+      println!("cargo build failed {e:?}");
+      return;
+    }
+  }
+
+  let home = home::home_dir().unwrap();
+
+  let source = match os {
+    Os::Linux => "./target/debug/easychangedirectory",
+    Os::Windows => "./target/debug/easychangedirectory.exe",
+  };
+
+  let destination = match os {
+    Os::Linux => home.join(".cargo/bin/easychangedirectory"),
+    Os::Windows => home.join(".cargo/bin/easychangedirectory.exe"),
+  };
+
+  match fs::copy(source, destination) {
+    Ok(_) => println!("copy success"),
+    Err(e) => {
+      println!("copy failed: {e:?}");
+      return;
+    }
+  }
+}
+
+#[allow(unused)]
+#[derive(Debug)]
+enum Shell {
+  Bash,
+  PowerShell,
+}
+
+fn judge_shell() -> Shell {
+  match Command::new("echo").arg("").stdout(Stdio::null()).status() {
+    Ok(_) => return Shell::Bash,
+    Err(_) => return Shell::PowerShell,
+  };
+}
+
+#[allow(unused)]
+#[derive(Debug)]
+enum Os {
+  Linux,
+  Windows,
+}
+
+fn judge_os() -> Os {
+  #[cfg(target_os = "linux")]
+  return Os::Linux;
+  #[cfg(target_os = "windows")]
+  return Os::Windows;
+}
