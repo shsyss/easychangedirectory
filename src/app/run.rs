@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
 use tui::{backend::Backend, Terminal};
 
 use crate::{action::Action, Log};
@@ -13,7 +13,10 @@ pub fn run<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> anyhow::Resu
   }
   loop {
     terminal.draw(|f| super::ui(f, &mut app))?;
-    if let Event::Key(key) = event::read()? {
+    if let Ok(Event::Key(key)) = event::read() {
+      if key.kind == KeyEventKind::Release {
+        continue;
+      }
       if app.config.is_log() {
         Log::write(&app, &key);
       }
