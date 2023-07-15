@@ -11,7 +11,7 @@ categories = ["command-line-utilities", "filesystem"]
 keywords = ["cli","terminal","cd"]
 
 [dependencies]
-anyhow = "1.0.71"
+anyhow = "1.0.72"
 clap = { version = "4.3.12", features = ["cargo", "derive"] }
 crossterm = "0.26.1"
 envy = "0.4.2"
