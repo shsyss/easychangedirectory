@@ -12,7 +12,7 @@ keywords = ["cli","terminal","cd"]
 
 [dependencies]
 anyhow = "1.0.72"
-clap = { version = "4.3.16", features = ["cargo", "derive"] }
+clap = { version = "4.3.17", features = ["cargo", "derive"] }
 crossterm = "0.26.1"
 envy = "0.4.2"
 exitcode = "1.1.2"
