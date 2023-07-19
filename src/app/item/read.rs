@@ -1,20 +1,22 @@
 use std::fs;
 use std::path::Path;
 
-use crate::app::{Item, ItemType, Kind};
+use crate::app::{Item, ItemInfo};
 
-pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
+use super::_item::ItemPath;
+
+pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<ItemInfo>> {
   let mut items = if let Ok(read_dir) = fs::read_dir(&path) {
     read_dir
       .filter_map(|entry| {
         let entry = entry.ok()?;
         let filepath = entry.path();
-        let kind = if filepath.is_dir() { Kind::Dir } else { Kind::File };
-        Some(Item { item: ItemType::Path(filepath), kind, index: Some(0) })
+        let path = if filepath.is_dir() { ItemPath::Dir(filepath) } else { ItemPath::File(filepath) };
+        Some(ItemInfo { item: Item::Path(path), index: Some(0) })
       })
-      .collect::<Vec<Item>>()
+      .collect::<Vec<_>>()
   } else {
-    return Ok(vec![Item::default()]);
+    return Ok(vec![ItemInfo::default()]);
   };
 
   items.sort_by_key(|item| item.get_path());

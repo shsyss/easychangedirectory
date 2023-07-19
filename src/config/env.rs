@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::app::{Item, Kind};
+use crate::app::{Item, ItemInfo};
 
 #[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Config {
@@ -19,8 +19,8 @@ impl Config {
   pub fn is_pwd(&self) -> bool {
     self._ed_pwd.eq(&Some(1))
   }
-  pub fn is_show_index(&self, items: &[Item]) -> bool {
-    self._ed_show_index.eq(&Some(1)) && !items.is_empty() && !items[0].kind.eq(&Kind::Search)
+  pub fn is_show_index(&self, items: &[ItemInfo]) -> bool {
+    self._ed_show_index.eq(&Some(1)) && !items.is_empty() && !matches!(items[0].item, Item::Search(_))
   }
   pub fn is_view_file_contents(&self) -> bool {
     self._ed_view_file_contents.eq(&Some(1))
@@ -58,7 +58,7 @@ mod tests {
       _ed_log: Some(1),
     };
     assert!(config.is_pwd());
-    assert!(config.is_show_index(&[Item::default()]));
+    assert!(config.is_show_index(&[ItemInfo::default()]));
     assert!(config.is_view_file_contents());
     assert!(config.is_set_bg());
     assert!(config.is_log());

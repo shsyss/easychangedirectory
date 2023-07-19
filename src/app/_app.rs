@@ -12,7 +12,7 @@ use crossterm::{
 };
 use tui::{backend::CrosstermBackend, Terminal};
 
-use super::{Item, ItemType, Search, State, StatefulList};
+use super::{Item, ItemInfo, Search, State, StatefulList};
 use crate::{action::Action, Config};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub struct App {
 
 const JUMP: usize = 4;
 impl App {
-  fn generate_index<P: AsRef<Path>>(items: &[Item], path: P) -> usize {
+  fn generate_index<P: AsRef<Path>>(items: &[ItemInfo], path: P) -> usize {
     let generate_item = items.iter().enumerate().find(|(_, item)| item.get_path().unwrap() == path.as_ref());
     if let Some((i, _)) = generate_item {
       i
@@ -53,25 +53,25 @@ impl App {
   fn get_child_index(&self) -> usize {
     self.child_items.state.selected().unwrap_or(0)
   }
-  pub fn get_child_items(&self) -> Vec<Item> {
+  pub fn get_child_items(&self) -> Vec<ItemInfo> {
     self.child_items.items.clone()
   }
   fn get_current_index(&self) -> usize {
     self.items.state.selected().unwrap_or(0)
   }
-  pub fn get_items(&self) -> Vec<Item> {
+  pub fn get_items(&self) -> Vec<ItemInfo> {
     self.items.items.clone()
   }
-  pub fn get_parent_items(&self) -> Vec<Item> {
+  pub fn get_parent_items(&self) -> Vec<ItemInfo> {
     self.parent_items.items.clone()
   }
   fn get_search_index(&self) -> usize {
     self.search.state.selected().unwrap_or(0)
   }
-  fn get_search_list(&self) -> Vec<Item> {
+  fn get_search_list(&self) -> Vec<ItemInfo> {
     self.search.list.clone()
   }
-  fn get_selected_item(&self) -> Item {
+  fn get_selected_item(&self) -> ItemInfo {
     match self.judge_mode() {
       AppMode::Normal => self.items.items[self.items.selected()].clone(),
       AppMode::Search => self.search.list[self.search.state.selected().unwrap()].clone(),
@@ -98,8 +98,8 @@ impl App {
       AppMode::Search
     }
   }
-  pub fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Item>> {
-    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![Item::default()] } else { super::read_items(path)? })
+  pub fn make_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<ItemInfo>> {
+    Ok(if path.as_ref().to_string_lossy().is_empty() { vec![ItemInfo::default()] } else { super::read_items(path)? })
   }
   pub fn move_child(&mut self) -> anyhow::Result<()> {
     if self.is_empty_in_working_block() {
@@ -122,7 +122,7 @@ impl App {
     let (new_child_items, new_i) = if let Some(items) = self.get_child_items().get(selected_ci) {
       (items.generate_child_items()?, self.get_child_index())
     } else {
-      (self.get_child_items().get(0).unwrap_or(&Item::default()).generate_child_items()?, 0)
+      (self.get_child_items().get(0).unwrap_or(&ItemInfo::default()).generate_child_items()?, 0)
     };
 
     let new_pi = match self.judge_mode() {
@@ -147,7 +147,7 @@ impl App {
 
     Ok(())
   }
-  pub fn move_content(&mut self, selected_item: Item) -> anyhow::Result<()> {
+  pub fn move_content(&mut self, selected_item: ItemInfo) -> anyhow::Result<()> {
     let new_pi = match self.judge_mode() {
       AppMode::Normal => Some(self.get_current_index()),
       AppMode::Search => self.get_search_list()[self.get_search_index()].index,
@@ -161,7 +161,7 @@ impl App {
       &mut self.parent_items,
       mem::replace(
         &mut self.items,
-        mem::replace(&mut self.child_items, StatefulList::with_items(vec![Item::default()])),
+        mem::replace(&mut self.child_items, StatefulList::with_items(vec![ItemInfo::default()])),
       ),
     );
     self.items.state.select(Some(0));
@@ -335,13 +335,13 @@ impl App {
 
     Ok(app)
   }
-  pub fn search_sort_to_vec(&self) -> Vec<Item> {
+  pub fn search_sort_to_vec(&self) -> Vec<ItemInfo> {
     self
       .items
       .items
       .iter()
-      .filter_map(|item| -> Option<Item> {
-        if let ItemType::Content(s) = &item.item {
+      .filter_map(|item| -> Option<ItemInfo> {
+        if let Item::Content(s) = &item.item {
           if s.contains(&self.search.text) {
             Some(item.clone())
           } else {
@@ -369,7 +369,7 @@ impl App {
     };
 
     self.child_items =
-      StatefulList::with_items_option(items.get(index).unwrap_or(&Item::default()).generate_child_items()?, ci);
+      StatefulList::with_items_option(items.get(index).unwrap_or(&ItemInfo::default()).generate_child_items()?, ci);
     if items[index].is_file() {
       self.child_items.unselect();
     }

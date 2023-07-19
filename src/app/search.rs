@@ -1,11 +1,11 @@
 use tui::widgets::ListState;
 
-use super::{Item, State};
+use super::{ItemInfo, State};
 
 #[derive(Debug)]
 pub struct Search {
   pub text: String,
-  pub list: Vec<Item>,
+  pub list: Vec<ItemInfo>,
   pub state: ListState,
 }
 
@@ -55,18 +55,19 @@ impl State for Search {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::app::{ItemType, Kind};
+  use crate::app::Item;
 
-  impl Item {
+  impl ItemInfo {
     fn new_in_search_tests(s: &str) -> Self {
-      Self { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: None }
+      Self { item: Item::Content(s.into()), index: None }
     }
   }
 
   #[test]
   fn test_next() {
     let mut search = Search::new();
-    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    search.list =
+      vec![ItemInfo::new_in_search_tests("a"), ItemInfo::new_in_search_tests("b"), ItemInfo::new_in_search_tests("c")];
     assert_eq!(search.next(), 1);
     assert_eq!(search.next(), 2);
     assert_eq!(search.next(), 0);
@@ -77,7 +78,8 @@ mod tests {
   #[test]
   fn test_previous() {
     let mut search = Search::new();
-    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    search.list =
+      vec![ItemInfo::new_in_search_tests("a"), ItemInfo::new_in_search_tests("b"), ItemInfo::new_in_search_tests("c")];
     assert_eq!(search.previous(), 2);
     assert_eq!(search.previous(), 1);
     assert_eq!(search.previous(), 0);
@@ -88,7 +90,8 @@ mod tests {
   #[test]
   fn test_select() {
     let mut search = Search::new();
-    search.list = vec![Item::new_in_search_tests("a"), Item::new_in_search_tests("b"), Item::new_in_search_tests("c")];
+    search.list =
+      vec![ItemInfo::new_in_search_tests("a"), ItemInfo::new_in_search_tests("b"), ItemInfo::new_in_search_tests("c")];
     search.select(1);
     assert_eq!(search.state.selected(), Some(1));
   }

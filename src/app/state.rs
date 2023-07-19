@@ -1,6 +1,6 @@
 use tui::widgets::ListState;
 
-use super::Item;
+use super::ItemInfo;
 
 pub trait State {
   fn next(&mut self) -> usize;
@@ -11,7 +11,7 @@ pub trait State {
 #[derive(Debug)]
 pub struct StatefulList {
   pub state: ListState,
-  pub items: Vec<Item>,
+  pub items: Vec<ItemInfo>,
 }
 
 impl StatefulList {
@@ -21,17 +21,17 @@ impl StatefulList {
   pub fn unselect(&mut self) {
     self.state.select(None);
   }
-  pub fn with_items(items: Vec<Item>) -> StatefulList {
+  pub fn with_items(items: Vec<ItemInfo>) -> StatefulList {
     let mut state = ListState::default();
     state.select(Some(0));
     StatefulList { state, items }
   }
-  pub fn with_items_option(items: Vec<Item>, index: Option<usize>) -> StatefulList {
+  pub fn with_items_option(items: Vec<ItemInfo>, index: Option<usize>) -> StatefulList {
     let mut state = ListState::default();
     state.select(index);
     StatefulList { state, items }
   }
-  pub fn with_items_select(items: Vec<Item>, index: usize) -> StatefulList {
+  pub fn with_items_select(items: Vec<ItemInfo>, index: usize) -> StatefulList {
     let mut state = ListState::default();
     state.select(Some(index));
     StatefulList { state, items }
@@ -75,30 +75,34 @@ impl State for StatefulList {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::app::{ItemType, Kind};
+  use crate::app::Item;
 
-  impl Item {
+  impl ItemInfo {
     fn new_in_state_tests(s: &str) -> Self {
-      Self { item: ItemType::Content(s.to_string()), kind: Kind::Content, index: None }
+      Self { item: Item::Content(s.to_string()), index: None }
     }
   }
 
   #[test]
   fn test_with_items_option() {
-    let state =
-      StatefulList::with_items_option(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], Some(1));
+    let state = StatefulList::with_items_option(
+      vec![ItemInfo::new_in_state_tests("a"), ItemInfo::new_in_state_tests("b")],
+      Some(1),
+    );
     assert_eq!(state.selected(), 1);
   }
 
   #[test]
   fn test_with_items_select() {
-    let state = StatefulList::with_items_select(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")], 1);
+    let state =
+      StatefulList::with_items_select(vec![ItemInfo::new_in_state_tests("a"), ItemInfo::new_in_state_tests("b")], 1);
     assert_eq!(state.selected(), 1);
   }
 
   #[test]
   fn test_next() {
-    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    let mut state =
+      StatefulList::with_items(vec![ItemInfo::new_in_state_tests("a"), ItemInfo::new_in_state_tests("b")]);
     assert_eq!(state.next(), 1);
     assert_eq!(state.next(), 0);
     state.unselect();
@@ -107,7 +111,8 @@ mod tests {
 
   #[test]
   fn test_previous() {
-    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    let mut state =
+      StatefulList::with_items(vec![ItemInfo::new_in_state_tests("a"), ItemInfo::new_in_state_tests("b")]);
     assert_eq!(state.previous(), 1);
     assert_eq!(state.previous(), 0);
     state.unselect();
@@ -116,7 +121,8 @@ mod tests {
 
   #[test]
   fn test_select() {
-    let mut state = StatefulList::with_items(vec![Item::new_in_state_tests("a"), Item::new_in_state_tests("b")]);
+    let mut state =
+      StatefulList::with_items(vec![ItemInfo::new_in_state_tests("a"), ItemInfo::new_in_state_tests("b")]);
     state.select(1);
     assert_eq!(state.selected(), 1);
   }

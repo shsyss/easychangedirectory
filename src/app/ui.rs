@@ -8,8 +8,20 @@ use tui::{
   Frame,
 };
 
-use super::{App, AppMode, Item, ItemType, Kind};
+use super::{App, AppMode, Item, ItemInfo, ItemPath};
 use crate::Config;
+
+/* Color
+- background: (10, 10, 10)
+- border: gray
+- title: yellow
+- dir: blue
+- search: green
+- file, content, none: gray
+- symlink:
+- current-file-highlight: white
+- current-dir-highlight: magenta
+*/
 
 struct MyStyle;
 
@@ -47,7 +59,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   );
 
   // search
-  let item = Item { item: ItemType::SearchText(app.search.text.clone()), kind: Kind::Search, index: Some(0) };
+  let item = ItemInfo { item: Item::Search(app.search.text.clone()), index: Some(0) };
   let search_items = vec![item];
   let search_items = set_items(&search_items, app.config);
   let search_text = List::new(search_items).highlight_symbol("> ");
@@ -98,19 +110,20 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
   f.render_stateful_widget(child_items, bottom_chunks[3], &mut app.child_items.state);
 }
 
-fn set_items(items: &[Item], config: Config) -> Vec<ListItem> {
+fn set_items(items: &[ItemInfo], config: Config) -> Vec<ListItem> {
   items
     .iter()
     .filter_map(|item| {
-      let style = match item.kind {
-        Kind::Content | Kind::None | Kind::File => Style::default().fg(Color::Gray),
-        Kind::Dir => Style::default().fg(Color::Blue),
-        Kind::Search => Style::default().fg(Color::Green),
+      let style = match item.item {
+        Item::Content(_) | Item::None | Item::Path(ItemPath::File(_)) => Style::default().fg(Color::Gray),
+        Item::Path(ItemPath::Dir(_)) => Style::default().fg(Color::Blue),
+        Item::Search(_) => Style::default().fg(Color::Green),
+        Item::Path(ItemPath::Symlink(_)) => todo!(),
       };
 
-      let mut text = if let ItemType::SearchText(text) = &item.item {
+      let mut text = if let Item::Search(text) = &item.item {
         text.into()
-      } else if let ItemType::Content(text) = &item.item {
+      } else if let Item::Content(text) = &item.item {
         text.into()
       } else {
         item.generate_filename()?
