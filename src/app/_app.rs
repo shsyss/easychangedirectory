@@ -219,7 +219,13 @@ impl App {
       AppMode::Normal => (self.items.items.len() - 1, self.get_current_index()),
       AppMode::Search => (self.search.list.len() - 1, self.get_search_index()),
     };
-    let new_i = if old_i > last_i - JUMP { last_i } else { old_i + JUMP };
+    let new_i = if <isize as std::convert::TryInto<usize>>::try_into(last_i as isize - JUMP as isize).is_ok()
+      && old_i.le(&(last_i - JUMP))
+    {
+      old_i + JUMP
+    } else {
+      last_i
+    };
     match self.judge_mode() {
       AppMode::Normal => self.items.select(new_i),
       AppMode::Search => self.search.select(new_i),
