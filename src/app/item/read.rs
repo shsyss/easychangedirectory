@@ -11,7 +11,13 @@ pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<ItemInfo>> {
       .filter_map(|entry| {
         let entry = entry.ok()?;
         let filepath = entry.path();
-        let path = if filepath.is_dir() { ItemPath::Dir(filepath) } else { ItemPath::File(filepath) };
+        let path = if filepath.is_file() {
+          ItemPath::File(filepath)
+        } else if filepath.is_symlink() {
+          ItemPath::Symlink(filepath)
+        } else {
+          ItemPath::Dir(filepath)
+        };
         Some(ItemInfo { item: Item::Path(path), index: Some(0) })
       })
       .collect::<Vec<_>>()

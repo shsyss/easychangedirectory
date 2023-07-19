@@ -12,15 +12,15 @@ use super::{App, AppMode, Item, ItemInfo, ItemPath};
 use crate::Config;
 
 /* Color
-- background: (10, 10, 10)
+- background: rgb(10, 10, 10)
 - border: gray
 - title: yellow
 - dir: blue
 - search: green
 - file, content, none: gray
-- symlink:
-- current-file-highlight: white
-- current-dir-highlight: magenta
+- symlink: cyan
+- current-highlight: bold, underlined, bright
+- parent-highlight: magenta
 */
 
 struct MyStyle;
@@ -118,7 +118,7 @@ fn set_items(items: &[ItemInfo], config: Config) -> Vec<ListItem> {
         Item::Content(_) | Item::None | Item::Path(ItemPath::File(_)) => Style::default().fg(Color::Gray),
         Item::Path(ItemPath::Dir(_)) => Style::default().fg(Color::Blue),
         Item::Search(_) => Style::default().fg(Color::Green),
-        Item::Path(ItemPath::Symlink(_)) => todo!(),
+        Item::Path(ItemPath::Symlink(_)) => Style::default().fg(Color::Cyan),
       };
 
       let mut text = if let Item::Search(text) = &item.item {
