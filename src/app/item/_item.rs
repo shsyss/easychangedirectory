@@ -46,7 +46,23 @@ impl Item {
 pub enum ItemPath {
   Dir(PathBuf),
   File(PathBuf),
-  Symlink(PathBuf),
+  Symlink(ItemSymlink),
+  Unknown(PathBuf),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ItemSymlink {
+  Dir(PathBuf),
+  File(PathBuf),
+}
+
+impl ItemSymlink {
+  fn get_path(&self) -> &PathBuf {
+    match self {
+      ItemSymlink::Dir(path) => path,
+      ItemSymlink::File(path) => path,
+    }
+  }
 }
 
 impl ItemPath {
@@ -54,7 +70,8 @@ impl ItemPath {
     match self {
       ItemPath::Dir(path) => path,
       ItemPath::File(path) => path,
-      ItemPath::Symlink(path) => path,
+      ItemPath::Symlink(symlink) => symlink.get_path(),
+      ItemPath::Unknown(path) => path,
     }
     .into()
   }
@@ -64,18 +81,19 @@ impl ItemPath {
       match self {
         ItemPath::Dir(path) => path,
         ItemPath::File(path) => path,
-        ItemPath::Symlink(path) => path,
+        ItemPath::Symlink(symlink) => symlink.get_path(),
+        ItemPath::Unknown(path) => path,
       }
       .read_link()?,
     )
   }
 
   fn is_dir(&self) -> bool {
-    matches!(self, ItemPath::Dir(_) | ItemPath::Symlink(_))
+    matches!(self, ItemPath::Dir(_) | ItemPath::Symlink(ItemSymlink::Dir(_)))
   }
 
   fn is_file(&self) -> bool {
-    matches!(self, ItemPath::File(_))
+    matches!(self, ItemPath::File(_) | ItemPath::Symlink(ItemSymlink::File(_)))
   }
 }
 

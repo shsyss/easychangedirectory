@@ -8,7 +8,7 @@ use tui::{
   Frame,
 };
 
-use super::{App, AppMode, Item, ItemInfo, ItemPath};
+use super::{item::ItemSymlink, App, AppMode, Item, ItemInfo, ItemPath};
 use crate::Config;
 
 /* Color
@@ -118,7 +118,9 @@ fn set_items(items: &[ItemInfo], config: Config) -> Vec<ListItem> {
         Item::Content(_) | Item::None | Item::Path(ItemPath::File(_)) => Style::default().fg(Color::Gray),
         Item::Path(ItemPath::Dir(_)) => Style::default().fg(Color::Blue),
         Item::Search(_) => Style::default().fg(Color::Green),
-        Item::Path(ItemPath::Symlink(_)) => Style::default().fg(Color::Cyan),
+        Item::Path(ItemPath::Symlink(ItemSymlink::Dir(_))) => Style::default().fg(Color::Cyan),
+        Item::Path(ItemPath::Symlink(ItemSymlink::File(_))) => Style::default().fg(Color::LightCyan),
+        Item::Path(ItemPath::Unknown(_)) => Style::default().fg(Color::Red),
       };
 
       let mut text = if let Item::Search(text) = &item.item {

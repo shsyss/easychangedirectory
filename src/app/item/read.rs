@@ -3,7 +3,7 @@ use std::path::Path;
 
 use crate::app::{Item, ItemInfo};
 
-use super::_item::ItemPath;
+use super::_item::{ItemPath, ItemSymlink};
 
 pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<ItemInfo>> {
   let mut items = if let Ok(read_dir) = fs::read_dir(&path) {
@@ -11,12 +11,16 @@ pub fn read_items<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<ItemInfo>> {
       .filter_map(|entry| {
         let entry = entry.ok()?;
         let filepath = entry.path();
-        let path = if filepath.is_file() {
+        let path = if filepath.is_file() && filepath.is_symlink() {
+          ItemPath::Symlink(ItemSymlink::File(filepath))
+        } else if filepath.is_dir() && filepath.is_symlink() {
+          ItemPath::Symlink(ItemSymlink::Dir(filepath))
+        } else if filepath.is_file() {
           ItemPath::File(filepath)
-        } else if filepath.is_symlink() {
-          ItemPath::Symlink(filepath)
-        } else {
+        } else if filepath.is_dir() {
           ItemPath::Dir(filepath)
+        } else {
+          ItemPath::Unknown(filepath)
         };
         Some(ItemInfo { item: Item::Path(path), index: Some(0) })
       })
