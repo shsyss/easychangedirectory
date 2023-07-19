@@ -71,7 +71,7 @@ impl ItemPath {
   }
 
   fn is_dir(&self) -> bool {
-    matches!(self, ItemPath::Dir(_))
+    matches!(self, ItemPath::Dir(_) | ItemPath::Symlink(_))
   }
 
   fn is_file(&self) -> bool {
