@@ -85,6 +85,9 @@ impl App {
     let i = self.parent_items.selected();
     self.get_parent_items()[i].is_file()
   }
+  fn is_child_empty(&self) -> bool {
+    self.child_items.items.is_empty()
+  }
   fn is_empty_in_working_block(&self) -> bool {
     match self.judge_mode() {
       AppMode::Normal => self.items.items.is_empty(),
@@ -102,7 +105,7 @@ impl App {
     Ok(if path.as_ref().to_string_lossy().is_empty() { vec![ItemInfo::default()] } else { super::read_items(path)? })
   }
   pub fn move_child(&mut self) -> anyhow::Result<()> {
-    if self.is_empty_in_working_block() {
+    if self.is_empty_in_working_block() || self.is_child_empty() {
       return Ok(());
     }
 
