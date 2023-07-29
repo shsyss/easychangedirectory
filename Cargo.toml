@@ -19,7 +19,7 @@ exitcode = "1.1.2"
 handlebars = "4.3.7"
 home = "0.5.5"
 log = "0.4.19"
-serde = { version = "1.0.177", features = ["derive"] }
+serde = { version = "1.0.178", features = ["derive"] }
 serde_json = "1.0.104"
 simplelog = "0.12.1"
 tui = "0.19.0"
