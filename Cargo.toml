@@ -17,7 +17,7 @@ crossterm = "0.27.0"
 envy = "0.4.2"
 exitcode = "1.1.2"
 handlebars = "4.5.0"
-home = "0.5.5"
+home = "0.5.9"
 log = "0.4.20"
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
